@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Игра Сопоставление</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #fff0f5;
+      text-align: center;
+      padding: 10px;
+    }
+
+    h1 {
+      color: #a84c6d;
+      font-size: 1.8em;
+    }
+
+    #theme-buttons {
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .theme-button {
+      background-color: #f8c4d9;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1em;
+    }
+
+    .theme-button.active {
+      background-color: #a84c6d;
+      color: white;
+    }
+
+    #game-board {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      justify-content: center;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    .card {
+      width: 100%;
+      aspect-ratio: 3/4;
+      perspective: 1000px;
+      cursor: pointer;
+    }
+
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.5s;
+      transform-style: preserve-3d;
+    }
+
+    .card.flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-front, .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border: 2px solid #d8a1b4;
+      border-radius: 10px;
+      backface-visibility: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .card-front {
+      background: #fef6f9;
+    }
+
+    .card-back {
+      background: #d8a1b4;
+      transform: rotateY(180deg);
+    }
+
+    .card-back img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+
+    #message {
+      margin-top: 20px;
+      font-size: 1.2em;
+      color: #a84c6d;
+    }
+
+    #restart-button {
+      display: none;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #a84c6d;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1em;
+      cursor: pointer;
+    }
+
+    @media (max-width: 600px) {
+      #game-board {
+        max-width: 320px;
+        margin: 0 auto;
+        gap: 8px;
+        grid-template-columns: repeat(4, 1fr);
+      }
+      .card-front, .card-back {
+        font-size: 1.8em;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Игра Сопоставление</h1>
+
+  <div id="theme-buttons">
+    <button class="theme-button" onclick="selectTheme('animals')">Животные</button>
+    <button class="theme-button" onclick="selectTheme('vegetables')">Овощи</button>
+    <button class="theme-button" onclick="selectTheme('transport')">Транспорт</button>
+  </div>
+
+  <div id="game-board"></div>
+  <div id="message"></div>
+  <button id="restart-button" onclick="startGame()">Новая игра</button>
+
+  <script>
+    const animals = [
+      { word: 'кот', image: 'images/koshka.jpg', audio: 'audio/koshka.mp3' },
+      { word: 'собака', image: 'images/sobaka.jpg', audio: 'audio/sobaka.mp3' },
+      { word: 'тигр', image: 'images/tigr.jpg', audio: 'audio/tigr.mp3' },
+      { word: 'обезьяна', image: 'images/obezyano.jpg', audio: 'audio/obezyano.mp3' },
+      { word: 'лиса', image: 'images/lisa.jpg', audio: 'audio/lisa.mp3' },
+      { word: 'медведь', image: 'images/medved.jpg', audio: 'audio/medved.mp3' }
+    ];
+
+    const vegetables = [
+      { word: 'морковь', image: 'images/mork.jpg', audio: 'audio/mork.mp3' },
+      { word: 'баклажан', image: 'images/bak.jpg', audio: 'audio/bak.mp3' },
+      { word: 'перец', image: 'images/per.jpg', audio: 'audio/per.mp3' },
+      { word: 'кукуруза', image: 'images/kuku.jpg', audio: 'audio/kuku.mp3' },
+      { word: 'капуста', image: 'images/kap.jpg', audio: 'audio/kap.mp3' },
+      { word: 'огурец', image: 'images/ogurec.jpg', audio: 'audio/ogurec.mp3' }
+    ];
+
+    const transport = [
+      { word: 'поезд', image: 'images/poe.jpg', audio: 'audio/poe.mp3' },
+      { word: 'машина', image: 'images/car.jpg', audio: 'audio/car.mp3' },
+      { word: 'самолёт', image: 'images/plane.jpg', audio: 'audio/plane.mp3' },
+      { word: 'пароход', image: 'images/ship.jpg', audio: 'audio/ship.mp3' },
+      { word: 'мотоцикл', image: 'images/moto.jpg', audio: 'audio/moto.mp3' },
+      { word: 'трамвай', image: 'images/tram.jpg', audio: 'audio/tram.mp3' }
+    ];
+
+    let currentTheme = [];
+    let cards = [];
+    let firstCard = null;
+    let secondCard = null;
+    let lockBoard = false;
+    let matchedPairs = 0;
+
+    const board = document.getElementById('game-board');
+    const message = document.getElementById('message');
+    const restartBtn = document.getElementById('restart-button');
+    const buttons = document.querySelectorAll('.theme-button');
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function selectTheme(themeName) {
+      buttons.forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+
+      switch (themeName) {
+        case 'animals': currentTheme = animals; break;
+        case 'vegetables': currentTheme = vegetables; break;
+        case 'transport': currentTheme = transport; break;
+      }
+      startGame();
+    }
+
+    function startGame() {
+      message.textContent = '';
+      restartBtn.style.display = 'none';
+      buttons.forEach(btn => btn.style.display = 'inline-block');
+      board.innerHTML = '';
+      firstCard = null;
+      secondCard = null;
+      lockBoard = false;
+      matchedPairs = 0;
+
+      let chosen = shuffle(currentTheme).slice(0, 6);
+      cards = shuffle([...chosen, ...chosen]);
+
+      cards.forEach((card, index) => {
+        const cardEl = document.createElement('div');
+        cardEl.classList.add('card');
+        cardEl.dataset.id = index;
+        cardEl.dataset.word = card.word;
+        cardEl.dataset.audio = card.audio;
+
+        const inner = document.createElement('div');
+        inner.classList.add('card-inner');
+
+        const front = document.createElement('div');
+        front.classList.add('card-front');
+
+        const back = document.createElement('div');
+        back.classList.add('card-back');
+
+        const img = document.createElement('img');
+        img.src = card.image;
+        img.alt = card.word;
+        back.appendChild(img);
+
+        inner.appendChild(front);
+        inner.appendChild(back);
+        cardEl.appendChild(inner);
+        board.appendChild(cardEl);
+
+        cardEl.addEventListener('click', () => handleFlip(cardEl));
+      });
+    }
+
+    function handleFlip(card) {
+      if (lockBoard || card.classList.contains('flipped') || card === firstCard) return;
+
+      card.classList.add('flipped');
+      if (card.dataset.audio) {
+        new Audio(card.dataset.audio).play();
+      }
+
+      if (!firstCard) {
+        firstCard = card;
+        return;
+      }
+
+      secondCard = card;
+      lockBoard = true;
+
+      setTimeout(() => {
+        if (firstCard.dataset.word === secondCard.dataset.word) {
+          matchedPairs++;
+          if (matchedPairs === 6) {
+            message.textContent = 'Ура! Все пары найдены!';
+            restartBtn.style.display = 'inline-block';
+            buttons.forEach(btn => btn.style.display = 'inline-block');
+          } else {
+            message.textContent = 'Молодец!';
+          }
+          firstCard = null;
+          secondCard = null;
+          lockBoard = false;
+        } else {
+          firstCard.classList.remove('flipped');
+          secondCard.classList.remove('flipped');
+          message.textContent = 'Попробуй ещё!';
+          firstCard = null;
+          secondCard = null;
+          lockBoard = false;
+        }
+      }, 1000);
+    }
+
+    selectTheme('animals');
+  </script>
+</body>
+</html>
