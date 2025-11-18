@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Игра: Подбери Животное (Устойчивая версия)</title>
+    <title>Игра: Подбери Животное (Для Малышей)</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Базовые стили */
+        /* Общие стили */
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f0f4f8; 
+            font-family: 'Comic Sans MS', 'Inter', sans-serif; 
+            background-color: #f7f7f7; 
             display: flex;
             justify-content: center;
             align-items: flex-start;
@@ -22,162 +22,254 @@
 
         .game-container {
             width: 100%;
-            max-width: 600px;
+            max-width: 900px; /* Увеличил максимальную ширину для альбомной ориентации */
             background-color: #ffffff;
-            padding: 24px 20px 32px 20px;
-            border-radius: 25px;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            padding: 32px 25px 40px 25px; 
+            border-radius: 35px; 
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15); 
             text-align: center;
+            border: 4px solid #a78bfa; 
+        }
+
+        h1 {
+            color: #6d28d9; 
+            font-size: clamp(2rem, 8vw, 3.5rem); /* Адаптивный размер заголовка */
+            font-weight: 900; 
+            margin-bottom: 12px;
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+        }
+
+        p {
+            color: #4b5563; 
+            font-size: clamp(1rem, 4vw, 1.5rem); /* Адаптивный размер текста */
+            margin-bottom: 28px;
+            font-weight: 600;
         }
 
         /* Стиль для зоны силуэта */
         .drop-zone {
             width: 100%;
-            height: 200px;
-            background-color: #e2e8f0; 
-            border-radius: 20px;
-            border: 4px dashed #94a3b8;
+            height: clamp(200px, 40vw, 300px); /* Адаптивная высота */
+            background-color: #e0f2fe; 
+            border-radius: 25px; 
+            border: 6px dashed #7dd3fc; 
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            margin-bottom: 24px;
-            transition: background-color 0.3s;
+            margin-bottom: 30px;
+            transition: background-color 0.3s ease-in-out;
             position: relative;
             overflow: hidden; 
         }
+        .drop-zone.bg-green-100 {
+            background-color: #d1fae5; 
+            border-color: #34d399; 
+        }
 
-        /* Стили для карточек (эмодзи) */
+        /* Силуэт-тень */
+        #silhouette-icon {
+            filter: grayscale(100%) brightness(0.2); 
+            transition: opacity 0.3s ease-in-out;
+            font-size: clamp(6rem, 20vw, 10rem); /* Огромный, адаптивный размер */
+            line-height: 1; 
+        }
+
+        /* --- Стили для КАРАУСЕЛИ (Ручной свайп) --- */
+        #choices-wrapper {
+            overflow-x: scroll; 
+            -webkit-overflow-scrolling: touch; 
+            padding: 15px 0; 
+            scrollbar-width: none; 
+            -ms-overflow-style: none; 
+        }
+        #choices-wrapper::-webkit-scrollbar {
+            display: none; 
+        }
+        
+        #carousel-track {
+            display: flex;
+            justify-content: start; 
+            width: fit-content; 
+        }
+
+        /* Стили для карточек (эмодзи) - приоритет на большой touch target */
         .choice-card {
             cursor: grab;
             touch-action: none; 
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
             position: relative;
             user-select: none;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 15px 5px; 
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            height: 120px; 
-            width: 100px; 
+            padding: 20px 10px; 
+            background: linear-gradient(145deg, #f0f9ff, #e0f2fe); 
+            border-radius: 20px; 
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15); 
+            height: 140px; 
+            width: 120px; /* Фиксированная ширина для большого тач-таргета */
+            flex-shrink: 0; 
+            margin-right: 15px; 
+            border: 2px solid #93c5fd; 
+        }
+        .choice-card:active {
+            transform: scale(0.98); 
         }
 
         /* Стиль для перетаскиваемой карточки */
         .dragging {
             position: absolute;
-            z-index: 100;
-            transform: scale(1.2); 
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-            opacity: 0.9;
-            background-color: #fffbeb; 
+            z-index: 9999; 
+            transform: scale(1.3) rotate(5deg); 
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3); 
+            opacity: 0.98;
+            background: linear-gradient(145deg, #fefce8, #fffbeb); 
         }
         
-        /* Loading Spinner */
-        .loader {
-            border: 5px solid #f3f3f3; 
-            border-top: 5px solid #3498db; 
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
+        .choice-card span:first-child { /* Эмодзи */
+            font-size: 5rem; /* Чуть меньше, чем 6.5rem, но все еще огромный */
+            line-height: 1;
+        }
+        .choice-card span:last-child { /* Название */
+            font-size: 1rem; 
+            font-weight: 700;
+            color: #374151; 
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .correct-match-card {
+            z-index: 9; 
+            background: linear-gradient(145deg, #d1fae5, #a7f3d0); 
+            border-color: #10b981;
+        }
+        .correct-match-card span:last-child {
+            font-size: 1.8rem; 
+            color: #166534;
         }
 
-        /* Анимация конфетти */
+        /* Анимация конфетти и сообщения */
         .confetti {
             position: absolute;
-            width: 10px;
-            height: 10px;
+            width: 12px; 
+            height: 12px;
             background: radial-gradient(circle, #fcd34d, #ef4444);
             border-radius: 50%;
             opacity: 0;
-            animation: confetti-fall 1.5s ease-out forwards;
+            animation: confetti-fall 1.8s ease-out forwards; 
+            z-index: 100; 
         }
 
         @keyframes confetti-fall {
             0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(400px) rotate(720deg); opacity: 0; }
+            100% { transform: translateY(500px) rotate(720deg); opacity: 0; }
         }
 
-        /* Стили для сообщений */
         .message-box {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            padding: 15px 30px;
-            border-radius: 15px;
-            font-size: 1.5rem;
+            padding: 20px 40px; 
+            border-radius: 20px; 
+            font-size: 2rem; 
             font-weight: bold;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            transition: opacity 0.3s;
-            z-index: 10;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+            transition: opacity 0.3s ease-in-out;
+            z-index: 100; 
         }
         .success { background-color: #34d399; color: white; }
         .hint { background-color: #fcd34d; color: #78350f; }
-        .error { background-color: #ef4444; color: white; }
         
-        /* Стиль для карточки после успешного совпадения */
-        .correct-match-card {
-            z-index: 9; 
+        /* Стили для ползунка (слайдера) - ОЧЕНЬ БОЛЬШОЙ И УДОБНЫЙ ДЛЯ ДЕТЕЙ */
+        #carousel-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 25px; 
+            background: #d1e5fa; 
+            border-radius: 12px; 
+            margin-top: 25px; 
+            outline: none; 
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
         }
+
+        #carousel-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 50px; 
+            height: 50px; 
+            background: #8b5cf6; 
+            border-radius: 50%;
+            cursor: grab;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); 
+            transition: background-color 0.2s, transform 0.1s;
+            border: 4px solid #ede9fe; 
+        }
+        #carousel-slider::-webkit-slider-thumb:active {
+            transform: scale(0.95); 
+            cursor: grabbing;
+        }
+
+        #carousel-slider::-moz-range-thumb {
+            width: 50px; 
+            height: 50px;
+            background: #8b5cf6;
+            border-radius: 50%;
+            cursor: grab;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.2s, transform 0.1s;
+            border: 4px solid #ede9fe;
+        }
+        #carousel-slider::-moz-range-thumb:active {
+             transform: scale(0.95); 
+             cursor: grabbing;
+        }
+
     </style>
 </head>
 <body>
 
 <div class="game-container">
-    <h1 class="text-3xl font-extrabold text-gray-800 mb-4">УГАДАЙ ЖИВОТНОЕ!</h1>
-    <p class="text-lg text-gray-600 mb-6">Перетащи эмодзи к силуэту.</p>
+    <h1>УГАДАЙ ЖИВОТНОЕ!</h1>
+    <p>Сможешь найти и перетащить? 🥰</p>
 
     
     <div id="drop-zone" class="drop-zone relative">
-        <!-- Индикатор загрузки -->
-        <div id="loading-indicator" class="absolute inset-0 flex flex-col justify-center items-center bg-white bg-opacity-80 rounded-2xl z-20 hidden">
-            <div class="loader"></div>
-            <p class="text-gray-600 font-semibold mt-2">Готовим голос...</p>
-        </div>
-        <div id="silhouette-icon" class="text-9xl text-gray-800 opacity-20"></div>
+        <div id="silhouette-icon"></div> 
         <div id="status-message" class="message-box hidden"></div>
-        
     </div>
 
-    
-    <div id="choices-container" class="flex justify-around items-start gap-3 mt-6">
-        
+    <!-- Карусель -->
+    <div id="choices-wrapper">
+        <!-- #carousel-track будет создан через JS -->
     </div>
 
-    
-    <button id="next-button" class="mt-8 px-6 py-3 bg-indigo-500 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-600 transition hidden" onclick="nextQuestion()">
-        СЛЕДУЮЩИЙ РАУНД!
-    </button>
+    <!-- Ползунок -->
+    <div class="mt-4 px-4">
+        <input type="range" id="carousel-slider" min="0" value="0" class="w-full">
+    </div>
 </div>
 
 <script>
     // ------------------------------------
-    // 1. КОНФИГУРАЦИЯ ИГРЫ И TTS
+    // 1. КОНФИГУРАЦИЯ ИГРЫ
     // ------------------------------------
-    const apiKey = ""; // API Key for TTS
 
-    // ОБНОВЛЕННЫЙ СПИСОК ЖИВОТНЫХ (10)
     const animals = [
-        { id: 'dog', name: 'Собака', emoji: '🐶' },
-        { id: 'cat', name: 'Кошка', emoji: '🐱' },
-        { id: 'pig', name: 'Свинья', emoji: '🐷' },
-        { id: 'cow', name: 'Корова', emoji: '🐮' },
-        { id: 'lion', name: 'Лев', emoji: '🦁' },
-        { id: 'duck', name: 'Утка', emoji: '🦆' },
-        { id: 'bear', name: 'Медведь', emoji: '🐻' },
-        { id: 'fox', name: 'Лиса', emoji: '🦊' },
-        { id: 'rabbit', name: 'Кролик', emoji: '🐰' },
-        { id: 'monkey', name: 'Обезьяна', emoji: '🐒' },
+        { id: 'dog', name: 'Собачка', emoji: '🐶' }, 
+        { id: 'cat', name: 'Кошечка', emoji: '🐱' },
+        { id: 'pig', name: 'Свинка', emoji: '🐷' },
+        { id: 'cow', name: 'Коровка', emoji: '🐮' },
+        { id: 'lion', name: 'Лёва', emoji: '🦁' },
+        { id: 'duck', name: 'Уточка', emoji: '🦆' },
+        { id: 'bear', name: 'Мишка', emoji: '🐻' },
+        { id: 'fox', name: 'Лисичка', emoji: '🦊' },
+        { id: 'rabbit', name: 'Зайчик', emoji: '🐰' },
+        { id: 'monkey', name: 'Обезьянка', emoji: '🐒' },
+        { id: 'zebra', name: 'Зебра', emoji: '🦓' },
+        { id: 'horse', name: 'Лошадка', emoji: '🐴' },
+        { id: 'tiger', name: 'Тигрёнок', emoji: '🐯' },
     ];
 
     let currentQuestion = {};
@@ -186,133 +278,14 @@
     // Ссылки на элементы DOM
     const dropZoneEl = document.getElementById('drop-zone');
     const silhouetteIconEl = document.getElementById('silhouette-icon');
-    const choicesContainerEl = document.getElementById('choices-container');
+    const choicesWrapperEl = document.getElementById('choices-wrapper'); 
     const statusMessageEl = document.getElementById('status-message');
-    const nextButtonEl = document.getElementById('next-button');
-    const loadingIndicatorEl = document.getElementById('loading-indicator');
-
-    // ------------------------------------
-    // 2. TTS УТИЛИТЫ И ФУНКЦИЯ (Голосовой синтез)
-    // ------------------------------------
-
-    function base64ToArrayBuffer(base64) {
-        const binaryString = atob(base64);
-        const len = binaryString.length;
-        const bytes = new Uint8Array(len);
-        for (let i = 0; i < len; i++) {
-            bytes[i] = binaryString.charCodeAt(i);
-        }
-        return bytes.buffer;
-    }
-
-    function pcmToWav(pcm16, sampleRate) {
-        const buffer = new ArrayBuffer(44 + pcm16.length * 2);
-        const view = new DataView(buffer);
-        let pos = 0;
-
-        function setUint16(i) { view.setUint16(pos, i, true); pos += 2; }
-        function setUint32(i) { view.setUint32(pos, i, true); pos += 4; }
-        function setString(s) { for (let i = 0; i < s.length; i++) { view.setUint8(pos + i, s.charCodeAt(i)); } pos += s.length; }
-
-        setString('RIFF');
-        setUint32(36 + pcm16.length * 2); 
-        setString('WAVE');
-        setString('fmt ');
-        setUint32(16); 
-        setUint16(1); 
-        setUint16(1); 
-        setUint32(sampleRate);
-        setUint32(sampleRate * 2); 
-        setUint16(2); 
-        setUint16(16); 
-        setString('data');
-        setUint32(pcm16.length * 2);
-
-        for (let i = 0; i < pcm16.length; i++) {
-            view.setInt16(pos, pcm16[i], true);
-            pos += 2;
-        }
-
-        return new Blob([buffer], { type: 'audio/wav' });
-    }
+    const carouselSliderEl = document.getElementById('carousel-slider'); 
     
-    async function playAnimalNameTTS(name) {
-        
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
-        const textToSpeak = name + '!'; 
-        
-        const payload = {
-            contents: [{
-                parts: [{ text: textToSpeak }]
-            }],
-            generationConfig: {
-                responseModalities: ["AUDIO"],
-                speechConfig: {
-                    voiceConfig: {
-                        // Используем "Iapetus" для чистого русского произношения.
-                        prebuiltVoiceConfig: { voiceName: "Iapetus" } 
-                    }
-                }
-            },
-            model: "gemini-2.5-flash-preview-tts"
-        };
-
-        try {
-            let response;
-            for (let i = 0; i < 3; i++) { 
-                response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                if (response.ok) break;
-                // Экспоненциальная задержка перед повторной попыткой
-                console.warn(`TTS API retry ${i + 1}/3...`);
-                await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
-            }
-            // --- УЛУЧШЕННАЯ ОБРАБОТКА ОШИБКИ API ---
-            if (!response || !response.ok) {
-                // Если API не ответило после ретраев, показываем ошибку пользователю
-                showStatus(`❌ Ошибка: Звук недоступен. Проверьте соединение.`, 'error', 3000);
-                throw new Error('TTS API failed after retries.');
-            }
-            // --- КОНЕЦ ОБРАБОТКИ ОШИБКИ API ---
-
-            const result = await response.json();
-            const part = result?.candidates?.[0]?.content?.parts?.[0];
-            const audioData = part?.inlineData?.data;
-            const mimeType = part?.inlineData?.mimeType;
-
-            if (audioData && mimeType && mimeType.startsWith("audio/L16")) {
-                const sampleRateMatch = mimeType.match(/rate=(\d+)/);
-                const sampleRate = sampleRateMatch ? parseInt(sampleRateMatch[1], 10) : 24000;
-                
-                const pcmData = base64ToArrayBuffer(audioData);
-                const pcm16 = new Int16Array(pcmData);
-                
-                const wavBlob = pcmToWav(pcm16, sampleRate);
-                const audioUrl = URL.createObjectURL(wavBlob);
-
-                const audio = new Audio(audioUrl);
-                audio.play().catch(e => console.error("Error playing audio:", e));
-            } else {
-                console.error("TTS Response missing audio data or invalid format.");
-                showStatus(`❌ Ошибка: Некорректный аудио-ответ.`, 'error', 3000);
-            }
-        } catch (error) {
-            console.error("Ошибка при вызове TTS API:", error);
-             // Убедитесь, что ошибка показана, если она не была показана выше
-             if (!statusMessageEl.textContent.includes('Ошибка')) {
-                 showStatus(`❌ Ошибка: Не удалось получить звук.`, 'error', 3000);
-             }
-        } finally {
-            loadingIndicatorEl.classList.add('hidden'); // Гарантируем скрытие индикатора
-        }
-    }
-
+    let carouselTrackEl = null; 
 
     // ------------------------------------
-    // 3. ЛОГИКА ИГРЫ И D&D
+    // 2. ЛОГИКА ИГРЫ И D&D
     // ------------------------------------
 
     function shuffleArray(array) {
@@ -325,51 +298,101 @@
 
     function createNewQuestion() {
         const correctAnswer = animals[Math.floor(Math.random() * animals.length)];
-        // Убедитесь, что всегда есть 3 варианта выбора (всего 4 карточки)
-        const incorrectAnswers = shuffleArray(animals.filter(a => a.id !== correctAnswer.id)).slice(0, 3);
+        
+        // 8 вариантов выбора: 1 правильный и 7 неправильных
+        const incorrectAnswers = shuffleArray(animals.filter(a => a.id !== correctAnswer.id)).slice(0, 7);
         const choices = shuffleArray([correctAnswer, ...incorrectAnswers]);
 
         currentQuestion = {
             correct: correctAnswer,
-            choices: choices
+            choices: choices 
         };
     }
 
-    function initializeQuestionUI() {
+    // Вспомогательная функция для создания карточек и добавления слушателей D&D
+    function renderChoices(choices) {
+        choices.forEach(animal => {
+            const card = document.createElement('div');
+            card.className = 'choice-card';
+            card.id = `card-${animal.id}-${Date.now() + Math.random()}`; 
+            card.setAttribute('data-id', animal.id);
+            // pointer-events-none для span, чтобы перетаскивание срабатывало на div
+            card.innerHTML = `<span class="pointer-events-none">${animal.emoji}</span>
+                              <span class="mt-1 pointer-events-none">${animal.name}</span>`;
+            
+            carouselTrackEl.appendChild(card);
+            addDragListeners(card);
+        });
+    }
+    
+    // --- ФУНКЦИИ СЛАЙДЕРА/СВАЙПА ---
+    function updateSliderConfig() {
+        // Проверяем, существует ли карусель, прежде чем работать с ней
+        if (!carouselTrackEl) return;
+        
+        // Вычисляем максимальное расстояние для прокрутки
+        const maxScroll = carouselTrackEl.scrollWidth - choicesWrapperEl.clientWidth;
+        
+        if (maxScroll <= 0) {
+            // Если контент не прокручивается, скрываем ползунок
+            carouselSliderEl.style.display = 'none';
+            carouselSliderEl.max = 0;
+            carouselSliderEl.value = 0;
+            choicesWrapperEl.scrollLeft = 0; 
+        } else {
+            // Иначе показываем и настраиваем ползунок
+            carouselSliderEl.style.display = 'block';
+            carouselSliderEl.max = maxScroll;
+            // Обновляем значение ползунка до текущей прокрутки
+            carouselSliderEl.value = choicesWrapperEl.scrollLeft; 
+        }
+    }
+
+    // Слушатель: Движение ползунка -> Прокрутка карусели
+    carouselSliderEl.addEventListener('input', () => {
+        choicesWrapperEl.scrollLeft = carouselSliderEl.value;
+    });
+
+    // Слушатель: Прокрутка карусели (свайп/мышь) -> Обновление ползунка
+    choicesWrapperEl.addEventListener('scroll', () => {
+        carouselSliderEl.value = choicesWrapperEl.scrollLeft;
+    });
+    
+    // Слушатель для обработки поворота экрана/изменения размера окна
+    window.addEventListener('resize', updateSliderConfig);
+    // --- КОНЕЦ ФУНКЦИЙ СЛАЙДЕРА/СВАЙПА ---
+
+    // Инициализация/запуск нового раунда
+    function startNewRound() {
         isCorrectlyAnswered = false;
         dropZoneEl.classList.remove('bg-green-100');
         statusMessageEl.classList.add('hidden');
-        nextButtonEl.classList.add('hidden');
-        loadingIndicatorEl.classList.add('hidden'); 
         
-        // --- ГАРАНТИРОВАННАЯ ОЧИСТКА ---
-        choicesContainerEl.innerHTML = ''; // Удаляем все карточки выбора
+        // --- Очистка и создание карусели ---
+        choicesWrapperEl.innerHTML = '';
         Array.from(dropZoneEl.children).forEach(child => {
             if (child.classList.contains('correct-match-card')) {
-                child.remove(); // Удаляем старую карточку из зоны сброса
+                child.remove(); 
             }
         });
+        
+        carouselTrackEl = document.createElement('div');
+        carouselTrackEl.id = 'carousel-track';
+        choicesWrapperEl.appendChild(carouselTrackEl);
         // --- КОНЕЦ ОЧИСТКИ ---
 
         createNewQuestion();
 
-        // 1. Устанавливаем силуэт (снова виден)
+        // 1. Устанавливаем силуэт
         silhouetteIconEl.textContent = currentQuestion.correct.emoji;
-        silhouetteIconEl.style.opacity = '0.2';
+        silhouetteIconEl.style.opacity = '0.7'; 
         
-        // 2. Создаем карточки выбора
-        currentQuestion.choices.forEach(animal => {
-            const card = document.createElement('div');
-            card.className = 'choice-card';
-            card.id = `card-${animal.id}`;
-            card.setAttribute('data-id', animal.id);
-            card.innerHTML = `<span class="text-6xl pointer-events-none">${animal.emoji}</span>
-                              <span class="mt-1 text-xs font-semibold text-gray-600 pointer-events-none">${animal.name}</span>`;
-            card.style.flex = '1 1 100px'; 
-            choicesContainerEl.appendChild(card);
-            
-            addDragListeners(card);
-        });
+        // 2. Создаем карточки выбора (8 уникальных вариантов)
+        renderChoices(currentQuestion.choices);
+        
+        // 3. Обновляем конфигурацию ползунка
+        // Используем небольшую задержку, чтобы браузер успел отрисовать track width
+        setTimeout(updateSliderConfig, 100); 
     }
 
     // --- D&D ФУНКЦИИ ---
@@ -390,7 +413,15 @@
 
     function getCoordinates(e) {
         if (e.type.includes("touch")) {
-            return { clientX: e.touches[0].clientX, clientY: e.touches[0].clientY };
+            // Убеждаемся, что touch-событие имеет touches
+            if (e.touches && e.touches.length > 0) {
+                 return { clientX: e.touches[0].clientX, clientY: e.touches[0].clientY };
+            }
+            // Для touchend, touches может быть пустым, используем changedTouches
+            if (e.changedTouches && e.changedTouches.length > 0) {
+                 return { clientX: e.changedTouches[0].clientX, clientY: e.changedTouches[0].clientY };
+            }
+            return { clientX: null, clientY: null }; // Fallback
         }
         return { clientX: e.clientX, clientY: e.clientY };
     }
@@ -398,15 +429,24 @@
     function dragStart(e) {
         if (isCorrectlyAnswered) return;
         const coords = getCoordinates(e);
+        if (!coords.clientX) return; // Защита от пустого touch-события
+
         activeItem = e.target.closest('.choice-card');
         if (activeItem) {
             e.preventDefault(); 
+            
+            // Если карточка перетаскивается, ее свайп-родитель не должен прокручиваться
+            choicesWrapperEl.style.overflowX = 'hidden'; 
+            
             const rect = activeItem.getBoundingClientRect();
             xOffset = coords.clientX - rect.left;
             yOffset = coords.clientY - rect.top;
+            
             activeItem.classList.add('dragging');
             activeItem.style.position = 'absolute';
-            document.body.appendChild(activeItem);
+            // Перемещаем карточку в body, чтобы она не обрезалась контейнером
+            document.body.appendChild(activeItem); 
+            
             currentX = coords.clientX - xOffset;
             currentY = coords.clientY - yOffset;
         }
@@ -414,9 +454,14 @@
 
     function dragEnd(e) {
         if (!activeItem || isCorrectlyAnswered) return;
+        
+        // Восстанавливаем возможность свайпа/прокрутки
+        choicesWrapperEl.style.overflowX = 'scroll'; 
+
         const dropZoneRect = dropZoneEl.getBoundingClientRect();
         const droppedId = activeItem.getAttribute('data-id');
 
+        // Проверка попадания в зону сброса (Drop Zone)
         const isDroppedOver = 
             currentX + (activeItem.offsetWidth / 2) > dropZoneRect.left &&
             currentX + (activeItem.offsetWidth / 2) < dropZoneRect.right &&
@@ -437,6 +482,8 @@
         if (!activeItem || isCorrectlyAnswered) return;
         e.preventDefault(); 
         const coords = getCoordinates(e);
+        if (!coords.clientX) return; // Защита от пустого touch-события
+
         currentX = coords.clientX - xOffset;
         currentY = coords.clientY - yOffset;
         activeItem.style.left = `${currentX}px`;
@@ -444,98 +491,82 @@
     }
     
     function resetCardPosition(card) {
-        choicesContainerEl.appendChild(card); 
+        // Возвращаем карточку обратно в карусель
+        carouselTrackEl.appendChild(card); 
         card.classList.remove('dragging');
         card.style.position = 'relative'; 
         card.style.left = 'auto';
         card.style.top = 'auto';
         card.style.transform = 'none'; 
-        showStatus('Попробуй еще!', 'hint', 1000);
+        showStatus('Попробуй ещё! ✨', 'hint', 1000); 
     }
     
-    // Функция проверки совпадения
     function checkMatch(droppedId, cardElement) {
         if (droppedId === currentQuestion.correct.id) {
             isCorrectlyAnswered = true;
             
-            // 1. МГНОВЕННО БЛОКИРУЕМ UI И ПОКАЗЫВАЕМ УСПЕХ
+            choicesWrapperEl.style.overflowX = 'hidden'; 
+
             startConfetti();
             dropZoneEl.classList.add('bg-green-100');
-            showStatus(`✅ Верно!`, 'success', 2500);
+            showStatus(`🥳 Ура! Это ${currentQuestion.correct.name}!`, 'success', 2500); 
 
-            // Финальное положение карточки
             cardElement.style.position = 'absolute';
             cardElement.style.top = '50%';
             cardElement.style.left = '50%';
-            cardElement.style.transform = 'translate(-50%, -50%)';
+            cardElement.style.transform = 'translate(-50%, -50%) scale(1.1)'; 
             cardElement.classList.remove('dragging');
             cardElement.classList.add('correct-match-card'); 
+            
             const nameSpan = cardElement.querySelector('span:nth-child(2)');
-            if (nameSpan) nameSpan.style.display = 'none'; // Скрываем название под эмодзи
+            if (nameSpan) {
+                nameSpan.style.display = 'block'; 
+                nameSpan.classList.add('text-xl', 'text-gray-800', 'font-bold');
+                nameSpan.classList.remove('text-xs', 'font-semibold', 'text-gray-600');
+            }
             
             dropZoneEl.appendChild(cardElement);
             
-            // Удаляем остальные карточки и блокируем контейнер
-            choicesContainerEl.innerHTML = '';
-            
-            // Скрываем силуэт
+            choicesWrapperEl.innerHTML = '';
             silhouetteIconEl.style.opacity = '0';
             
-            // 2. АСИНХРОННЫЙ ВЫЗОВ TTS
-            loadingIndicatorEl.classList.remove('hidden');
-            playAnimalNameTTS(currentQuestion.correct.name); // больше не .finally() здесь, т.к. finally внутри TTS
-
-            // 3. ГАРАНТИЯ: Показываем кнопку "Далее" через 1.5 секунды
+            // Запускаем новый раунд
             setTimeout(() => {
-                nextButtonEl.classList.remove('hidden');
-            }, 1500); 
+                startNewRound();
+            }, 2500); 
 
         } else {
-            // Неправильный ответ
             resetCardPosition(cardElement);
         }
     }
 
-    // Показ временного статусного сообщения
     function showStatus(message, type, duration) {
         statusMessageEl.textContent = message;
         statusMessageEl.className = 'message-box';
         statusMessageEl.classList.add(type);
         statusMessageEl.classList.remove('hidden');
 
-        // Очистка сообщения только если оно не является постоянной ошибкой
-        if (type !== 'error') {
-            setTimeout(() => {
-                statusMessageEl.classList.add('hidden');
-            }, duration);
-        } else {
-            // Для ошибки оставляем видимым, пока не начнется новый раунд
-            setTimeout(() => {
-                statusMessageEl.classList.add('hidden');
-            }, duration);
-        }
+        setTimeout(() => {
+            statusMessageEl.classList.add('hidden');
+        }, duration);
     }
 
-    function nextQuestion() {
-        initializeQuestionUI();
-    }
-
-    // Запуск игры при загрузке страницы
-    window.onload = initializeQuestionUI;
+    window.onload = startNewRound;
     
-    // Конфетти (для красоты)
     function startConfetti() {
-        const count = 30;
+        const count = 40; 
+        const dropZoneRect = dropZoneEl.getBoundingClientRect();
+        
         for (let i = 0; i < count; i++) {
             const confetti = document.createElement('div');
             confetti.className = 'confetti';
-            confetti.style.left = `${Math.random() * 100}%`;
-            confetti.style.top = '0';
-            confetti.style.animationDelay = `${Math.random() * 0.5}s`;
+            confetti.style.left = `${Math.random() * dropZoneRect.width}px`;
+            confetti.style.top = `${dropZoneRect.height / 2}px`;
+            confetti.style.animationDelay = `${Math.random() * 0.7}s`; 
+            
             dropZoneEl.appendChild(confetti);
             
-            // Удалить элемент после анимации
-            setTimeout(() => confetti.remove(), 2000);
+            setTimeout(() => confetti.remove(), 2500); 
         }
     }
 
