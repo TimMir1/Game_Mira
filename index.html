@@ -3,574 +3,614 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Игра: Подбери Животное (Для Малышей)</title>
+    
+    <!-- SEO & AI SEARCH OPTIMIZATION -->
+    <title>Кнопки Ютуба на заказ | Золотые и Серебряные</title>
+    <meta name="description" content="Изготовление и продажа золотых и серебряных кнопок YouTube. Эксклюзивный подарок для блогера. Высокое качество, ручная работа, доставка.">
+    <meta name="keywords" content="купить кнопку ютуб, золотая кнопка youtube цена, серебряная кнопка youtube заказать, подарок блогеру, награда ютуб копия, youtube creator awards buy, кнопка 100000 подписчиков, кнопка 1000000 подписчиков">
+    <meta name="author" content="Creator Awards Russia">
     
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'gucci-black': '#0a0a0a',
+                        'gucci-gold': '#d4af37',
+                        'gucci-cream': '#f5f5f5',
+                        'gucci-gray': '#333333',
+                    },
+                    fontFamily: {
+                        serif: ['"Playfair Display"', 'serif'],
+                        sans: ['"Lato"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        /* Общие стили */
         body {
-            font-family: 'Comic Sans MS', 'Inter', sans-serif; 
-            background-color: #f7f7f7; 
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-            user-select: none; 
+            background-color: #0a0a0a;
+            color: #f5f5f5;
         }
-
-        .game-container {
-            width: 100%;
-            max-width: 900px; /* Увеличил максимальную ширину для альбомной ориентации */
-            background-color: #ffffff;
-            padding: 32px 25px 40px 25px; 
-            border-radius: 35px; 
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15); 
-            text-align: center;
-            border: 4px solid #a78bfa; 
+        .luxury-border {
+            border: 1px solid rgba(212, 175, 55, 0.3);
         }
-
-        h1 {
-            color: #6d28d9; 
-            font-size: clamp(2rem, 8vw, 3.5rem); /* Адаптивный размер заголовка */
-            font-weight: 900; 
-            margin-bottom: 12px;
-            text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
-        }
-
-        p {
-            color: #4b5563; 
-            font-size: clamp(1rem, 4vw, 1.5rem); /* Адаптивный размер текста */
-            margin-bottom: 28px;
-            font-weight: 600;
-        }
-
-        /* Стиль для зоны силуэта */
-        .drop-zone {
-            width: 100%;
-            height: clamp(200px, 40vw, 300px); /* Адаптивная высота */
-            background-color: #e0f2fe; 
-            border-radius: 25px; 
-            border: 6px dashed #7dd3fc; 
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 30px;
-            transition: background-color 0.3s ease-in-out;
-            position: relative;
-            overflow: hidden; 
-        }
-        .drop-zone.bg-green-100 {
-            background-color: #d1fae5; 
-            border-color: #34d399; 
-        }
-
-        /* Силуэт-тень */
-        #silhouette-icon {
-            filter: grayscale(100%) brightness(0.2); 
-            transition: opacity 0.3s ease-in-out;
-            font-size: clamp(6rem, 20vw, 10rem); /* Огромный, адаптивный размер */
-            line-height: 1; 
-        }
-
-        /* --- Стили для КАРАУСЕЛИ (Ручной свайп) --- */
-        #choices-wrapper {
-            overflow-x: scroll; 
-            -webkit-overflow-scrolling: touch; 
-            padding: 15px 0; 
-            scrollbar-width: none; 
-            -ms-overflow-style: none; 
-        }
-        #choices-wrapper::-webkit-scrollbar {
-            display: none; 
-        }
-        
-        #carousel-track {
-            display: flex;
-            justify-content: start; 
-            width: fit-content; 
-        }
-
-        /* Стили для карточек (эмодзи) - приоритет на большой touch target */
-        .choice-card {
-            cursor: grab;
-            touch-action: none; 
-            transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
-            position: relative;
-            user-select: none;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px 10px; 
-            background: linear-gradient(145deg, #f0f9ff, #e0f2fe); 
-            border-radius: 20px; 
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15); 
-            height: 140px; 
-            width: 120px; /* Фиксированная ширина для большого тач-таргета */
-            flex-shrink: 0; 
-            margin-right: 15px; 
-            border: 2px solid #93c5fd; 
-        }
-        .choice-card:active {
-            transform: scale(0.98); 
-        }
-
-        /* Стиль для перетаскиваемой карточки */
-        .dragging {
-            position: absolute;
-            z-index: 9999; 
-            transform: scale(1.3) rotate(5deg); 
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3); 
-            opacity: 0.98;
-            background: linear-gradient(145deg, #fefce8, #fffbeb); 
-        }
-        
-        .choice-card span:first-child { /* Эмодзи */
-            font-size: 5rem; /* Чуть меньше, чем 6.5rem, но все еще огромный */
-            line-height: 1;
-        }
-        .choice-card span:last-child { /* Название */
-            font-size: 1rem; 
-            font-weight: 700;
-            color: #374151; 
-        }
-
-        .correct-match-card {
-            z-index: 9; 
-            background: linear-gradient(145deg, #d1fae5, #a7f3d0); 
-            border-color: #10b981;
-        }
-        .correct-match-card span:last-child {
-            font-size: 1.8rem; 
-            color: #166534;
-        }
-
-        /* Анимация конфетти и сообщения */
-        .confetti {
-            position: absolute;
-            width: 12px; 
-            height: 12px;
-            background: radial-gradient(circle, #fcd34d, #ef4444);
-            border-radius: 50%;
+        .fade-in-up {
             opacity: 0;
-            animation: confetti-fall 1.8s ease-out forwards; 
-            z-index: 100; 
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        .visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #d4af37;
+        }
+        .btn-hover-effect {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-hover-effect:hover {
+            background-color: #d4af37;
+            color: #000;
+        }
+        .product-card:hover .product-img {
+            transform: scale(1.05);
+        }
+        .product-img {
+            transition: transform 0.7s ease;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .img-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #1a1a1a, #333);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            text-align: center;
+            padding: 10px;
         }
 
-        @keyframes confetti-fall {
-            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(500px) rotate(720deg); opacity: 0; }
+        /* Modal Styles */
+        #productModal {
+            backdrop-filter: blur(10px);
+        }
+        .modal-content {
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        /* Thumbnails */
+        .thumb-active {
+            border-color: #d4af37;
+            opacity: 1;
         }
 
-        .message-box {
+        /* Lightbox Navigation */
+        .lightbox-nav-btn {
             position: absolute;
             top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            padding: 20px 40px; 
-            border-radius: 20px; 
-            font-size: 2rem; 
-            font-weight: bold;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-            transition: opacity 0.3s ease-in-out;
-            z-index: 100; 
+            transform: translateY(-50%);
+            color: white;
+            font-size: 2rem;
+            padding: 20px;
+            cursor: pointer;
+            z-index: 210;
+            opacity: 0.7;
+            transition: opacity 0.3s, color 0.3s;
         }
-        .success { background-color: #34d399; color: white; }
-        .hint { background-color: #fcd34d; color: #78350f; }
-        
-        /* Стили для ползунка (слайдера) - ОЧЕНЬ БОЛЬШОЙ И УДОБНЫЙ ДЛЯ ДЕТЕЙ */
-        #carousel-slider {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 100%;
-            height: 25px; 
-            background: #d1e5fa; 
-            border-radius: 12px; 
-            margin-top: 25px; 
-            outline: none; 
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+        .lightbox-nav-btn:hover {
+            opacity: 1;
+            color: #d4af37;
         }
-
-        #carousel-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 50px; 
-            height: 50px; 
-            background: #8b5cf6; 
-            border-radius: 50%;
-            cursor: grab;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); 
-            transition: background-color 0.2s, transform 0.1s;
-            border: 4px solid #ede9fe; 
-        }
-        #carousel-slider::-webkit-slider-thumb:active {
-            transform: scale(0.95); 
-            cursor: grabbing;
-        }
-
-        #carousel-slider::-moz-range-thumb {
-            width: 50px; 
-            height: 50px;
-            background: #8b5cf6;
-            border-radius: 50%;
-            cursor: grab;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            transition: background-color 0.2s, transform 0.1s;
-            border: 4px solid #ede9fe;
-        }
-        #carousel-slider::-moz-range-thumb:active {
-             transform: scale(0.95); 
-             cursor: grabbing;
-        }
-
+        .lightbox-prev { left: 10px; }
+        .lightbox-next { right: 10px; }
     </style>
 </head>
-<body>
+<body class="antialiased overflow-x-hidden">
 
-<div class="game-container">
-    <h1>УГАДАЙ ЖИВОТНОЕ!</h1>
-    <p>Сможешь найти и перетащить? 🥰</p>
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 bg-gucci-black/90 backdrop-blur-md border-b border-gray-800 py-6">
+        <div class="container mx-auto text-center cursor-pointer" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+            <h1 class="font-serif text-2xl md:text-3xl tracking-[0.2em] text-gucci-gold font-bold uppercase">
+                КНОПКИ<span class="text-white">ЮТУБА</span>
+            </h1>
+        </div>
+    </nav>
 
-    
-    <div id="drop-zone" class="drop-zone relative">
-        <div id="silhouette-icon"></div> 
-        <div id="status-message" class="message-box hidden"></div>
+    <!-- Hero Section -->
+    <header class="relative h-screen flex items-center justify-center overflow-hidden">
+        <div class="absolute inset-0 z-0 opacity-30">
+            <div class="absolute top-1/4 left-1/4 w-64 h-64 bg-gray-800 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
+            <div class="absolute top-1/3 right-1/4 w-64 h-64 bg-gucci-gold rounded-full mix-blend-multiply filter blur-3xl animate-blob opacity-20"></div>
+        </div>
+
+        <div class="container mx-auto px-6 relative z-10 text-center mt-16">
+            <p class="text-xs md:text-sm tracking-[0.5em] uppercase text-gray-400 mb-6 fade-in-up delay-100">
+                КОЛЛЕКЦИЯ 2025
+            </p>
+            <h2 class="font-serif text-5xl md:text-7xl lg:text-8xl text-white mb-8 leading-tight fade-in-up delay-200">
+                СИМВОЛ <br/> <span class="italic text-gucci-gold">УСПЕХА</span>
+            </h2>
+            <p class="font-sans text-gray-300 max-w-xl mx-auto text-sm md:text-lg leading-relaxed mb-12 fade-in-up delay-300">
+                Эксклюзивные награды для тех, кто создает историю. Золотые и Серебряные кнопки YouTube. Ручная работа. Премиальное качество материалов.
+            </p>
+            <a href="#collection" class="inline-block px-12 py-4 border border-white text-white font-sans uppercase tracking-[0.2em] text-xs hover:bg-white hover:text-black transition duration-500 fade-in-up delay-500">
+                СМОТРЕТЬ КОЛЛЕКЦИЮ
+            </a>
+        </div>
+    </header>
+
+    <!-- Divider -->
+    <div class="flex justify-center py-12">
+        <div class="h-16 w-[1px] bg-gucci-gold opacity-50"></div>
     </div>
 
-    <!-- Карусель -->
-    <div id="choices-wrapper">
-        <!-- #carousel-track будет создан через JS -->
+    <!-- Collection Grid -->
+    <section id="collection" class="py-20 px-6 bg-gucci-black">
+        <div class="container mx-auto max-w-6xl">
+            <div class="text-center mb-24">
+                <h3 class="font-serif text-3xl md:text-4xl text-white mb-4">КАТАЛОГ</h3>
+                <div class="w-24 h-[1px] bg-gucci-gold mx-auto"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-8">
+                
+                <!-- Silver Item -->
+                <div class="product-card group cursor-pointer fade-in-up" onclick="openModal('silver')">
+                    <div class="relative aspect-[4/5] overflow-hidden mb-8 bg-[#1a1a1a] luxury-border">
+                        <img 
+                            id="grid-img-silver"
+                            src="https://placehold.co/600x800/333333/FFFFFF/png?text=ФОТО+СЕРЕБРЯНОЙ+КНОПКИ" 
+                            alt="Серебряная кнопка Ютуб 100к подписчиков" 
+                            class="product-img"
+                            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                        >
+                        <div class="img-placeholder hidden h-full w-full absolute top-0 left-0">ФОТО СЕРЕБРЯНОЙ КНОПКИ</div>
+                        <div class="absolute bottom-4 left-4 text-xs tracking-widest text-gray-500">NO. 100K</div>
+                    </div>
+                    <div class="text-center">
+                        <h4 class="font-serif text-2xl text-white mb-2">СЕРЕБРЯНАЯ КНОПКА</h4>
+                        <p class="text-gray-400 text-xs tracking-widest uppercase mb-4">Серебряное напыление • 100,000 Подписчиков</p>
+                        <div class="font-serif text-3xl text-gucci-gold mb-6">10 200 ₽</div>
+                        <button class="btn-hover-effect w-full md:w-auto border border-gray-600 px-10 py-3 text-sm uppercase tracking-widest text-white hover:border-gucci-gold">
+                            ПОДРОБНЕЕ
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Gold Item -->
+                <div class="product-card group cursor-pointer fade-in-up delay-100" onclick="openModal('gold')">
+                    <div class="relative aspect-[4/5] overflow-hidden mb-8 bg-[#1a1a1a] luxury-border">
+                        <img 
+                            id="grid-img-gold"
+                            src="https://placehold.co/600x800/D4AF37/000000/png?text=ФОТО+ЗОЛОТОЙ+КНОПКИ" 
+                            alt="Золотая кнопка Ютуб 1 миллион подписчиков" 
+                            class="product-img"
+                            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                        >
+                        <div class="img-placeholder hidden h-full w-full absolute top-0 left-0 text-gucci-gold">ФОТО ЗОЛОТОЙ КНОПКИ</div>
+                        <div class="absolute bottom-4 left-4 text-xs tracking-widest text-gucci-gold">NO. 1M</div>
+                    </div>
+                    <div class="text-center">
+                        <h4 class="font-serif text-2xl text-gucci-gold mb-2">ЗОЛОТАЯ КНОПКА</h4>
+                        <p class="text-gray-400 text-xs tracking-widest uppercase mb-4">Покрытие Золото 24K • 1,000,000 Подписчиков</p>
+                        <div class="font-serif text-3xl text-gucci-gold mb-6">12 800 ₽</div>
+                        <button class="btn-hover-effect w-full md:w-auto border border-gucci-gold px-10 py-3 text-sm uppercase tracking-widest text-white hover:border-gucci-gold">
+                            ПОДРОБНЕЕ
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Telegram Item -->
+                <div class="product-card group cursor-pointer fade-in-up delay-200" onclick="openModal('telegram')">
+                    <div class="relative aspect-[4/5] overflow-hidden mb-8 bg-[#1a1a1a] luxury-border">
+                        <img 
+                            id="grid-img-telegram"
+                            src="https://placehold.co/600x800/2AABEE/FFFFFF/png?text=ФОТО+TELEGRAM" 
+                            alt="Награда Telegram" 
+                            class="product-img"
+                            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                        >
+                        <div class="img-placeholder hidden h-full w-full absolute top-0 left-0 text-blue-400">ФОТО TELEGRAM</div>
+                        <div class="absolute bottom-4 left-4 text-xs tracking-widest text-blue-400">TG AWARD</div>
+                    </div>
+                    <div class="text-center">
+                        <h4 class="font-serif text-2xl text-white mb-2">НАГРАДА TELEGRAM</h4>
+                        <p class="text-gray-400 text-xs tracking-widest uppercase mb-4">Кристалл & Алюминий • Лимитированная серия</p>
+                        <div class="font-serif text-3xl text-gucci-gold mb-6">9 800 ₽</div>
+                        <button class="btn-hover-effect w-full md:w-auto border border-gray-600 px-10 py-3 text-sm uppercase tracking-widest text-white hover:border-gucci-gold">
+                            ПОДРОБНЕЕ
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Instagram Item -->
+                <div class="product-card group cursor-pointer fade-in-up delay-200" onclick="openModal('instagram')">
+                    <div class="relative aspect-[4/5] overflow-hidden mb-8 bg-[#1a1a1a] luxury-border">
+                        <img 
+                            id="grid-img-instagram"
+                            src="https://placehold.co/600x800/E1306C/FFFFFF/png?text=ФОТО+INSTAGRAM" 
+                            alt="Награда Instagram" 
+                            class="product-img"
+                            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                        >
+                        <div class="img-placeholder hidden h-full w-full absolute top-0 left-0 text-pink-500">ФОТО INSTAGRAM</div>
+                        <div class="absolute bottom-4 left-4 text-xs tracking-widest text-pink-500">IG STAR</div>
+                    </div>
+                    <div class="text-center">
+                        <h4 class="font-serif text-2xl text-white mb-2">КНОПКА INSTAGRAM</h4>
+                        <p class="text-gray-400 text-xs tracking-widest uppercase mb-4">Зеркальный акрил • Премиум Глянец</p>
+                        <div class="font-serif text-3xl text-gucci-gold mb-6">10 500 ₽</div>
+                        <button class="btn-hover-effect w-full md:w-auto border border-gray-600 px-10 py-3 text-sm uppercase tracking-widest text-white hover:border-gucci-gold">
+                            ПОДРОБНЕЕ
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ChatGPT Item -->
+                <div class="product-card group cursor-pointer fade-in-up delay-300" onclick="openModal('chatgpt')">
+                    <div class="relative aspect-[4/5] overflow-hidden mb-8 bg-[#1a1a1a] luxury-border">
+                        <img 
+                            id="grid-img-chatgpt"
+                            src="https://placehold.co/600x800/10A37F/FFFFFF/png?text=ФОТО+CHATGPT" 
+                            alt="Награда ChatGPT" 
+                            class="product-img"
+                            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                        >
+                        <div class="img-placeholder hidden h-full w-full absolute top-0 left-0 text-emerald-500">ФОТО CHATGPT</div>
+                        <div class="absolute bottom-4 left-4 text-xs tracking-widest text-emerald-500">AI PIONEER</div>
+                    </div>
+                    <div class="text-center">
+                        <h4 class="font-serif text-2xl text-white mb-2">НАГРАДА CHATGPT</h4>
+                        <p class="text-gray-400 text-xs tracking-widest uppercase mb-4">Изумрудный оттенок • Символ Интеллекта</p>
+                        <div class="font-serif text-3xl text-gucci-gold mb-6">11 200 ₽</div>
+                        <button class="btn-hover-effect w-full md:w-auto border border-gray-600 px-10 py-3 text-sm uppercase tracking-widest text-white hover:border-gucci-gold">
+                            ПОДРОБНЕЕ
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Like Button Item -->
+                <div class="product-card group cursor-pointer fade-in-up delay-300" onclick="openModal('like')">
+                    <div class="relative aspect-[4/5] overflow-hidden mb-8 bg-[#1a1a1a] luxury-border">
+                        <img 
+                            id="grid-img-like"
+                            src="https://placehold.co/600x800/f5f5f5/000000/png?text=ФОТО+ЛАЙК" 
+                            alt="Кнопка Лайк" 
+                            class="product-img"
+                            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                        >
+                        <div class="img-placeholder hidden h-full w-full absolute top-0 left-0 text-gray-400">ФОТО ЛАЙК</div>
+                        <div class="absolute bottom-4 left-4 text-xs tracking-widest text-gray-400">THE LIKE</div>
+                    </div>
+                    <div class="text-center">
+                        <h4 class="font-serif text-2xl text-white mb-2">КНОПКА ЛАЙК</h4>
+                        <p class="text-gray-400 text-xs tracking-widest uppercase mb-4">Скульптурный дизайн • Настольный формат</p>
+                        <div class="font-serif text-3xl text-gucci-gold mb-6">8 900 ₽</div>
+                        <button class="btn-hover-effect w-full md:w-auto border border-gray-600 px-10 py-3 text-sm uppercase tracking-widest text-white hover:border-gucci-gold">
+                            ПОДРОБНЕЕ
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Philosophy / Text Section -->
+    <section class="py-24 px-6 bg-[#0f0f0f] relative">
+        <div class="container mx-auto max-w-4xl text-center">
+            <i class="fa-solid fa-crown text-gucci-gold text-2xl mb-8 opacity-60"></i>
+            <h3 class="font-serif text-3xl md:text-5xl leading-snug text-white mb-8 fade-in-up">
+                "Качество — это не действие. <br/> <span class="text-gray-500 italic">Это привычка.</span>"
+            </h3>
+            <p class="font-sans text-gray-400 leading-loose text-sm md:text-base fade-in-up delay-100">
+                Каждая награда создается с исключительным вниманием к деталям. Зеркальная полировка, правильный вес и безупречная геометрия. Это не просто сувенир — это физическое воплощение вашего цифрового триумфа.
+            </p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black py-12 border-t border-gray-900">
+        <div class="container mx-auto text-center">
+            <p class="font-serif italic text-gucci-gold mb-4 text-xl">Creator Awards</p>
+            <p class="text-gray-600 text-[10px] uppercase tracking-widest">
+                © 2025 Эксклюзивное Производство. Все права защищены.
+            </p>
+        </div>
+    </footer>
+
+    <!-- PRODUCT MODAL -->
+    <div id="productModal" class="fixed inset-0 z-[100] hidden bg-black/90 flex items-center justify-center p-4">
+        <div class="bg-gucci-black border border-gray-800 w-full max-w-5xl relative shadow-2xl modal-content flex flex-col md:flex-row animate-fade-in-up">
+            <!-- Close Button -->
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-white hover:text-gucci-gold z-10 text-2xl">
+                <i class="fa-solid fa-times"></i>
+            </button>
+
+            <!-- Left: Gallery -->
+            <div class="w-full md:w-1/2 bg-[#050505] p-4 md:p-8 flex flex-col">
+                <!-- Main Image (Clickable) -->
+                <div class="relative aspect-square w-full mb-4 overflow-hidden cursor-zoom-in border border-gray-800 group" onclick="openLightbox()">
+                    <img id="modalMainImg" src="" class="w-full h-full object-cover transition duration-700 group-hover:scale-105" alt="Main View">
+                    <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300 bg-black/20 pointer-events-none">
+                        <i class="fa-solid fa-magnifying-glass-plus text-white text-3xl drop-shadow-lg"></i>
+                    </div>
+                </div>
+                <!-- Thumbnails (3 items) -->
+                <div class="grid grid-cols-3 gap-2" id="modalThumbnails">
+                    <!-- Thumbnails injected via JS -->
+                </div>
+            </div>
+
+            <!-- Right: Info -->
+            <div class="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center bg-gucci-black">
+                <h3 id="modalTitle" class="font-serif text-3xl md:text-4xl text-white mb-2 uppercase"></h3>
+                <div class="w-12 h-[1px] bg-gucci-gold mb-6"></div>
+                
+                <div id="modalPrice" class="font-serif text-3xl text-gucci-gold mb-8"></div>
+                
+                <p id="modalDesc" class="font-sans text-gray-400 leading-relaxed mb-10 text-sm md:text-base"></p>
+                
+                <button id="modalBtn" class="bg-gucci-gold text-black py-4 px-8 uppercase tracking-[0.2em] font-bold hover:bg-white transition duration-300 flex items-center justify-center gap-3">
+                    <i class="fa-brands fa-whatsapp text-xl"></i>
+                    Заказать в WhatsApp
+                </button>
+                
+                <p class="mt-6 text-xs text-gray-600 text-center uppercase tracking-widest">
+                    Срок изготовления: 3-5 дней <br> Доставка по всей России
+                </p>
+            </div>
+        </div>
     </div>
 
-    <!-- Ползунок -->
-    <div class="mt-4 px-4">
-        <input type="range" id="carousel-slider" min="0" value="0" class="w-full">
-    </div>
-</div>
-
-<script>
-    // ------------------------------------
-    // 1. КОНФИГУРАЦИЯ ИГРЫ
-    // ------------------------------------
-
-    const animals = [
-        { id: 'dog', name: 'Собачка', emoji: '🐶' }, 
-        { id: 'cat', name: 'Кошечка', emoji: '🐱' },
-        { id: 'pig', name: 'Свинка', emoji: '🐷' },
-        { id: 'cow', name: 'Коровка', emoji: '🐮' },
-        { id: 'lion', name: 'Лёва', emoji: '🦁' },
-        { id: 'duck', name: 'Уточка', emoji: '🦆' },
-        { id: 'bear', name: 'Мишка', emoji: '🐻' },
-        { id: 'fox', name: 'Лисичка', emoji: '🦊' },
-        { id: 'rabbit', name: 'Зайчик', emoji: '🐰' },
-        { id: 'monkey', name: 'Обезьянка', emoji: '🐒' },
-        { id: 'zebra', name: 'Зебра', emoji: '🦓' },
-        { id: 'horse', name: 'Лошадка', emoji: '🐴' },
-        { id: 'tiger', name: 'Тигрёнок', emoji: '🐯' },
-    ];
-
-    let currentQuestion = {};
-    let isCorrectlyAnswered = false;
-
-    // Ссылки на элементы DOM
-    const dropZoneEl = document.getElementById('drop-zone');
-    const silhouetteIconEl = document.getElementById('silhouette-icon');
-    const choicesWrapperEl = document.getElementById('choices-wrapper'); 
-    const statusMessageEl = document.getElementById('status-message');
-    const carouselSliderEl = document.getElementById('carousel-slider'); 
-    
-    let carouselTrackEl = null; 
-
-    // ------------------------------------
-    // 2. ЛОГИКА ИГРЫ И D&D
-    // ------------------------------------
-
-    function shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
-        }
-        return array;
-    }
-
-    function createNewQuestion() {
-        const correctAnswer = animals[Math.floor(Math.random() * animals.length)];
+    <!-- LIGHTBOX (Full Screen Image) -->
+    <div id="lightbox" class="fixed inset-0 z-[200] hidden bg-black flex items-center justify-center p-2" onclick="closeLightbox()">
+        <button class="absolute top-4 right-4 text-white text-4xl hover:text-gucci-gold z-[210]">
+            <i class="fa-solid fa-times"></i>
+        </button>
         
-        // 8 вариантов выбора: 1 правильный и 7 неправильных
-        const incorrectAnswers = shuffleArray(animals.filter(a => a.id !== correctAnswer.id)).slice(0, 7);
-        const choices = shuffleArray([correctAnswer, ...incorrectAnswers]);
+        <!-- Navigation Arrows -->
+        <div class="lightbox-nav-btn lightbox-prev" onclick="prevImage(event)">
+            <i class="fa-solid fa-chevron-left"></i>
+        </div>
+        <div class="lightbox-nav-btn lightbox-next" onclick="nextImage(event)">
+            <i class="fa-solid fa-chevron-right"></i>
+        </div>
 
-        currentQuestion = {
-            correct: correctAnswer,
-            choices: choices 
+        <img id="lightboxImg" src="" class="max-w-full max-h-full object-contain shadow-2xl border border-gray-800" alt="Full View">
+    </div>
+
+    <script>
+        // Data with 3 placeholder images per product
+        // ⚠️ ЗАМЕНИТЕ ССЫЛКИ НА ВАШИ ФОТО НИЖЕ В МАССИВАХ images: [...]
+        const products = {
+            silver: {
+                title: "Серебряная Кнопка",
+                price: "10 200 ₽",
+                desc: "Идеальная реплика награды YouTube Creator Award за 100,000 подписчиков. Выполнена из зеркального полированного металла с глубоким серебряным покрытием. Тяжелая, солидная, с возможностью персонализации имени канала.",
+                images: [
+                    "https://placehold.co/800x800/333333/FFFFFF/png?text=СЕРЕБРО+ФАС",
+                    "https://placehold.co/800x800/444444/FFFFFF/png?text=СЕРЕБРО+БОК",
+                    "https://placehold.co/800x800/222222/FFFFFF/png?text=СЕРЕБРО+ДЕТАЛИ"
+                ]
+            },
+            gold: {
+                title: "Золотая Кнопка",
+                price: "12 800 ₽",
+                desc: "Символ миллионной аудитории. Покрытие золотом 24 карат, безупречный зеркальный блеск. Массивная конструкция, полностью повторяющая оригинал по весу и тактильным ощущениям.",
+                images: [
+                    "https://placehold.co/800x800/D4AF37/000000/png?text=ЗОЛОТО+ФАС",
+                    "https://placehold.co/800x800/C5A028/000000/png?text=ЗОЛОТО+РАКУРС",
+                    "https://placehold.co/800x800/F0C040/000000/png?text=ЗОЛОТО+УПАКОВКА"
+                ]
+            },
+            telegram: {
+                title: "Награда Telegram",
+                price: "9 800 ₽",
+                desc: "Уникальная награда для администраторов каналов Telegram. Сочетание авиационного алюминия и кристально прозрачного акрила. Фирменный синий цвет логотипа с внутренней подсветкой граней.",
+                images: [
+                    "https://placehold.co/800x800/2AABEE/FFFFFF/png?text=TG+ФАС",
+                    "https://placehold.co/800x800/2090D0/FFFFFF/png?text=TG+РАКУРС",
+                    "https://placehold.co/800x800/50C0FF/FFFFFF/png?text=TG+ДЕТАЛИ"
+                ]
+            },
+            instagram: {
+                title: "Кнопка Instagram",
+                price: "10 500 ₽",
+                desc: "Яркая и стильная награда для звезд Instagram. Многослойный акрил с градиентной печатью высокого разрешения. Глянцевая поверхность, устойчивая к царапинам.",
+                images: [
+                    "https://placehold.co/800x800/E1306C/FFFFFF/png?text=INSTA+ФАС",
+                    "https://placehold.co/800x800/C12050/FFFFFF/png?text=INSTA+БОК",
+                    "https://placehold.co/800x800/F15080/FFFFFF/png?text=INSTA+ДЕТАЛИ"
+                ]
+            },
+            chatgpt: {
+                title: "Награда ChatGPT",
+                price: "11 200 ₽",
+                desc: "Для пионеров искусственного интеллекта. Изумрудный оттенок логотипа OpenAI, выполненный в строгом минимализме. Идеальный подарок для разработчиков и энтузиастов AI.",
+                images: [
+                    "https://placehold.co/800x800/10A37F/FFFFFF/png?text=GPT+ФАС",
+                    "https://placehold.co/800x800/0E8060/FFFFFF/png?text=GPT+РАКУРС",
+                    "https://placehold.co/800x800/20C090/FFFFFF/png?text=GPT+ДЕТАЛИ"
+                ]
+            },
+            like: {
+                title: "Кнопка Лайк",
+                price: "8 900 ₽",
+                desc: "Скульптурная композиция в виде знаменитого 'пальца вверх'. Выполнена из прочного композитного материала с ручной покраской. Отлично смотрится на рабочем столе стримера.",
+                images: [
+                    "https://placehold.co/800x800/f5f5f5/000000/png?text=LIKE+ФАС",
+                    "https://placehold.co/800x800/e0e0e0/000000/png?text=LIKE+БОК",
+                    "https://placehold.co/800x800/ffffff/000000/png?text=LIKE+УПАКОВКА"
+                ]
+            }
         };
-    }
 
-    // Вспомогательная функция для создания карточек и добавления слушателей D&D
-    function renderChoices(choices) {
-        choices.forEach(animal => {
-            const card = document.createElement('div');
-            card.className = 'choice-card';
-            card.id = `card-${animal.id}-${Date.now() + Math.random()}`; 
-            card.setAttribute('data-id', animal.id);
-            // pointer-events-none для span, чтобы перетаскивание срабатывало на div
-            card.innerHTML = `<span class="pointer-events-none">${animal.emoji}</span>
-                              <span class="mt-1 pointer-events-none">${animal.name}</span>`;
+        // Global state to track current product and image index
+        let activeProductId = null;
+        let activeImageIndex = 0;
+
+        // --- MODAL LOGIC ---
+        const modal = document.getElementById('productModal');
+        const modalMainImg = document.getElementById('modalMainImg');
+        const modalThumbnails = document.getElementById('modalThumbnails');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalPrice = document.getElementById('modalPrice');
+        const modalDesc = document.getElementById('modalDesc');
+        const modalBtn = document.getElementById('modalBtn');
+
+        function openModal(productId) {
+            activeProductId = productId;
+            activeImageIndex = 0; // Reset to first image
             
-            carouselTrackEl.appendChild(card);
-            addDragListeners(card);
+            const product = products[productId];
+            if (!product) return;
+
+            // Set Text
+            modalTitle.innerText = product.title;
+            modalPrice.innerText = product.price;
+            modalDesc.innerText = product.desc;
+
+            updateModalImages();
+
+            // Set WhatsApp Action
+            modalBtn.onclick = () => orderViaWhatsapp(product.title);
+
+            // Show Modal
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // Prevent background scroll
+        }
+
+        function updateModalImages() {
+            const product = products[activeProductId];
+            
+            // 1. Set Main Image
+            modalMainImg.src = product.images[activeImageIndex];
+            
+            // 2. Generate Thumbnails
+            modalThumbnails.innerHTML = '';
+            product.images.forEach((imgSrc, index) => {
+                const thumb = document.createElement('img');
+                thumb.src = imgSrc;
+                thumb.className = `w-full h-24 object-cover border-2 cursor-pointer transition hover:opacity-100 ${index === activeImageIndex ? 'border-gucci-gold opacity-100' : 'border-transparent opacity-60'}`;
+                
+                thumb.onclick = () => {
+                    activeImageIndex = index;
+                    updateModalImages(); // Refresh view
+                };
+                
+                modalThumbnails.appendChild(thumb);
+            });
+        }
+
+        function closeModal() {
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside content
+        modal.onclick = (e) => {
+            if (e.target === modal) closeModal();
+        }
+
+        // --- LIGHTBOX LOGIC ---
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightboxImg');
+
+        function openLightbox() {
+            updateLightboxImage();
+            lightbox.classList.remove('hidden');
+        }
+
+        function closeLightbox() {
+            lightbox.classList.add('hidden');
+        }
+
+        function updateLightboxImage() {
+            const product = products[activeProductId];
+            lightboxImg.src = product.images[activeImageIndex];
+        }
+
+        function nextImage(e) {
+            e.stopPropagation(); // Stop click from closing lightbox
+            const product = products[activeProductId];
+            activeImageIndex = (activeImageIndex + 1) % product.images.length;
+            updateLightboxImage();
+        }
+
+        function prevImage(e) {
+            e.stopPropagation();
+            const product = products[activeProductId];
+            activeImageIndex = (activeImageIndex - 1 + product.images.length) % product.images.length;
+            updateLightboxImage();
+        }
+
+        // Keyboard navigation support
+        document.addEventListener('keydown', (e) => {
+            if (lightbox.classList.contains('hidden')) return;
+            if (e.key === 'ArrowRight') nextImage(e);
+            if (e.key === 'ArrowLeft') prevImage(e);
+            if (e.key === 'Escape') closeLightbox();
         });
-    }
-    
-    // --- ФУНКЦИИ СЛАЙДЕРА/СВАЙПА ---
-    function updateSliderConfig() {
-        // Проверяем, существует ли карусель, прежде чем работать с ней
-        if (!carouselTrackEl) return;
-        
-        // Вычисляем максимальное расстояние для прокрутки
-        const maxScroll = carouselTrackEl.scrollWidth - choicesWrapperEl.clientWidth;
-        
-        if (maxScroll <= 0) {
-            // Если контент не прокручивается, скрываем ползунок
-            carouselSliderEl.style.display = 'none';
-            carouselSliderEl.max = 0;
-            carouselSliderEl.value = 0;
-            choicesWrapperEl.scrollLeft = 0; 
-        } else {
-            // Иначе показываем и настраиваем ползунок
-            carouselSliderEl.style.display = 'block';
-            carouselSliderEl.max = maxScroll;
-            // Обновляем значение ползунка до текущей прокрутки
-            carouselSliderEl.value = choicesWrapperEl.scrollLeft; 
-        }
-    }
 
-    // Слушатель: Движение ползунка -> Прокрутка карусели
-    carouselSliderEl.addEventListener('input', () => {
-        choicesWrapperEl.scrollLeft = carouselSliderEl.value;
-    });
 
-    // Слушатель: Прокрутка карусели (свайп/мышь) -> Обновление ползунка
-    choicesWrapperEl.addEventListener('scroll', () => {
-        carouselSliderEl.value = choicesWrapperEl.scrollLeft;
-    });
-    
-    // Слушатель для обработки поворота экрана/изменения размера окна
-    window.addEventListener('resize', updateSliderConfig);
-    // --- КОНЕЦ ФУНКЦИЙ СЛАЙДЕРА/СВАЙПА ---
-
-    // Инициализация/запуск нового раунда
-    function startNewRound() {
-        isCorrectlyAnswered = false;
-        dropZoneEl.classList.remove('bg-green-100');
-        statusMessageEl.classList.add('hidden');
-        
-        // --- Очистка и создание карусели ---
-        choicesWrapperEl.innerHTML = '';
-        Array.from(dropZoneEl.children).forEach(child => {
-            if (child.classList.contains('correct-match-card')) {
-                child.remove(); 
-            }
+        // --- SCROLL ANIMATION ---
+        const observerOptions = {
+            threshold: 0.1
+        };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+        document.querySelectorAll('.fade-in-up').forEach(el => {
+            observer.observe(el);
         });
-        
-        carouselTrackEl = document.createElement('div');
-        carouselTrackEl.id = 'carousel-track';
-        choicesWrapperEl.appendChild(carouselTrackEl);
-        // --- КОНЕЦ ОЧИСТКИ ---
 
-        createNewQuestion();
-
-        // 1. Устанавливаем силуэт
-        silhouetteIconEl.textContent = currentQuestion.correct.emoji;
-        silhouetteIconEl.style.opacity = '0.7'; 
-        
-        // 2. Создаем карточки выбора (8 уникальных вариантов)
-        renderChoices(currentQuestion.choices);
-        
-        // 3. Обновляем конфигурацию ползунка
-        // Используем небольшую задержку, чтобы браузер успел отрисовать track width
-        setTimeout(updateSliderConfig, 100); 
-    }
-
-    // --- D&D ФУНКЦИИ ---
-    let activeItem = null;
-    let currentX;
-    let currentY;
-    let xOffset = 0;
-    let yOffset = 0;
-
-    function addDragListeners(item) {
-        item.addEventListener("touchstart", dragStart, false);
-        item.addEventListener("touchend", dragEnd, false);
-        item.addEventListener("touchmove", drag, false);
-        item.addEventListener("mousedown", dragStart, false);
-        item.addEventListener("mouseup", dragEnd, false);
-        item.addEventListener("mousemove", drag, false);
-    }
-
-    function getCoordinates(e) {
-        if (e.type.includes("touch")) {
-            // Убеждаемся, что touch-событие имеет touches
-            if (e.touches && e.touches.length > 0) {
-                 return { clientX: e.touches[0].clientX, clientY: e.touches[0].clientY };
-            }
-            // Для touchend, touches может быть пустым, используем changedTouches
-            if (e.changedTouches && e.changedTouches.length > 0) {
-                 return { clientX: e.changedTouches[0].clientX, clientY: e.changedTouches[0].clientY };
-            }
-            return { clientX: null, clientY: null }; // Fallback
-        }
-        return { clientX: e.clientX, clientY: e.clientY };
-    }
-    
-    function dragStart(e) {
-        if (isCorrectlyAnswered) return;
-        const coords = getCoordinates(e);
-        if (!coords.clientX) return; // Защита от пустого touch-события
-
-        activeItem = e.target.closest('.choice-card');
-        if (activeItem) {
-            e.preventDefault(); 
+        // --- WHATSAPP LOGIC ---
+        function orderViaWhatsapp(item) {
+            const phone = '79779662521';
+            let message = '';
             
-            // Если карточка перетаскивается, ее свайп-родитель не должен прокручиваться
-            choicesWrapperEl.style.overflowX = 'hidden'; 
-            
-            const rect = activeItem.getBoundingClientRect();
-            xOffset = coords.clientX - rect.left;
-            yOffset = coords.clientY - rect.top;
-            
-            activeItem.classList.add('dragging');
-            activeItem.style.position = 'absolute';
-            // Перемещаем карточку в body, чтобы она не обрезалась контейнером
-            document.body.appendChild(activeItem); 
-            
-            currentX = coords.clientX - xOffset;
-            currentY = coords.clientY - yOffset;
-        }
-    }
-
-    function dragEnd(e) {
-        if (!activeItem || isCorrectlyAnswered) return;
-        
-        // Восстанавливаем возможность свайпа/прокрутки
-        choicesWrapperEl.style.overflowX = 'scroll'; 
-
-        const dropZoneRect = dropZoneEl.getBoundingClientRect();
-        const droppedId = activeItem.getAttribute('data-id');
-
-        // Проверка попадания в зону сброса (Drop Zone)
-        const isDroppedOver = 
-            currentX + (activeItem.offsetWidth / 2) > dropZoneRect.left &&
-            currentX + (activeItem.offsetWidth / 2) < dropZoneRect.right &&
-            currentY + (activeItem.offsetHeight / 2) > dropZoneRect.top &&
-            currentY + (activeItem.offsetHeight / 2) < dropZoneRect.bottom;
-
-        if (isDroppedOver) {
-            checkMatch(droppedId, activeItem);
-        } else {
-            resetCardPosition(activeItem);
-        }
-        activeItem = null;
-        xOffset = 0;
-        yOffset = 0;
-    }
-
-    function drag(e) {
-        if (!activeItem || isCorrectlyAnswered) return;
-        e.preventDefault(); 
-        const coords = getCoordinates(e);
-        if (!coords.clientX) return; // Защита от пустого touch-события
-
-        currentX = coords.clientX - xOffset;
-        currentY = coords.clientY - yOffset;
-        activeItem.style.left = `${currentX}px`;
-        activeItem.style.top = `${currentY}px`;
-    }
-    
-    function resetCardPosition(card) {
-        // Возвращаем карточку обратно в карусель
-        carouselTrackEl.appendChild(card); 
-        card.classList.remove('dragging');
-        card.style.position = 'relative'; 
-        card.style.left = 'auto';
-        card.style.top = 'auto';
-        card.style.transform = 'none'; 
-        showStatus('Попробуй ещё! ✨', 'hint', 1000); 
-    }
-    
-    function checkMatch(droppedId, cardElement) {
-        if (droppedId === currentQuestion.correct.id) {
-            isCorrectlyAnswered = true;
-            
-            choicesWrapperEl.style.overflowX = 'hidden'; 
-
-            startConfetti();
-            dropZoneEl.classList.add('bg-green-100');
-            showStatus(`🥳 Ура! Это ${currentQuestion.correct.name}!`, 'success', 2500); 
-
-            cardElement.style.position = 'absolute';
-            cardElement.style.top = '50%';
-            cardElement.style.left = '50%';
-            cardElement.style.transform = 'translate(-50%, -50%) scale(1.1)'; 
-            cardElement.classList.remove('dragging');
-            cardElement.classList.add('correct-match-card'); 
-            
-            const nameSpan = cardElement.querySelector('span:nth-child(2)');
-            if (nameSpan) {
-                nameSpan.style.display = 'block'; 
-                nameSpan.classList.add('text-xl', 'text-gray-800', 'font-bold');
-                nameSpan.classList.remove('text-xs', 'font-semibold', 'text-gray-600');
+            if (item === 'Консультация') {
+                message = 'Здравствуйте. Меня интересует консультация по кнопкам YouTube.';
+            } else {
+                message = `Здравствуйте. Я хочу заказать: ${item}. Расскажите подробнее о доставке и оплате.`;
             }
             
-            dropZoneEl.appendChild(cardElement);
-            
-            choicesWrapperEl.innerHTML = '';
-            silhouetteIconEl.style.opacity = '0';
-            
-            // Запускаем новый раунд
-            setTimeout(() => {
-                startNewRound();
-            }, 2500); 
-
-        } else {
-            resetCardPosition(cardElement);
+            const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+            window.open(url, '_blank');
         }
-    }
-
-    function showStatus(message, type, duration) {
-        statusMessageEl.textContent = message;
-        statusMessageEl.className = 'message-box';
-        statusMessageEl.classList.add(type);
-        statusMessageEl.classList.remove('hidden');
-
-        setTimeout(() => {
-            statusMessageEl.classList.add('hidden');
-        }, duration);
-    }
-
-    window.onload = startNewRound;
-    
-    function startConfetti() {
-        const count = 40; 
-        const dropZoneRect = dropZoneEl.getBoundingClientRect();
-        
-        for (let i = 0; i < count; i++) {
-            const confetti = document.createElement('div');
-            confetti.className = 'confetti';
-            confetti.style.left = `${Math.random() * dropZoneRect.width}px`;
-            confetti.style.top = `${dropZoneRect.height / 2}px`;
-            confetti.style.animationDelay = `${Math.random() * 0.7}s`; 
-            
-            dropZoneEl.appendChild(confetti);
-            
-            setTimeout(() => confetti.remove(), 2500); 
-        }
-    }
-
-</script>
+    </script>
 </body>
 </html>
+
 
