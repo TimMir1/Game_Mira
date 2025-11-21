@@ -6,14 +6,11 @@
     
     <!-- SEO & AI SEARCH OPTIMIZATION -->
     <title>Кнопки Ютуба на заказ | Золотые и Серебряные</title>
-    <meta name="description" content="Изготовление и продажа золотых и серебряных кнопок YouTube. Эксклюзивный подарок для блогера. Высокое качество, ручная работа, доставка.">
-    <meta name="keywords" content="купить кнопку ютуб, золотая кнопка youtube цена, серебряная кнопка youtube заказать, подарок блогеру, награда ютуб копия, youtube creator awards buy, кнопка 100000 подписчиков, кнопка 1000000 подписчиков">
-    <meta name="author" content="Creator Awards Russia">
+    <meta name="description" content="Изготовление и продажа золотых и серебряных кнопок YouTube. Эксклюзивный подарок для блогера.">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- Добавил &subset=cyrillic для поддержки русского языка во всех шрифтах -->
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&subset=cyrillic&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -44,7 +41,6 @@
             background-color: #0a0a0a;
             color: #f5f5f5;
             -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
         }
         .luxury-border {
             border: 1px solid rgba(212, 175, 55, 0.3);
@@ -58,92 +54,63 @@
             opacity: 1;
             transform: translateY(0);
         }
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0a0a0a;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #333;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #d4af37;
-        }
         .btn-hover-effect {
             transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
         }
         .btn-hover-effect:hover {
             background-color: #d4af37;
             color: #000;
         }
-        .product-card:hover .product-img {
-            transform: scale(1.05);
-        }
         .product-img {
-            transition: transform 0.7s ease;
+            transition: opacity 0.5s ease;
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-        .img-placeholder {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(45deg, #1a1a1a, #333);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #666;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            text-align: center;
-            padding: 10px;
-        }
-
-        /* Modal Styles */
-        #productModal {
-            backdrop-filter: blur(10px);
-        }
-        .modal-content {
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        /* Thumbnails */
-        .thumb-active {
-            border-color: #d4af37;
-            opacity: 1;
-        }
-
-        /* Lightbox Navigation */
-        .lightbox-nav-btn {
+        .slider-arrow {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            color: white;
-            font-size: 2rem;
-            padding: 20px;
-            cursor: pointer;
-            z-index: 210;
-            opacity: 0.7;
-            transition: opacity 0.3s, color 0.3s;
-            background: rgba(0,0,0,0.3); /* Фон для стрелок чтобы видно было */
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
+            background: rgba(0, 0, 0, 0.6);
+            color: #d4af37;
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            border-radius: 50%;
+            transition: all 0.3s;
         }
-        .lightbox-nav-btn:hover {
-            opacity: 1;
-            color: #d4af37;
-            background: rgba(0,0,0,0.8);
+        .slider-arrow:hover {
+            background: #d4af37;
+            color: black;
         }
-        .lightbox-prev { left: 10px; }
-        .lightbox-next { right: 10px; }
+        .arrow-left { left: 10px; }
+        .arrow-right { right: 10px; }
+
+        /* Dots for slider */
+        .slider-dots {
+            position: absolute;
+            bottom: 15px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            z-index: 10;
+        }
+        .dot {
+            width: 6px;
+            height: 6px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 50%;
+        }
+        .dot.active {
+            background: #d4af37;
+            transform: scale(1.2);
+        }
     </style>
 </head>
 <body class="antialiased overflow-x-hidden">
@@ -151,7 +118,6 @@
     <!-- Navigation -->
     <nav class="fixed w-full z-50 bg-gucci-black/95 backdrop-blur-md border-b border-gray-800 py-6">
         <div class="container mx-auto text-center cursor-pointer" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
-            <!-- Добавил пробел &nbsp; между словами -->
             <h1 class="font-serif text-2xl md:text-3xl tracking-[0.2em] text-gucci-gold font-bold uppercase">
                 КНОПКИ&nbsp;<span class="text-white">ЮТУБА</span>
             </h1>
@@ -173,7 +139,7 @@
                 СИМВОЛ <br/> <span class="italic text-gucci-gold">УСПЕХА</span>
             </h2>
             <p class="font-sans text-gray-300 max-w-xl mx-auto text-sm md:text-lg leading-relaxed mb-12 fade-in-up delay-300">
-                Эксклюзивные награды для тех, кто создает историю. Золотые и Серебряные кнопки YouTube. Ручная работа. Премиальное качество материалов.
+                Эксклюзивные награды для тех, кто создает историю. Золотые и Серебряные кнопки YouTube. Ручная работа.
             </p>
             <a href="#collection" class="inline-block px-12 py-4 border border-white text-white font-sans uppercase tracking-[0.2em] text-xs hover:bg-white hover:text-black transition duration-500 fade-in-up delay-500">
                 СМОТРЕТЬ КОЛЛЕКЦИЮ
@@ -194,162 +160,135 @@
                 <div class="w-24 h-[1px] bg-gucci-gold mx-auto"></div>
             </div>
 
-            <!-- Изменил grid-cols-1 md:grid-cols-2 на lg:grid-cols-2. Теперь на планшетах и телефонах всегда 1 колонка -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16">
                 
-                <!-- Silver Item -->
-                <div class="product-card group cursor-pointer fade-in-up" onclick="openModal('silver')">
-                    <div class="relative aspect-[4/5] overflow-hidden mb-8 bg-[#1a1a1a] luxury-border">
-                        <img 
-                            id="grid-img-silver"
-                            src="https://placehold.co/600x800/333333/FFFFFF/png?text=ФОТО+СЕРЕБРЯНОЙ+КНОПКИ" 
-                            alt="Серебряная кнопка Ютуб 100к подписчиков" 
-                            class="product-img"
-                            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
-                        >
-                        <div class="img-placeholder hidden h-full w-full absolute top-0 left-0">ФОТО СЕРЕБРЯНОЙ КНОПКИ</div>
+                <!-- Silver Item (с вашими фото) -->
+                <div class="product-card fade-in-up">
+                    <div class="relative aspect-[4/5] overflow-hidden mb-8 bg-[#1a1a1a] luxury-border group">
+                        <!-- Слайдер изображений -->
+                        <img id="img-silver" src="images/IMG_20251113_162956.jpg" alt="Серебряная кнопка" class="product-img">
+                        
+                        <!-- Стрелки управления (появляются при наведении на ПК, всегда доступны на моб) -->
+                        <div class="slider-arrow arrow-left" onclick="changeImage('silver', -1)">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </div>
+                        <div class="slider-arrow arrow-right" onclick="changeImage('silver', 1)">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </div>
+                        
                         <div class="absolute bottom-4 left-4 text-xs tracking-widest text-gray-500">NO. 100K</div>
                     </div>
                     <div class="text-center px-4">
                         <h4 class="font-serif text-2xl text-white mb-2">СЕРЕБРЯНАЯ КНОПКА</h4>
                         <p class="text-gray-400 text-xs tracking-widest uppercase mb-4">Серебряное напыление • 100,000 Подписчиков</p>
-                        <!-- Заменил символ ₽ на текст "руб." -->
                         <div class="font-serif text-3xl text-gucci-gold mb-6">10 200 руб.</div>
-                        <button class="btn-hover-effect w-full md:w-auto border border-gray-600 px-10 py-3 text-sm uppercase tracking-widest text-white hover:border-gucci-gold">
-                            ПОДРОБНЕЕ
+                        <button onclick="orderViaWhatsapp('Серебряная кнопка')" class="btn-hover-effect w-full border border-gucci-gold bg-gucci-gold text-black px-10 py-4 text-sm uppercase tracking-widest font-bold hover:bg-white">
+                            ЗАКАЗАТЬ
                         </button>
                     </div>
                 </div>
 
                 <!-- Gold Item -->
-                <div class="product-card group cursor-pointer fade-in-up delay-100" onclick="openModal('gold')">
-                    <div class="relative aspect-[4/5] overflow-hidden mb-8 bg-[#1a1a1a] luxury-border">
-                        <img 
-                            id="grid-img-gold"
-                            src="https://placehold.co/600x800/D4AF37/000000/png?text=ФОТО+ЗОЛОТОЙ+КНОПКИ" 
-                            alt="Золотая кнопка Ютуб 1 миллион подписчиков" 
-                            class="product-img"
-                            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
-                        >
-                        <div class="img-placeholder hidden h-full w-full absolute top-0 left-0 text-gucci-gold">ФОТО ЗОЛОТОЙ КНОПКИ</div>
+                <div class="product-card fade-in-up delay-100">
+                    <div class="relative aspect-[4/5] overflow-hidden mb-8 bg-[#1a1a1a] luxury-border group">
+                        <img id="img-gold" src="https://placehold.co/600x800/D4AF37/000000/png?text=ЗОЛОТО+ФАС" alt="Золотая кнопка" class="product-img">
+                        
+                        <div class="slider-arrow arrow-left" onclick="changeImage('gold', -1)"><i class="fa-solid fa-chevron-left"></i></div>
+                        <div class="slider-arrow arrow-right" onclick="changeImage('gold', 1)"><i class="fa-solid fa-chevron-right"></i></div>
+
                         <div class="absolute bottom-4 left-4 text-xs tracking-widest text-gucci-gold">NO. 1M</div>
                     </div>
                     <div class="text-center px-4">
                         <h4 class="font-serif text-2xl text-gucci-gold mb-2">ЗОЛОТАЯ КНОПКА</h4>
                         <p class="text-gray-400 text-xs tracking-widest uppercase mb-4">Покрытие Золото 24K • 1,000,000 Подписчиков</p>
                         <div class="font-serif text-3xl text-gucci-gold mb-6">12 800 руб.</div>
-                        <button class="btn-hover-effect w-full md:w-auto border border-gucci-gold px-10 py-3 text-sm uppercase tracking-widest text-white hover:border-gucci-gold">
-                            ПОДРОБНЕЕ
+                        <button onclick="orderViaWhatsapp('Золотая кнопка')" class="btn-hover-effect w-full border border-gucci-gold bg-gucci-gold text-black px-10 py-4 text-sm uppercase tracking-widest font-bold hover:bg-white">
+                            ЗАКАЗАТЬ
                         </button>
                     </div>
                 </div>
 
                 <!-- Telegram Item -->
-                <div class="product-card group cursor-pointer fade-in-up delay-200" onclick="openModal('telegram')">
-                    <div class="relative aspect-[4/5] overflow-hidden mb-8 bg-[#1a1a1a] luxury-border">
-                        <img 
-                            id="grid-img-telegram"
-                            src="https://placehold.co/600x800/2AABEE/FFFFFF/png?text=ФОТО+TELEGRAM" 
-                            alt="Награда Telegram" 
-                            class="product-img"
-                            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
-                        >
-                        <div class="img-placeholder hidden h-full w-full absolute top-0 left-0 text-blue-400">ФОТО TELEGRAM</div>
+                <div class="product-card fade-in-up delay-200">
+                    <div class="relative aspect-[4/5] overflow-hidden mb-8 bg-[#1a1a1a] luxury-border group">
+                        <img id="img-telegram" src="https://placehold.co/600x800/2AABEE/FFFFFF/png?text=TG+ФАС" alt="Telegram Award" class="product-img">
+                        
+                        <div class="slider-arrow arrow-left" onclick="changeImage('telegram', -1)"><i class="fa-solid fa-chevron-left"></i></div>
+                        <div class="slider-arrow arrow-right" onclick="changeImage('telegram', 1)"><i class="fa-solid fa-chevron-right"></i></div>
+
                         <div class="absolute bottom-4 left-4 text-xs tracking-widest text-blue-400">TG AWARD</div>
                     </div>
                     <div class="text-center px-4">
                         <h4 class="font-serif text-2xl text-white mb-2">НАГРАДА TELEGRAM</h4>
-                        <p class="text-gray-400 text-xs tracking-widest uppercase mb-4">Кристалл & Алюминий • Лимитированная серия</p>
+                        <p class="text-gray-400 text-xs tracking-widest uppercase mb-4">Кристалл & Алюминий</p>
                         <div class="font-serif text-3xl text-gucci-gold mb-6">9 800 руб.</div>
-                        <button class="btn-hover-effect w-full md:w-auto border border-gray-600 px-10 py-3 text-sm uppercase tracking-widest text-white hover:border-gucci-gold">
-                            ПОДРОБНЕЕ
+                        <button onclick="orderViaWhatsapp('Награда Telegram')" class="btn-hover-effect w-full border border-gray-600 px-10 py-4 text-sm uppercase tracking-widest text-white hover:border-gucci-gold">
+                            ЗАКАЗАТЬ
                         </button>
                     </div>
                 </div>
 
                 <!-- Instagram Item -->
-                <div class="product-card group cursor-pointer fade-in-up delay-200" onclick="openModal('instagram')">
-                    <div class="relative aspect-[4/5] overflow-hidden mb-8 bg-[#1a1a1a] luxury-border">
-                        <img 
-                            id="grid-img-instagram"
-                            src="https://placehold.co/600x800/E1306C/FFFFFF/png?text=ФОТО+INSTAGRAM" 
-                            alt="Награда Instagram" 
-                            class="product-img"
-                            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
-                        >
-                        <div class="img-placeholder hidden h-full w-full absolute top-0 left-0 text-pink-500">ФОТО INSTAGRAM</div>
+                <div class="product-card fade-in-up delay-200">
+                    <div class="relative aspect-[4/5] overflow-hidden mb-8 bg-[#1a1a1a] luxury-border group">
+                        <img id="img-instagram" src="https://placehold.co/600x800/E1306C/FFFFFF/png?text=INSTA+ФАС" alt="Instagram Award" class="product-img">
+                        
+                        <div class="slider-arrow arrow-left" onclick="changeImage('instagram', -1)"><i class="fa-solid fa-chevron-left"></i></div>
+                        <div class="slider-arrow arrow-right" onclick="changeImage('instagram', 1)"><i class="fa-solid fa-chevron-right"></i></div>
+
                         <div class="absolute bottom-4 left-4 text-xs tracking-widest text-pink-500">IG STAR</div>
                     </div>
                     <div class="text-center px-4">
                         <h4 class="font-serif text-2xl text-white mb-2">КНОПКА INSTAGRAM</h4>
-                        <p class="text-gray-400 text-xs tracking-widest uppercase mb-4">Зеркальный акрил • Премиум Глянец</p>
+                        <p class="text-gray-400 text-xs tracking-widest uppercase mb-4">Зеркальный акрил</p>
                         <div class="font-serif text-3xl text-gucci-gold mb-6">10 500 руб.</div>
-                        <button class="btn-hover-effect w-full md:w-auto border border-gray-600 px-10 py-3 text-sm uppercase tracking-widest text-white hover:border-gucci-gold">
-                            ПОДРОБНЕЕ
+                        <button onclick="orderViaWhatsapp('Кнопка Instagram')" class="btn-hover-effect w-full border border-gray-600 px-10 py-4 text-sm uppercase tracking-widest text-white hover:border-gucci-gold">
+                            ЗАКАЗАТЬ
                         </button>
                     </div>
                 </div>
 
                 <!-- ChatGPT Item -->
-                <div class="product-card group cursor-pointer fade-in-up delay-300" onclick="openModal('chatgpt')">
-                    <div class="relative aspect-[4/5] overflow-hidden mb-8 bg-[#1a1a1a] luxury-border">
-                        <img 
-                            id="grid-img-chatgpt"
-                            src="https://placehold.co/600x800/10A37F/FFFFFF/png?text=ФОТО+CHATGPT" 
-                            alt="Награда ChatGPT" 
-                            class="product-img"
-                            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
-                        >
-                        <div class="img-placeholder hidden h-full w-full absolute top-0 left-0 text-emerald-500">ФОТО CHATGPT</div>
+                <div class="product-card fade-in-up delay-300">
+                    <div class="relative aspect-[4/5] overflow-hidden mb-8 bg-[#1a1a1a] luxury-border group">
+                        <img id="img-chatgpt" src="https://placehold.co/600x800/10A37F/FFFFFF/png?text=GPT+ФАС" alt="ChatGPT Award" class="product-img">
+                        
+                        <div class="slider-arrow arrow-left" onclick="changeImage('chatgpt', -1)"><i class="fa-solid fa-chevron-left"></i></div>
+                        <div class="slider-arrow arrow-right" onclick="changeImage('chatgpt', 1)"><i class="fa-solid fa-chevron-right"></i></div>
+
                         <div class="absolute bottom-4 left-4 text-xs tracking-widest text-emerald-500">AI PIONEER</div>
                     </div>
                     <div class="text-center px-4">
                         <h4 class="font-serif text-2xl text-white mb-2">НАГРАДА CHATGPT</h4>
-                        <p class="text-gray-400 text-xs tracking-widest uppercase mb-4">Изумрудный оттенок • Символ Интеллекта</p>
+                        <p class="text-gray-400 text-xs tracking-widest uppercase mb-4">Изумрудный оттенок</p>
                         <div class="font-serif text-3xl text-gucci-gold mb-6">11 200 руб.</div>
-                        <button class="btn-hover-effect w-full md:w-auto border border-gray-600 px-10 py-3 text-sm uppercase tracking-widest text-white hover:border-gucci-gold">
-                            ПОДРОБНЕЕ
+                        <button onclick="orderViaWhatsapp('Награда ChatGPT')" class="btn-hover-effect w-full border border-gray-600 px-10 py-4 text-sm uppercase tracking-widest text-white hover:border-gucci-gold">
+                            ЗАКАЗАТЬ
                         </button>
                     </div>
                 </div>
 
-                <!-- Like Button Item -->
-                <div class="product-card group cursor-pointer fade-in-up delay-300" onclick="openModal('like')">
-                    <div class="relative aspect-[4/5] overflow-hidden mb-8 bg-[#1a1a1a] luxury-border">
-                        <img 
-                            id="grid-img-like"
-                            src="images/IMG_20251113_162956.jpg" 
-                            alt="Кнопка Лайк" 
-                            class="product-img"
-                            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
-                        >
-                        <div class="img-placeholder hidden h-full w-full absolute top-0 left-0 text-gray-400">ФОТО ЛАЙК</div>
+                <!-- Like Item -->
+                <div class="product-card fade-in-up delay-300">
+                    <div class="relative aspect-[4/5] overflow-hidden mb-8 bg-[#1a1a1a] luxury-border group">
+                        <img id="img-like" src="https://placehold.co/600x800/f5f5f5/000000/png?text=LIKE+ФАС" alt="Like Award" class="product-img">
+                        
+                        <div class="slider-arrow arrow-left" onclick="changeImage('like', -1)"><i class="fa-solid fa-chevron-left"></i></div>
+                        <div class="slider-arrow arrow-right" onclick="changeImage('like', 1)"><i class="fa-solid fa-chevron-right"></i></div>
+
                         <div class="absolute bottom-4 left-4 text-xs tracking-widest text-gray-400">THE LIKE</div>
                     </div>
                     <div class="text-center px-4">
                         <h4 class="font-serif text-2xl text-white mb-2">КНОПКА ЛАЙК</h4>
-                        <p class="text-gray-400 text-xs tracking-widest uppercase mb-4">Скульптурный дизайн • Настольный формат</p>
+                        <p class="text-gray-400 text-xs tracking-widest uppercase mb-4">Скульптурный дизайн</p>
                         <div class="font-serif text-3xl text-gucci-gold mb-6">8 900 руб.</div>
-                        <button class="btn-hover-effect w-full md:w-auto border border-gray-600 px-10 py-3 text-sm uppercase tracking-widest text-white hover:border-gucci-gold">
-                            ПОДРОБНЕЕ
+                        <button onclick="orderViaWhatsapp('Кнопка Лайк')" class="btn-hover-effect w-full border border-gray-600 px-10 py-4 text-sm uppercase tracking-widest text-white hover:border-gucci-gold">
+                            ЗАКАЗАТЬ
                         </button>
                     </div>
                 </div>
 
             </div>
-        </div>
-    </section>
-
-    <!-- Philosophy / Text Section -->
-    <section class="py-24 px-6 bg-[#0f0f0f] relative">
-        <div class="container mx-auto max-w-4xl text-center">
-            <i class="fa-solid fa-crown text-gucci-gold text-2xl mb-8 opacity-60"></i>
-            <h3 class="font-serif text-3xl md:text-5xl leading-snug text-white mb-8 fade-in-up">
-                "Качество — это не действие. <br/> <span class="text-gray-500 italic">Это привычка.</span>"
-            </h3>
-            <p class="font-sans text-gray-400 leading-loose text-sm md:text-base fade-in-up delay-100">
-                Каждая награда создается с исключительным вниманием к деталям. Зеркальная полировка, правильный вес и безупречная геометрия. Это не просто сувенир — это физическое воплощение вашего цифрового триумфа.
-            </p>
         </div>
     </section>
 
@@ -363,245 +302,78 @@
         </div>
     </footer>
 
-    <!-- PRODUCT MODAL -->
-    <div id="productModal" class="fixed inset-0 z-[100] hidden bg-black/90 flex items-center justify-center p-4">
-        <div class="bg-gucci-black border border-gray-800 w-full max-w-5xl relative shadow-2xl modal-content flex flex-col md:flex-row animate-fade-in-up">
-            <!-- Close Button -->
-            <button onclick="closeModal()" class="absolute top-4 right-4 text-white hover:text-gucci-gold z-10 text-2xl w-10 h-10 flex items-center justify-center rounded-full bg-black/50 md:bg-transparent">
-                <i class="fa-solid fa-times"></i>
-            </button>
-
-            <!-- Left: Gallery -->
-            <div class="w-full md:w-1/2 bg-[#050505] p-4 md:p-8 flex flex-col">
-                <!-- Main Image (Clickable) -->
-                <div class="relative aspect-square w-full mb-4 overflow-hidden cursor-zoom-in border border-gray-800 group" onclick="openLightbox()">
-                    <img id="modalMainImg" src="" class="w-full h-full object-cover transition duration-700 group-hover:scale-105" alt="Main View">
-                    <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300 bg-black/20 pointer-events-none">
-                        <i class="fa-solid fa-magnifying-glass-plus text-white text-3xl drop-shadow-lg"></i>
-                    </div>
-                </div>
-                <!-- Thumbnails (3 items) -->
-                <div class="grid grid-cols-3 gap-2" id="modalThumbnails">
-                    <!-- Thumbnails injected via JS -->
-                </div>
-            </div>
-
-            <!-- Right: Info -->
-            <div class="w-full md:w-1/2 p-6 md:p-12 flex flex-col justify-center bg-gucci-black">
-                <h3 id="modalTitle" class="font-serif text-2xl md:text-4xl text-white mb-2 uppercase"></h3>
-                <div class="w-12 h-[1px] bg-gucci-gold mb-6"></div>
-                
-                <div id="modalPrice" class="font-serif text-2xl md:text-3xl text-gucci-gold mb-8"></div>
-                
-                <p id="modalDesc" class="font-sans text-gray-400 leading-relaxed mb-10 text-sm md:text-base"></p>
-                
-                <button id="modalBtn" class="bg-gucci-gold text-black py-4 px-8 uppercase tracking-[0.2em] font-bold hover:bg-white transition duration-300 flex items-center justify-center gap-3 w-full md:w-auto">
-                    <i class="fa-brands fa-whatsapp text-xl"></i>
-                    <span>Заказать в WhatsApp</span>
-                </button>
-                
-                <p class="mt-6 text-xs text-gray-600 text-center uppercase tracking-widest">
-                    Срок изготовления: 3-5 дней <br> Доставка по всей России
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <!-- LIGHTBOX (Full Screen Image) -->
-    <div id="lightbox" class="fixed inset-0 z-[200] hidden bg-black flex items-center justify-center p-2" onclick="closeLightbox()">
-        <button class="absolute top-4 right-4 text-white text-4xl hover:text-gucci-gold z-[210] w-12 h-12 flex items-center justify-center bg-black/50 rounded-full">
-            <i class="fa-solid fa-times"></i>
-        </button>
-        
-        <!-- Navigation Arrows -->
-        <div class="lightbox-nav-btn lightbox-prev" onclick="prevImage(event)">
-            <i class="fa-solid fa-chevron-left"></i>
-        </div>
-        <div class="lightbox-nav-btn lightbox-next" onclick="nextImage(event)">
-            <i class="fa-solid fa-chevron-right"></i>
-        </div>
-
-        <img id="lightboxImg" src="" class="max-w-full max-h-full object-contain shadow-2xl border border-gray-800" alt="Full View">
-    </div>
-
     <script>
-        // Data with 3 placeholder images per product
-        // ⚠️ ЗАМЕНИТЕ ССЫЛКИ НА ВАШИ ФОТО НИЖЕ В МАССИВАХ images: [...]
+        // База данных изображений для каждого товара
+        // Ваши фото вставлены в 'silver'
         const products = {
-            silver: {
-                title: "Серебряная Кнопка",
-                price: "10 200 руб.",
-                desc: "Идеальная реплика награды YouTube Creator Award за 100,000 подписчиков. Выполнена из зеркального полированного металла с глубоким серебряным покрытием. Тяжелая, солидная, с возможностью персонализации имени канала.",
-                images: [
-                    "https://placehold.co/800x800/333333/FFFFFF/png?text=СЕРЕБРО+ФАС",
-                    "https://placehold.co/800x800/444444/FFFFFF/png?text=СЕРЕБРО+БОК",
-                    "https://placehold.co/800x800/222222/FFFFFF/png?text=СЕРЕБРО+ДЕТАЛИ"
-                ]
-            },
-            gold: {
-                title: "Золотая Кнопка",
-                price: "12 800 руб.",
-                desc: "Символ миллионной аудитории. Покрытие золотом 24 карат, безупречный зеркальный блеск. Массивная конструкция, полностью повторяющая оригинал по весу и тактильным ощущениям.",
-                images: [
-                    "https://placehold.co/800x800/D4AF37/000000/png?text=ЗОЛОТО+ФАС",
-                    "https://placehold.co/800x800/C5A028/000000/png?text=ЗОЛОТО+РАКУРС",
-                    "https://placehold.co/800x800/F0C040/000000/png?text=ЗОЛОТО+УПАКОВКА"
-                ]
-            },
-            telegram: {
-                title: "Награда Telegram",
-                price: "9 800 руб.",
-                desc: "Уникальная награда для администраторов каналов Telegram. Сочетание авиационного алюминия и кристально прозрачного акрила. Фирменный синий цвет логотипа с внутренней подсветкой граней.",
-                images: [
-                    "https://placehold.co/800x800/2AABEE/FFFFFF/png?text=TG+ФАС",
-                    "https://placehold.co/800x800/2090D0/FFFFFF/png?text=TG+РАКУРС",
-                    "https://placehold.co/800x800/50C0FF/FFFFFF/png?text=TG+ДЕТАЛИ"
-                ]
-            },
-            instagram: {
-                title: "Кнопка Instagram",
-                price: "10 500 руб.",
-                desc: "Яркая и стильная награда для звезд Instagram. Многослойный акрил с градиентной печатью высокого разрешения. Глянцевая поверхность, устойчивая к царапинам.",
-                images: [
-                    "https://placehold.co/800x800/E1306C/FFFFFF/png?text=INSTA+ФАС",
-                    "https://placehold.co/800x800/C12050/FFFFFF/png?text=INSTA+БОК",
-                    "https://placehold.co/800x800/F15080/FFFFFF/png?text=INSTA+ДЕТАЛИ"
-                ]
-            },
-            chatgpt: {
-                title: "Награда ChatGPT",
-                price: "11 200 руб.",
-                desc: "Для пионеров искусственного интеллекта. Изумрудный оттенок логотипа OpenAI, выполненный в строгом минимализме. Идеальный подарок для разработчиков и энтузиастов AI.",
-                images: [
-                    "https://placehold.co/800x800/10A37F/FFFFFF/png?text=GPT+ФАС",
-                    "https://placehold.co/800x800/0E8060/FFFFFF/png?text=GPT+РАКУРС",
-                    "https://placehold.co/800x800/20C090/FFFFFF/png?text=GPT+ДЕТАЛИ"
-                ]
-            },
-            like: {
-                title: "Кнопка Лайк",
-                price: "8 900 руб.",
-                desc: "Скульптурная композиция в виде знаменитого 'пальца вверх'. Выполнена из прочного композитного материала с ручной покраской. Отлично смотрится на рабочем столе стримера.",
-                images: [
-                    "images/IMG_20251113_162956.jpg",
-                    "images/IMG_20251113_163002.jpg",
-                    "images/IMG_20251113_163011.jpg"
-                ]
-            }
+            silver: [
+                "images/IMG_20251113_162956.jpg",
+                "images/IMG_20251113_163002.jpg",
+                "images/IMG_20251113_163011.jpg"
+            ],
+            gold: [
+                "https://placehold.co/600x800/D4AF37/000000/png?text=ЗОЛОТО+ФАС",
+                "https://placehold.co/600x800/C5A028/000000/png?text=ЗОЛОТО+РАКУРС",
+                "https://placehold.co/600x800/F0C040/000000/png?text=ЗОЛОТО+УПАКОВКА"
+            ],
+            telegram: [
+                "https://placehold.co/600x800/2AABEE/FFFFFF/png?text=TG+ФАС",
+                "https://placehold.co/600x800/2090D0/FFFFFF/png?text=TG+РАКУРС",
+                "https://placehold.co/600x800/50C0FF/FFFFFF/png?text=TG+ДЕТАЛИ"
+            ],
+            instagram: [
+                "https://placehold.co/600x800/E1306C/FFFFFF/png?text=INSTA+ФАС",
+                "https://placehold.co/600x800/C12050/FFFFFF/png?text=INSTA+БОК",
+                "https://placehold.co/600x800/F15080/FFFFFF/png?text=INSTA+ДЕТАЛИ"
+            ],
+            chatgpt: [
+                "https://placehold.co/600x800/10A37F/FFFFFF/png?text=GPT+ФАС",
+                "https://placehold.co/600x800/0E8060/FFFFFF/png?text=GPT+РАКУРС",
+                "https://placehold.co/600x800/20C090/FFFFFF/png?text=GPT+ДЕТАЛИ"
+            ],
+            like: [
+                "https://placehold.co/600x800/f5f5f5/000000/png?text=LIKE+ФАС",
+                "https://placehold.co/600x800/e0e0e0/000000/png?text=LIKE+БОК",
+                "https://placehold.co/600x800/ffffff/000000/png?text=LIKE+УПАКОВКА"
+            ]
         };
 
-        // Global state to track current product and image index
-        let activeProductId = null;
-        let activeImageIndex = 0;
-
-        // --- MODAL LOGIC ---
-        const modal = document.getElementById('productModal');
-        const modalMainImg = document.getElementById('modalMainImg');
-        const modalThumbnails = document.getElementById('modalThumbnails');
-        const modalTitle = document.getElementById('modalTitle');
-        const modalPrice = document.getElementById('modalPrice');
-        const modalDesc = document.getElementById('modalDesc');
-        const modalBtn = document.getElementById('modalBtn');
-
-        function openModal(productId) {
-            activeProductId = productId;
-            activeImageIndex = 0; // Reset to first image
-            
-            const product = products[productId];
-            if (!product) return;
-
-            // Set Text
-            modalTitle.innerText = product.title;
-            modalPrice.innerText = product.price;
-            modalDesc.innerText = product.desc;
-
-            updateModalImages();
-
-            // Set WhatsApp Action
-            modalBtn.onclick = () => orderViaWhatsapp(product.title);
-
-            // Show Modal
-            modal.classList.remove('hidden');
-            document.body.style.overflow = 'hidden'; // Prevent background scroll
-        }
-
-        function updateModalImages() {
-            const product = products[activeProductId];
-            
-            // 1. Set Main Image
-            modalMainImg.src = product.images[activeImageIndex];
-            
-            // 2. Generate Thumbnails
-            modalThumbnails.innerHTML = '';
-            product.images.forEach((imgSrc, index) => {
-                const thumb = document.createElement('img');
-                thumb.src = imgSrc;
-                thumb.className = `w-full h-24 object-cover border-2 cursor-pointer transition hover:opacity-100 ${index === activeImageIndex ? 'border-gucci-gold opacity-100' : 'border-transparent opacity-60'}`;
-                
-                thumb.onclick = () => {
-                    activeImageIndex = index;
-                    updateModalImages(); // Refresh view
-                };
-                
-                modalThumbnails.appendChild(thumb);
-            });
-        }
-
-        function closeModal() {
-            modal.classList.add('hidden');
-            document.body.style.overflow = 'auto';
-        }
-
-        // Close modal when clicking outside content
-        modal.onclick = (e) => {
-            if (e.target === modal) closeModal();
-        }
-
-        // --- LIGHTBOX LOGIC ---
-        const lightbox = document.getElementById('lightbox');
-        const lightboxImg = document.getElementById('lightboxImg');
-
-        function openLightbox() {
-            updateLightboxImage();
-            lightbox.classList.remove('hidden');
-        }
-
-        function closeLightbox() {
-            lightbox.classList.add('hidden');
-        }
-
-        function updateLightboxImage() {
-            const product = products[activeProductId];
-            lightboxImg.src = product.images[activeImageIndex];
-        }
-
-        function nextImage(e) {
-            e.stopPropagation(); // Stop click from closing lightbox
-            const product = products[activeProductId];
-            activeImageIndex = (activeImageIndex + 1) % product.images.length;
-            updateLightboxImage();
-        }
-
-        function prevImage(e) {
-            e.stopPropagation();
-            const product = products[activeProductId];
-            activeImageIndex = (activeImageIndex - 1 + product.images.length) % product.images.length;
-            updateLightboxImage();
-        }
-
-        // Keyboard navigation support
-        document.addEventListener('keydown', (e) => {
-            if (lightbox.classList.contains('hidden')) return;
-            if (e.key === 'ArrowRight') nextImage(e);
-            if (e.key === 'ArrowLeft') prevImage(e);
-            if (e.key === 'Escape') closeLightbox();
-        });
-
-
-        // --- SCROLL ANIMATION ---
-        const observerOptions = {
-            threshold: 0.1
+        // Храним текущий индекс фото для каждого товара
+        const currentIndices = {
+            silver: 0,
+            gold: 0,
+            telegram: 0,
+            instagram: 0,
+            chatgpt: 0,
+            like: 0
         };
+
+        // Функция смены фото в карточке
+        function changeImage(productId, direction) {
+            const images = products[productId];
+            let index = currentIndices[productId];
+
+            index += direction;
+
+            // Зацикливание (после последней идет первая и наоборот)
+            if (index >= images.length) index = 0;
+            if (index < 0) index = images.length - 1;
+
+            currentIndices[productId] = index;
+
+            // Обновляем src картинки
+            const imgElement = document.getElementById(`img-${productId}`);
+            // Добавляем эффект затухания при смене
+            imgElement.style.opacity = 0;
+            
+            setTimeout(() => {
+                imgElement.src = images[index];
+                imgElement.style.opacity = 1;
+            }, 200); // Короткая задержка для плавности
+        }
+
+        // Анимация при скролле
+        const observerOptions = { threshold: 0.1 };
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -613,22 +385,13 @@
             observer.observe(el);
         });
 
-        // --- WHATSAPP LOGIC ---
+        // WhatsApp Redirect
         function orderViaWhatsapp(item) {
             const phone = '79779662521';
-            let message = '';
-            
-            if (item === 'Консультация') {
-                message = 'Здравствуйте. Меня интересует консультация по кнопкам YouTube.';
-            } else {
-                message = `Здравствуйте. Я хочу заказать: ${item}. Расскажите подробнее о доставке и оплате.`;
-            }
-            
+            const message = `Здравствуйте. Я хочу заказать: ${item}.`;
             const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
             window.open(url, '_blank');
         }
     </script>
 </body>
 </html>
-
-
