@@ -48,7 +48,6 @@
             color: #000;
         }
         
-        /* Слайдер */
         .image-slider {
             position: relative;
             width: 100%;
@@ -77,9 +76,9 @@
             height: 100%;
             object-fit: cover;
             user-select: none;
+            pointer-events: none;
         }
         
-        /* Стрелки */
         .slider-arrow {
             position: absolute;
             top: 50%;
@@ -113,7 +112,6 @@
         .arrow-left { left: 15px; }
         .arrow-right { right: 15px; }
 
-        /* Точки */
         .slider-dots {
             position: absolute;
             bottom: 20px;
@@ -150,7 +148,6 @@
 </head>
 <body>
 
-    <!-- Navigation -->
     <nav class="fixed w-full z-50 bg-black/95 backdrop-blur-md border-b border-gray-800 py-6">
         <div class="container mx-auto text-center cursor-pointer" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
             <h1 class="font-serif text-2xl md:text-3xl tracking-wider text-yellow-600 font-bold uppercase">
@@ -159,7 +156,6 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
     <header class="relative h-screen flex items-center justify-center overflow-hidden">
         <div class="container mx-auto px-6 relative z-10 text-center mt-16">
             <p class="text-xs md:text-sm tracking-widest uppercase text-gray-400 mb-6 fade-in-up">
@@ -177,12 +173,10 @@
         </div>
     </header>
 
-    <!-- Divider -->
     <div class="flex justify-center py-12">
         <div class="h-16 w-px bg-yellow-600 opacity-50"></div>
     </div>
 
-    <!-- Collection Grid -->
     <section id="collection" class="py-20 px-4 md:px-6">
         <div class="container mx-auto max-w-6xl">
             <div class="text-center mb-16 md:mb-24">
@@ -192,7 +186,7 @@
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16">
                 
-                <!-- Silver Item -->
+                <!-- СЕРЕБРЯНАЯ КНОПКА -->
                 <div class="product-card fade-in-up">
                     <div class="relative aspect-[4/5] overflow-hidden mb-8 bg-zinc-900 luxury-border">
                         <div class="image-slider" data-product="silver">
@@ -234,13 +228,13 @@
                     </div>
                 </div>
 
-                <!-- Gold Item -->
+                <!-- ЗОЛОТАЯ КНОПКА -->
                 <div class="product-card fade-in-up">
                     <div class="relative aspect-[4/5] overflow-hidden mb-8 bg-zinc-900 luxury-border">
                         <div class="image-slider" data-product="gold">
                             <div class="slider-track">
                                 <div class="slider-slide">
-                                    <img src="images/zolotaya-knopka-youtube1.jpg"alt="Золотая кнопка" class="product-img">
+                                    <img src="images/zolotaya-knopka-youtube1.jpg" alt="Золотая кнопка" class="product-img">
                                 </div>
                                 <div class="slider-slide">
                                     <img src="images/zolotaya-knopka-youtube2.jpg" alt="Золотая кнопка" class="product-img">
@@ -276,7 +270,7 @@
                     </div>
                 </div>
 
-                <!-- Telegram Item -->
+                <!-- Telegram -->
                 <div class="product-card fade-in-up">
                     <div class="relative aspect-[4/5] overflow-hidden mb-8 bg-zinc-900 luxury-border">
                         <div class="image-slider" data-product="telegram">
@@ -312,13 +306,13 @@
                         <h4 class="font-serif text-2xl text-white mb-2">НАГРАДА TELEGRAM</h4>
                         <p class="text-gray-400 text-xs tracking-widest uppercase mb-4">Кристалл & Алюминий</p>
                         <div class="font-serif text-3xl mb-6" style="color: #d4af37;">9 800 руб.</div>
-                        <button onclick="orderViaWhatsapp('Награда Telegram')" class="btn-hover-effect w-full border border-gray-600 px-10 py-4 text-sm uppercase tracking-widest text-white hover:border-yellow-600">
+                        <button onclick="orderViaWhatsapp('Награда Telegram')" class="btn-hover-effect w-full border text-black px-10 py-4 text-sm uppercase tracking-widest font-bold" style="border-color: #d4af37; background-color: #d4af37;">
                             ЗАКАЗАТЬ
                         </button>
                     </div>
                 </div>
 
-                <!-- Instagram Item -->
+                <!-- Instagram -->
                 <div class="product-card fade-in-up">
                     <div class="relative aspect-[4/5] overflow-hidden mb-8 bg-zinc-900 luxury-border">
                         <div class="image-slider" data-product="instagram">
@@ -354,13 +348,13 @@
                         <h4 class="font-serif text-2xl text-white mb-2">КНОПКА INSTAGRAM</h4>
                         <p class="text-gray-400 text-xs tracking-widest uppercase mb-4">Зеркальный акрил</p>
                         <div class="font-serif text-3xl mb-6" style="color: #d4af37;">10 500 руб.</div>
-                        <button onclick="orderViaWhatsapp('Кнопка Instagram')" class="btn-hover-effect w-full border border-gray-600 px-10 py-4 text-sm uppercase tracking-widest text-white hover:border-yellow-600">
+                        <button onclick="orderViaWhatsapp('Кнопка Instagram')" class="btn-hover-effect w-full border text-black px-10 py-4 text-sm uppercase tracking-widest font-bold" style="border-color: #d4af37; background-color: #d4af37;">
                             ЗАКАЗАТЬ
                         </button>
                     </div>
                 </div>
 
-                <!-- ChatGPT Item -->
+                <!-- ChatGPT -->
                 <div class="product-card fade-in-up">
                     <div class="relative aspect-[4/5] overflow-hidden mb-8 bg-zinc-900 luxury-border">
                         <div class="image-slider" data-product="chatgpt">
@@ -396,13 +390,13 @@
                         <h4 class="font-serif text-2xl text-white mb-2">НАГРАДА CHATGPT</h4>
                         <p class="text-gray-400 text-xs tracking-widest uppercase mb-4">Изумрудный оттенок</p>
                         <div class="font-serif text-3xl mb-6" style="color: #d4af37;">11 200 руб.</div>
-                        <button onclick="orderViaWhatsapp('Награда ChatGPT')" class="btn-hover-effect w-full border border-gray-600 px-10 py-4 text-sm uppercase tracking-widest text-white hover:border-yellow-600">
+                        <button onclick="orderViaWhatsapp('Награда ChatGPT')" class="btn-hover-effect w-full border text-black px-10 py-4 text-sm uppercase tracking-widest font-bold" style="border-color: #d4af37; background-color: #d4af37;">
                             ЗАКАЗАТЬ
                         </button>
                     </div>
                 </div>
 
-                <!-- Like Item -->
+                <!-- ЛАЙК -->
                 <div class="product-card fade-in-up">
                     <div class="relative aspect-[4/5] overflow-hidden mb-8 bg-zinc-900 luxury-border">
                         <div class="image-slider" data-product="like">
@@ -438,7 +432,7 @@
                         <h4 class="font-serif text-2xl text-white mb-2">КНОПКА ЛАЙК</h4>
                         <p class="text-gray-400 text-xs tracking-widest uppercase mb-4">Скульптурный дизайн</p>
                         <div class="font-serif text-3xl mb-6" style="color: #d4af37;">8 900 руб.</div>
-                        <button onclick="orderViaWhatsapp('Кнопка Лайк')" class="btn-hover-effect w-full border border-gray-600 px-10 py-4 text-sm uppercase tracking-widest text-white hover:border-yellow-600">
+                        <button onclick="orderViaWhatsapp('Кнопка Лайк')" class="btn-hover-effect w-full border text-black px-10 py-4 text-sm uppercase tracking-widest font-bold" style="border-color: #d4af37; background-color: #d4af37;">
                             ЗАКАЗАТЬ
                         </button>
                     </div>
@@ -448,7 +442,6 @@
         </div>
     </section>
 
-    <!-- Footer -->
     <footer class="bg-black py-12 border-t border-gray-900">
         <div class="container mx-auto text-center">
             <p class="font-serif italic mb-4 text-xl" style="color: #d4af37;">Creator Awards</p>
@@ -459,7 +452,6 @@
     </footer>
 
     <script>
-        // Современная система управления слайдерами
         class TouchSlider {
             constructor(slider) {
                 this.slider = slider;
@@ -470,20 +462,20 @@
                 this.totalSlides = this.slides.length;
                 
                 this.startX = 0;
+                this.startY = 0;
                 this.currentX = 0;
                 this.isDragging = false;
+                this.isHorizontalSwipe = false;
                 this.startPos = 0;
                 
                 this.init();
             }
             
             init() {
-                // Touch events
                 this.slider.addEventListener('touchstart', (e) => this.handleStart(e), { passive: true });
                 this.slider.addEventListener('touchmove', (e) => this.handleMove(e), { passive: false });
                 this.slider.addEventListener('touchend', () => this.handleEnd());
                 
-                // Mouse events
                 this.slider.addEventListener('mousedown', (e) => this.handleStart(e));
                 this.slider.addEventListener('mousemove', (e) => this.handleMove(e));
                 this.slider.addEventListener('mouseup', () => this.handleEnd());
@@ -494,7 +486,9 @@
             
             handleStart(e) {
                 this.isDragging = true;
+                this.isHorizontalSwipe = false;
                 this.startX = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
+                this.startY = e.type.includes('mouse') ? e.pageY : e.touches[0].pageY;
                 this.startPos = this.currentIndex * -100;
                 this.track.classList.add('dragging');
             }
@@ -502,19 +496,31 @@
             handleMove(e) {
                 if (!this.isDragging) return;
                 
-                e.preventDefault();
                 this.currentX = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
-                const diff = this.currentX - this.startX;
-                const movePercent = (diff / this.slider.offsetWidth) * 100;
+                const currentY = e.type.includes('mouse') ? e.pageY : e.touches[0].pageY;
                 
-                let newPos = this.startPos + movePercent;
-                const maxPos = 0;
-                const minPos = -(this.totalSlides - 1) * 100;
+                const diffX = Math.abs(this.currentX - this.startX);
+                const diffY = Math.abs(currentY - this.startY);
                 
-                if (newPos > maxPos) newPos = maxPos + (newPos - maxPos) * 0.3;
-                if (newPos < minPos) newPos = minPos + (newPos - minPos) * 0.3;
+                if (!this.isHorizontalSwipe && (diffX > 5 || diffY > 5)) {
+                    this.isHorizontalSwipe = diffX > diffY * 1.5;
+                }
                 
-                this.track.style.transform = `translateX(${newPos}%)`;
+                if (this.isHorizontalSwipe) {
+                    e.preventDefault();
+                    
+                    const diff = this.currentX - this.startX;
+                    const movePercent = (diff / this.slider.offsetWidth) * 100;
+                    
+                    let newPos = this.startPos + movePercent;
+                    const maxPos = 0;
+                    const minPos = -(this.totalSlides - 1) * 100;
+                    
+                    if (newPos > maxPos) newPos = maxPos + (newPos - maxPos) * 0.3;
+                    if (newPos < minPos) newPos = minPos + (newPos - minPos) * 0.3;
+                    
+                    this.track.style.transform = `translateX(${newPos}%)`;
+                }
             }
             
             handleEnd() {
@@ -523,18 +529,21 @@
                 this.isDragging = false;
                 this.track.classList.remove('dragging');
                 
-                const diff = this.currentX - this.startX;
-                const threshold = this.slider.offsetWidth * 0.2;
-                
-                if (Math.abs(diff) > threshold) {
-                    if (diff > 0 && this.currentIndex > 0) {
-                        this.currentIndex--;
-                    } else if (diff < 0 && this.currentIndex < this.totalSlides - 1) {
-                        this.currentIndex++;
+                if (this.isHorizontalSwipe) {
+                    const diff = this.currentX - this.startX;
+                    const threshold = this.slider.offsetWidth * 0.25;
+                    
+                    if (Math.abs(diff) > threshold) {
+                        if (diff > 0 && this.currentIndex > 0) {
+                            this.currentIndex--;
+                        } else if (diff < 0 && this.currentIndex < this.totalSlides - 1) {
+                            this.currentIndex++;
+                        }
                     }
                 }
                 
                 this.updateSlider();
+                this.isHorizontalSwipe = false;
             }
             
             goToSlide(index) {
@@ -559,7 +568,6 @@
             }
         }
         
-        // Инициализация всех слайдеров
         const sliders = {};
         
         function initSliders() {
@@ -569,7 +577,6 @@
             });
         }
         
-        // Функция для кнопок
         function changeSlide(productId, direction) {
             const slider = sliders[productId];
             if (slider) {
@@ -577,7 +584,6 @@
             }
         }
 
-        // Анимация при скролле
         const observerOptions = { threshold: 0.1 };
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -591,7 +597,6 @@
             observer.observe(el);
         });
 
-        // WhatsApp
         function orderViaWhatsapp(item) {
             const phone = '79779662521';
             const message = `Здравствуйте. Я хочу заказать: ${item}.`;
@@ -599,7 +604,6 @@
             window.open(url, '_blank');
         }
         
-        // Инициализация после загрузки DOM
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', initSliders);
         } else {
