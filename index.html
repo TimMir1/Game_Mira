@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Creator Awards - Mobile</title>
+    <title>Creator Awards - Mobile Product</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Playfair+Display:ital,wght@0,600;0,800;1,600&family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+    <!-- Используем более современный и четкий шрифт для заголовков, но сохраняем акцент -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Playfair+Display:ital,wght@0,600;0,800;1,600&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -16,7 +17,8 @@
     <style>
         :root {
             --bg-color: #F9F9F9;
-            --text-dark: #111111;
+            --text-dark: #1A1A1A;
+            --accent-gold: #B4975A;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -31,7 +33,7 @@
             position: fixed;
         }
 
-        /* Основной контейнер */
+        /* 1. Общий контейнер прокрутки */
         #snap-container {
             height: 100dvh; 
             width: 100%;
@@ -40,163 +42,150 @@
             scroll-behavior: smooth;
         }
 
-        /* Экран товара */
+        /* 2. Экран товара (одна карточка) */
         .product-screen {
             position: relative;
             width: 100%;
             height: 100dvh; 
             scroll-snap-align: start;
             scroll-snap-stop: always;
-            overflow: hidden;
             background: var(--bg-color);
             display: flex;
             flex-direction: column;
-            
-            /* ВАЖНО: Отступ сверху, чтобы фото не липло к краю */
-            padding-top: max(60px, env(safe-area-inset-top)); 
         }
-
-        /* --- ВЕРХНИЙ ХЕДЕР (Фиксированный логотип) --- */
-        .fixed-header {
+        
+        /* 3. Хедер (Логотип и отступ от "челки") */
+        .sticky-header {
             position: absolute;
             top: 0; left: 0; width: 100%;
-            height: 60px;
-            display: flex; align-items: center; justify-content: center;
+            padding-top: max(15px, env(safe-area-inset-top)); /* Учет "челки" */
+            padding-bottom: 10px;
+            text-align: center;
             z-index: 50;
-            background: rgba(249, 249, 249, 0.95); /* Полупрозрачный фон */
-            backdrop-filter: blur(5px);
+            background: linear-gradient(to bottom, rgba(249, 249, 249, 0.95), transparent);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            pointer-events: none; /* Чтобы можно было свайпать под ним */
         }
         .brand-logo {
             font-family: 'Cinzel', serif;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 800;
             letter-spacing: 3px;
-            color: #111;
+            color: var(--text-dark);
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.7);
         }
-
-        /* --- ФОТОГРАФИЯ (Слайдер) --- */
+        
+        /* 4. Область Фото (Занимает ~58% экрана) */
         .image-area-wrapper {
-            position: relative;
             width: 100%;
-            /* Высота фото - 45% от экрана. Достаточно, но не слишком много */
-            height: 48%; 
-            padding: 0 16px; /* Небольшие отступы по бокам для "карточного" вида */
+            /* ИЗМЕНЕНИЕ: Увеличение области фото для предотвращения обрезки нижней панели */
+            height: 58%; 
+            position: relative;
+            /* Дополнительный отступ сверху, чтобы фото не было прямо под логотипом */
+            margin-top: max(50px, env(safe-area-inset-top)); 
+            padding: 0 16px; 
+            z-index: 10;
         }
 
         .image-slider {
             width: 100%;
             height: 100%;
-            border-radius: 20px; /* Закругленные углы */
+            border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.08); /* Тень */
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
             position: relative;
         }
-        
+
         .slider-track { display: flex; width: 100%; height: 100%; transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1); }
-        .slider-slide { min-width: 100%; height: 100%; position: relative; }
+        .slider-slide { min-width: 100%; height: 100%; }
+        .product-img { width: 100%; height: 100%; object-fit: cover; }
         
-        .product-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+        .slider-dots { position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 10; }
+        .dot { width: 8px; height: 8px; background: rgba(255,255,255,0.7); border-radius: 50%; transition: 0.2s; }
+        .dot.active { background: #fff; transform: scale(1.1); }
+        .btn-view { position: absolute; bottom: 15px; right: 15px; width: 44px; height: 44px; background: rgba(0,0,0,0.6); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 18px; z-index: 10; }
 
-        /* Кнопка "Глаз" */
-        .btn-view {
-            position: absolute;
-            bottom: 15px; right: 15px;
-            width: 44px; height: 44px;
-            background: rgba(255,255,255,0.9);
-            border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            color: #111;
-            font-size: 18px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            z-index: 10;
-        }
 
-        /* Точки слайдера (внутри фото снизу) */
-        .slider-dots {
-            position: absolute;
-            bottom: 15px; left: 50%;
-            transform: translateX(-50%);
-            display: flex; gap: 8px;
-            z-index: 10;
-            background: rgba(0,0,0,0.3);
-            padding: 6px 10px;
-            border-radius: 20px;
-        }
-        .dot { width: 6px; height: 6px; background: rgba(255,255,255,0.5); border-radius: 50%; }
-        .dot.active { background: #fff; transform: scale(1.2); }
-
-        /* --- ТЕКСТ И ИНФО (НИЖНЯЯ ЧАСТЬ) --- */
+        /* 5. Область Инфо (Занимает оставшиеся ~42%) */
         .info-area {
-            flex: 1; /* Занимает все оставшееся место */
-            padding: 24px 24px 30px 24px;
+            /* ИЗМЕНЕНИЕ: Уменьшение области инфо для предотвращения обрезки нижней панели */
+            height: 42%; 
+            padding: 24px 24px 20px 24px;
+            padding-bottom: calc(20px + env(safe-area-inset-bottom)); /* Учет нижней "челки" */
             display: flex;
             flex-direction: column;
-            justify-content: flex-start; /* Текст начинается сразу под фото */
+            
+            /* Распределяем контент по всему пространству */
+            justify-content: space-between; 
+            gap: 15px; /* Минимальный зазор между блоками */
+        }
+
+        /* Типографика - КРУПНЫЕ ШРИФТЫ */
+        .top-meta {
+            margin-bottom: 5px; /* Небольшой отступ от заголовка */
         }
 
         .product-collection {
-            font-size: 13px;
-            font-weight: 800;
+            font-size: 14px; /* Крупнее */
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
             color: #888;
-            margin-bottom: 8px;
         }
 
         .product-title {
             font-family: 'Playfair Display', serif;
-            font-size: 34px; /* ОЧЕНЬ КРУПНО */
+            font-size: 38px; /* Крупнее, чтобы заполнить место */
             line-height: 1.05;
-            color: #111;
-            margin-bottom: 12px;
-            font-weight: 700;
+            color: var(--text-dark);
+            font-weight: 800;
         }
 
         .product-desc {
-            font-size: 16px; /* Крупный текст описания */
+            /* Убеждаемся, что описание занимает столько места, сколько нужно */
+            flex-grow: 1; 
+            font-size: 17px; /* Очень хорошо читается */
             line-height: 1.5;
-            color: #555;
+            color: #444;
             font-weight: 500;
-            margin-bottom: auto; /* Толкает цену вниз */
+            margin-top: 10px; /* Отступ после заголовка */
+            margin-bottom: 25px; /* Отступ перед ценой/кнопкой */
         }
 
         /* Блок цены и кнопки */
         .bottom-action {
-            margin-top: 20px;
             display: flex;
-            flex-direction: column;
-            gap: 15px;
+            align-items: center;
+            gap: 20px;
         }
 
         .price-tag {
             font-family: 'Cinzel', serif;
-            font-size: 30px; /* Гигантская цена */
-            color: #111;
-            font-weight: 700;
+            font-size: 32px; /* Цена */
+            color: var(--text-dark);
+            font-weight: 800;
+            flex-shrink: 0; /* Не сжимать цену */
         }
 
         .btn-main {
-            width: 100%;
-            background: #111;
+            flex-grow: 1;
+            background: var(--text-dark);
             color: #fff;
-            padding: 18px;
-            border-radius: 14px;
+            padding: 16px 20px;
+            border-radius: 12px;
             font-size: 16px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 1px;
             text-align: center;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
         }
 
-        /* WhatsApp плавающий */
+        /* WhatsApp */
         .wa-float {
             position: fixed;
-            bottom: 30px; right: 20px;
+            bottom: calc(20px + env(safe-area-inset-bottom) + 5px); /* Чуть выше кнопки */
+            right: 20px;
             width: 55px; height: 55px;
             background: #25D366;
             color: white;
@@ -211,45 +200,49 @@
         .modal {
             display: none;
             position: fixed; inset: 0;
-            background: #000; z-index: 999;
+            background: rgba(0,0,0,0.95); z-index: 9999;
             align-items: center; justify-content: center;
         }
         .modal.active { display: flex; }
-        .modal img { max-width: 100%; max-height: 100%; }
-        .modal-close { position: absolute; top: 20px; right: 20px; color: #fff; font-size: 30px; padding: 20px; }
-
+        .modal img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .modal-close { position: absolute; top: 20px; right: 20px; color: #fff; font-size: 36px; padding: 10px; }
     </style>
 </head>
 <body>
 
-    <!-- Фиксированный хедер -->
-    <div class="fixed-header">
+    <!-- Фиксированный хедер (Логотип) -->
+    <div class="sticky-header">
         <div class="brand-logo">CREATOR AWARDS</div>
     </div>
 
-    <a href="https://wa.me/79779662521" class="wa-float"><i class="fab fa-whatsapp"></i></a>
+    <!-- Кнопка WhatsApp -->
+    <a href="https://wa.me/79779662521" class="wa-float" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
 
     <div id="snap-container">
 
-        <!-- 1. СЕРЕБРЯНАЯ -->
+        <!-- 1. СЕРЕБРЯНАЯ КНОПКА -->
         <div class="product-screen">
-            <!-- Фото в рамке с отступом -->
             <div class="image-area-wrapper">
                 <div class="image-slider" data-product="silver">
                     <div class="slider-track">
-                        <div class="slider-slide"><img src="images/serebryanaya-knopka-youtube.jpg" class="product-img" onerror="this.src='https://placehold.co/800x800/e5e5e5/333?text=Silver+1'"></div>
-                        <div class="slider-slide"><img src="images/serebryanaya-knopka-youtube2.jpg" class="product-img" onerror="this.src='https://placehold.co/800x800/e5e5e5/333?text=Silver+2'"></div>
+                        <div class="slider-slide"><img src="images/serebryanaya-knopka-youtube.jpg" class="product-img" onerror="this.src='https://placehold.co/800x800/e5e5e5/333?text=Серебряная+1'"></div>
+                        <div class="slider-slide"><img src="images/serebryanaya-knopka-youtube2.jpg" class="product-img" onerror="this.src='https://placehold.co/800x800/e5e5e5/333?text=Серебряная+2'"></div>
+                        <!-- ДОБАВЛЕНО ТРЕТЬЕ ФОТО -->
+                        <div class="slider-slide"><img src="images/serebryanaya-knopka-youtube3.jpg" class="product-img" onerror="this.src='https://placehold.co/800x800/e5e5e5/333?text=Серебряная+3'"></div>
                     </div>
-                    <div class="slider-dots" id="dots-silver"><span class="dot active"></span><span class="dot"></span></div>
+                    <!-- ДОБАВЛЕНА ТРЕТЬЯ ТОЧКА -->
+                    <div class="slider-dots" id="dots-silver"><span class="dot active"></span><span class="dot"></span><span class="dot"></span></div>
                     <div class="btn-view" onclick="openModal('images/serebryanaya-knopka-youtube.jpg')"><i class="fa-regular fa-eye"></i></div>
                 </div>
             </div>
 
-            <!-- Текст -->
             <div class="info-area">
-                <div class="product-collection">Silver Collection</div>
-                <h1 class="product-title">Серебряная Кнопка</h1>
-                <p class="product-desc">Классическая награда за 100k. Зеркальное напыление, лазерная гравировка вашего канала.</p>
+                <div class="top-meta">
+                    <div class="product-collection">Серебряная коллекция</div>
+                    <h1 class="product-title">Серебряная Кнопка</h1>
+                </div>
+                
+                <p class="product-desc">Классическая награда за 100,000 подписчиков. Зеркальное напыление, лазерная гравировка имени канала. Изготовление в Москве за 4 часа.</p>
                 
                 <div class="bottom-action">
                     <div class="price-tag">10 200 ₽</div>
@@ -258,23 +251,29 @@
             </div>
         </div>
 
-        <!-- 2. ЗОЛОТАЯ -->
+        <!-- 2. ЗОЛОТАЯ КНОПКА -->
         <div class="product-screen">
             <div class="image-area-wrapper">
                 <div class="image-slider" data-product="gold">
                     <div class="slider-track">
-                        <div class="slider-slide"><img src="images/zolotaya-knopka-youtube1.jpg" class="product-img" onerror="this.src='https://placehold.co/800x800/d4af37/fff?text=Gold+1'"></div>
-                        <div class="slider-slide"><img src="images/zolotaya-knopka-youtube2.jpg" class="product-img" onerror="this.src='https://placehold.co/800x800/d4af37/fff?text=Gold+2'"></div>
+                        <div class="slider-slide"><img src="images/zolotaya-knopka-youtube1.jpg" class="product-img" onerror="this.src='https://placehold.co/800x800/d4af37/fff?text=Золотая+1'"></div>
+                        <div class="slider-slide"><img src="images/zolotaya-knopka-youtube2.jpg" class="product-img" onerror="this.src='https://placehold.co/800x800/d4af37/fff?text=Золотая+2'"></div>
+                        <!-- ДОБАВЛЕНО ТРЕТЬЕ ФОТО -->
+                        <div class="slider-slide"><img src="images/zolotaya-knopka-youtube3.jpg" class="product-img" onerror="this.src='https://placehold.co/800x800/d4af37/fff?text=Золотая+3'"></div>
                     </div>
-                    <div class="slider-dots" id="dots-gold"><span class="dot active"></span><span class="dot"></span></div>
+                    <!-- ДОБАВЛЕНА ТРЕТЬЯ ТОЧКА -->
+                    <div class="slider-dots" id="dots-gold"><span class="dot active"></span><span class="dot"></span><span class="dot"></span></div>
                     <div class="btn-view" onclick="openModal('images/zolotaya-knopka-youtube1.jpg')"><i class="fa-regular fa-eye"></i></div>
                 </div>
             </div>
 
             <div class="info-area">
-                <div class="product-collection" style="color:#B4975A">Gold Plated 24K</div>
-                <h1 class="product-title">Золотая Кнопка</h1>
-                <p class="product-desc">Покрытие настоящим золотом. Вес и качество оригинала. Награда за 1 миллион.</p>
+                <div class="top-meta">
+                    <div class="product-collection" style="color:var(--accent-gold)">Gold Plated 24K</div>
+                    <h1 class="product-title">Золотая Кнопка</h1>
+                </div>
+                
+                <p class="product-desc">Награда за 1 миллион подписчиков. Покрытие настоящим золотом 24 карата. Премиальное качество и внушительный вес.</p>
                 
                 <div class="bottom-action">
                     <div class="price-tag">12 800 ₽</div>
@@ -282,7 +281,7 @@
                 </div>
             </div>
         </div>
-
+        
         <!-- 3. TELEGRAM -->
         <div class="product-screen">
             <div class="image-area-wrapper">
@@ -290,57 +289,122 @@
                     <div class="slider-track">
                         <div class="slider-slide"><img src="images/IMG_20251113_163002.jpg" class="product-img" onerror="this.src='https://placehold.co/800x800/2CA5E0/fff?text=TG+1'"></div>
                         <div class="slider-slide"><img src="images/IMG_20251113_163011.jpg" class="product-img" onerror="this.src='https://placehold.co/800x800/2CA5E0/fff?text=TG+2'"></div>
+                        <!-- ДОБАВЛЕНО ТРЕТЬЕ ФОТО -->
+                        <div class="slider-slide"><img src="images/IMG_20251113_163003.jpg" class="product-img" onerror="this.src='https://placehold.co/800x800/2CA5E0/fff?text=TG+3'"></div>
                     </div>
-                    <div class="slider-dots" id="dots-tg"><span class="dot active"></span><span class="dot"></span></div>
+                    <!-- ДОБАВЛЕНА ТРЕТЬЯ ТОЧКА -->
+                    <div class="slider-dots" id="dots-tg"><span class="dot active"></span><span class="dot"></span><span class="dot"></span></div>
                     <div class="btn-view" onclick="openModal('images/IMG_20251113_163002.jpg')"><i class="fa-regular fa-eye"></i></div>
                 </div>
             </div>
 
             <div class="info-area">
-                <div class="product-collection" style="color:#2CA5E0">Premium Crystal</div>
-                <h1 class="product-title">Награда Telegram</h1>
-                <p class="product-desc">Шлифованный металл и оптический кристалл. Эксклюзив для авторов каналов.</p>
+                <div class="top-meta">
+                    <div class="product-collection" style="color:#2CA5E0">Crystal & Aluminium</div>
+                    <h1 class="product-title">Награда Telegram</h1>
+                </div>
+                
+                <p class="product-desc">Эксклюзивная награда для авторов каналов. Изысканное сочетание оптического кристалла и шлифованного металла.</p>
                 
                 <div class="bottom-action">
                     <div class="price-tag">9 800 ₽</div>
-                    <div class="btn-main" onclick="order('Telegram Award')">Заказать</div>
+                    <div class="btn-main" onclick="order('Награда Telegram')">Заказать</div>
                 </div>
             </div>
         </div>
 
     </div>
 
-    <!-- Модальное окно -->
+    <!-- Модальное окно для полного просмотра фото -->
     <div class="modal" id="modal" onclick="this.classList.remove('active')">
         <div class="modal-close">&times;</div>
-        <img id="modal-img" src="">
+        <img id="modal-img" src="" alt="Full size product image">
     </div>
 
     <script>
-        // Слайдер (touch support)
+        // Инициализация слайдеров
         document.querySelectorAll('.image-slider').forEach(slider => {
             const track = slider.querySelector('.slider-track');
             const dots = slider.querySelectorAll('.dot');
-            let startX = 0, currentIdx = 0;
+            let startX = 0, currentIdx = 0, isDragging = false;
+            const totalSlides = dots.length;
 
-            slider.addEventListener('touchstart', e => startX = e.touches[0].clientX);
+            // Touch events
+            slider.addEventListener('touchstart', e => {
+                startX = e.touches[0].clientX;
+                isDragging = true;
+                track.style.transition = 'none'; // Убрать анимацию во время перетаскивания
+            }, {passive: true});
+
+            slider.addEventListener('touchmove', e => {
+                if (!isDragging) return;
+                const currentX = e.touches[0].clientX;
+                const diff = currentX - startX;
+                // Небольшой превью свайпа
+                track.style.transform = `translateX(calc(-${currentIdx * 100}% + ${diff}px))`;
+            }, {passive: true});
+
             slider.addEventListener('touchend', e => {
-                const diff = startX - e.changedTouches[0].clientX;
-                if (Math.abs(diff) > 50) {
-                    if (diff > 0 && currentIdx < 1) currentIdx++;
-                    else if (diff < 0 && currentIdx > 0) currentIdx--;
+                if (!isDragging) return;
+                track.style.transition = 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1)'; // Вернуть анимацию
+                const diff = e.changedTouches[0].clientX - startX;
+                
+                if (Math.abs(diff) > 70) { // Порог свайпа
+                    if (diff > 0 && currentIdx > 0) currentIdx--;
+                    else if (diff < 0 && currentIdx < totalSlides - 1) currentIdx++;
+                }
+                update();
+                isDragging = false;
+            });
+            
+            // Мышка (для десктопа/планшета)
+            slider.addEventListener('mousedown', e => {
+                startX = e.clientX;
+                isDragging = true;
+                track.style.transition = 'none';
+            });
+            slider.addEventListener('mousemove', e => {
+                if (!isDragging) return;
+                const currentX = e.clientX;
+                const diff = currentX - startX;
+                track.style.transform = `translateX(calc(-${currentIdx * 100}% + ${diff}px))`;
+            });
+            slider.addEventListener('mouseup', e => {
+                if (!isDragging) return;
+                track.style.transition = 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1)';
+                const diff = e.clientX - startX;
+                if (Math.abs(diff) > 70) {
+                    if (diff > 0 && currentIdx > 0) currentIdx--;
+                    else if (diff < 0 && currentIdx < totalSlides - 1) currentIdx++;
+                }
+                update();
+                isDragging = false;
+            });
+            slider.addEventListener('mouseleave', () => {
+                if (isDragging) {
+                    track.style.transition = 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1)';
                     update();
+                    isDragging = false;
                 }
             });
+
 
             function update() {
                 track.style.transform = `translateX(-${currentIdx * 100}%)`;
                 dots.forEach((d, i) => d.classList.toggle('active', i === currentIdx));
+                
+                // Обновляем картинку для модалки, чтобы открывалась текущая
+                const currentImgSrc = track.children[currentIdx].querySelector('img').src;
+                const viewButton = slider.querySelector('.btn-view');
+                if (viewButton) viewButton.onclick = () => openModal(currentImgSrc);
             }
+            update(); // Инициализация
         });
 
+        // Функции модалки и заказа
         function order(item) {
-            window.location.href = `https://wa.me/79779662521?text=Здравствуйте! Хочу заказать: ${item}`;
+            // Сразу перекидывает в WhatsApp
+            window.location.href = `https://wa.me/79779662521?text=Здравствуйте! Хочу заказать: ${encodeURIComponent(item)}`;
         }
         function openModal(src) {
             document.getElementById('modal-img').src = src;
@@ -349,5 +413,4 @@
     </script>
 </body>
 </html>
-
 
