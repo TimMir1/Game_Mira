@@ -3,115 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CREATOR AWARDS | Exclusive Edition</title>
+    <meta name="description" content="Эксклюзивные награды YouTube и Social Media. Ручная работа, премиальные материалы.">
     
-    <title>Кнопки Ютуба на заказ | Золотые и Серебряные</title>
-    <meta name="description" content="Изготовление и продажа золотых и серебряных кнопок YouTube. Эксклюзивный подарок для блогера.">
-    
-    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        body {
-            background-color: #0a0a0a;
-            color: #f5f5f5;
-            font-family: 'Lato', sans-serif;
+        :root {
+            --bg-color: #F8F5F2; /* Кремовый, как бумага */
+            --text-color: #1A1A1A; /* Почти черный */
+            --gold-accent: #B4975A; /* Благородное золото */
+            --font-heading: 'Playfair Display', serif;
+            --font-decorative: 'Cinzel', serif;
+            --font-body: 'Montserrat', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            background-color: var(--bg-color); 
+            color: var(--text-color); 
+            font-family: var(--font-body);
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* --- Header --- */
+        .luxury-header {
+            background: var(--bg-color);
+            padding: 25px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            text-align: center;
+            transition: padding 0.3s;
         }
         
-        .font-serif {
-            font-family: 'Playfair Display', serif;
+        .brand-title {
+            font-family: var(--font-decorative);
+            font-size: 24px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--text-color);
+            font-weight: 600;
         }
         
-        .luxury-border {
-            border: 1px solid rgba(212, 175, 55, 0.3);
+        .brand-subtitle {
+            font-family: var(--font-heading);
+            font-size: 12px;
+            font-style: italic;
+            color: #666;
+            margin-top: 4px;
         }
-        
-        .fade-in-up {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+
+        /* --- Product Layout --- */
+        .collection-title {
+            font-family: var(--font-decorative);
+            text-align: center;
+            margin: 40px 0 20px;
+            font-size: 14px;
+            letter-spacing: 2px;
+            color: #888;
+            text-transform: uppercase;
         }
-        
-        .fade-in-up.visible {
-            opacity: 1;
-            transform: translateY(0);
+
+        .product-card {
+            background: transparent;
+            border: none;
+            margin-bottom: 60px;
+            position: relative;
         }
-        
-        .btn-hover-effect {
-            transition: all 0.3s ease;
-        }
-        
-        .btn-hover-effect:hover {
-            background-color: #d4af37;
-            color: #000;
-        }
-        
+
+        /* Слайдер в стиле fashion-фотографии */
         .image-slider {
             position: relative;
             width: 100%;
-            height: 100%;
+            aspect-ratio: 4/5; /* Более вертикальный формат, как в журналах */
             overflow: hidden;
-            touch-action: pan-y;
         }
         
-        .slider-track {
-            display: flex;
-            height: 100%;
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .slider-track.dragging {
-            transition: none;
-        }
-        
-        .slider-slide {
-            min-width: 100%;
-            height: 100%;
-        }
+        .slider-track { display: flex; height: 100%; transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1); }
+        .slider-slide { min-width: 100%; height: 100%; }
         
         .product-img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            user-select: none;
-            pointer-events: none;
+            /* Фильтр для винтажности (опционально) */
+            /* filter: contrast(0.95) sepia(0.05); */ 
         }
-        
+
+        /* Стрелки слайдера - минимализм */
         .slider-arrow {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            background: rgba(0, 0, 0, 0.7);
-            color: #d4af37;
-            width: 48px;
-            height: 48px;
-            display: none;
+            color: #fff;
+            font-size: 20px;
+            width: 40px;
+            height: 40px;
+            display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             z-index: 10;
-            border-radius: 50%;
-            transition: all 0.3s;
-            backdrop-filter: blur(10px);
+            opacity: 0; /* Скрыты по умолчанию */
+            transition: opacity 0.3s;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
-        
-        @media (min-width: 768px) {
-            .slider-arrow {
-                display: flex;
-            }
-        }
-        
-        .slider-arrow:hover {
-            background: #d4af37;
-            color: black;
-            transform: translateY(-50%) scale(1.1);
-        }
-        
-        .arrow-left { left: 15px; }
-        .arrow-right { right: 15px; }
+        .image-slider:hover .slider-arrow { opacity: 1; }
+        .arrow-left { left: 10px; }
+        .arrow-right { right: 10px; }
 
+        /* Точки слайдера */
         .slider-dots {
             position: absolute;
             bottom: 20px;
@@ -119,495 +129,399 @@
             right: 0;
             display: flex;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
             z-index: 10;
         }
-        
         .dot {
-            width: 8px;
-            height: 8px;
+            width: 30px; /* Длинные полоски вместо точек */
+            height: 2px;
             background: rgba(255,255,255,0.4);
-            border-radius: 50%;
             transition: all 0.3s;
         }
-        
-        .dot.active {
-            background: #d4af37;
-            transform: scale(1.3);
-            box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        .dot.active { background: #fff; }
+
+        /* Информация о товаре - строго по центру */
+        .product-info {
+            padding: 25px 20px 0;
+            text-align: center;
+        }
+
+        .product-name {
+            font-family: var(--font-heading);
+            font-size: 26px;
+            margin-bottom: 8px;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+
+        .product-meta {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #666;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .product-desc {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #444;
+            max-width: 80%;
+            margin: 0 auto 20px;
+            font-weight: 300;
+        }
+
+        .price {
+            font-family: var(--font-body);
+            font-size: 18px;
+            color: var(--text-color);
+            font-weight: 500;
+            margin-bottom: 25px;
+            display: block;
+        }
+
+        /* Кнопка в стиле High Fashion */
+        .btn-order {
+            background: #111;
+            color: #fff;
+            font-family: var(--font-body);
+            font-size: 12px;
+            font-weight: 500;
+            padding: 16px 40px;
+            border: 1px solid #111;
+            border-radius: 0; /* Острые углы */
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            display: inline-block;
+            text-decoration: none;
+            min-width: 200px;
         }
         
-        .product-card {
-            transition: transform 0.3s ease;
+        .btn-order:hover {
+            background: transparent;
+            color: #111;
+        }
+
+        /* Декоративные линии */
+        .divider {
+            width: 1px;
+            height: 40px;
+            background: #ddd;
+            margin: 40px auto;
+        }
+
+        /* --- Footer --- */
+        footer {
+            background: #111;
+            color: #fff;
+            padding: 60px 20px;
+            text-align: center;
+            margin-top: 60px;
+        }
+        footer h3 {
+            font-family: var(--font-decorative);
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+        footer p {
+            font-size: 12px;
+            color: #999;
+            letter-spacing: 0.5px;
+        }
+
+        /* Кнопка Whatsapp в углу (минимализм) */
+        .wa-float {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: #111;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            z-index: 100;
+            transition: 0.3s;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .wa-float:hover { background: #25D366; border-color: #25D366; }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(255,255,245,0.95); /* Светлый фон модалки */
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active { display: flex; }
+        .modal-img { max-width: 90%; max-height: 85%; box-shadow: 0 20px 50px rgba(0,0,0,0.1); }
+        .modal-close {
+            position: absolute; top: 20px; right: 30px;
+            color: #000; font-size: 40px; font-weight: 100; cursor: pointer;
+        }
+
+        @media(min-width: 768px) {
+            .product-card {
+                display: flex;
+                align-items: center;
+                gap: 40px;
+                max-width: 900px;
+                margin: 0 auto 80px;
+            }
+            .product-card:nth-child(even) { flex-direction: row-reverse; }
+            .image-slider { flex: 1; aspect-ratio: 1; }
+            .product-info { flex: 1; text-align: left; padding: 0; }
+            .product-desc { margin: 0 0 20px 0; max-width: 100%; }
+            .collection-title { margin-top: 80px; }
         }
         
-        .product-card:hover {
-            transform: translateY(-5px);
-        }
+        /* Fade In Animation */
+        .fade-in { opacity: 0; transform: translateY(20px); animation: fadeInUp 0.8s ease forwards; }
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <nav class="fixed w-full z-50 bg-black/95 backdrop-blur-md border-b border-gray-800 py-6">
-        <div class="container mx-auto text-center cursor-pointer" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
-            <h1 class="font-serif text-2xl md:text-3xl tracking-wider text-yellow-600 font-bold uppercase">
-                КНОПКИ <span class="text-white">ЮТУБА</span>
-            </h1>
-        </div>
-    </nav>
-
-    <header class="relative h-screen flex items-center justify-center overflow-hidden">
-        <div class="container mx-auto px-6 relative z-10 text-center mt-16">
-            <p class="text-xs md:text-sm tracking-widest uppercase text-gray-400 mb-6 fade-in-up">
-                КОЛЛЕКЦИЯ 2025
-            </p>
-            <h2 class="font-serif text-4xl md:text-7xl lg:text-8xl text-white mb-8 leading-tight fade-in-up">
-                СИМВОЛ <br/> <span class="italic" style="color: #d4af37;">УСПЕХА</span>
-            </h2>
-            <p class="text-gray-300 max-w-xl mx-auto text-sm md:text-lg leading-relaxed mb-12 fade-in-up">
-                Эксклюзивные награды для тех, кто создает историю. Золотые и Серебряные кнопки YouTube. Ручная работа.
-            </p>
-            <a href="#collection" class="inline-block px-12 py-4 border border-white text-white uppercase tracking-widest text-xs hover:bg-white hover:text-black transition duration-500 fade-in-up">
-                СМОТРЕТЬ КОЛЛЕКЦИЮ
-            </a>
+    <header class="luxury-header">
+        <div class="max-w-6xl mx-auto px-4">
+            <h1 class="brand-title">CREATOR<br><span style="font-size: 0.7em; letter-spacing: 5px;">AWARDS</span></h1>
+            <p class="brand-subtitle">EST. 2025</p>
         </div>
     </header>
 
-    <div class="flex justify-center py-12">
-        <div class="h-16 w-px bg-yellow-600 opacity-50"></div>
-    </div>
+    <div class="collection-title">The YouTube Collection</div>
 
-    <section id="collection" class="py-20 px-4 md:px-6">
-        <div class="container mx-auto max-w-6xl">
-            <div class="text-center mb-16 md:mb-24">
-                <h3 class="font-serif text-3xl md:text-4xl text-white mb-4">КАТАЛОГ</h3>
-                <div class="w-24 h-px mx-auto" style="background-color: #d4af37;"></div>
+    <main class="max-w-6xl mx-auto px-0">
+
+        <!-- Серебряная кнопка -->
+        <article class="product-card fade-in" style="animation-delay: 0.1s">
+            <div class="image-slider" data-product="silver">
+                <div class="slider-track">
+                    <div class="slider-slide">
+                        <img src="images/serebryanaya-knopka-youtube.jpg" class="product-img" onerror="this.src='https://placehold.co/600x750/e0e0e0/1a1a1a?text=Silver+Play+Button'">
+                    </div>
+                    <div class="slider-slide">
+                        <img src="images/serebryanaya-knopka-youtube2.jpg" class="product-img" onerror="this.src='https://placehold.co/600x750/e0e0e0/1a1a1a?text=Silver+Award+Detail'">
+                    </div>
+                    <div class="slider-slide">
+                        <img src="images/serebryanaya-knopka-youtube3.jpg" class="product-img" onerror="this.src='https://placehold.co/600x750/e0e0e0/1a1a1a?text=Silver+Box'">
+                    </div>
+                </div>
+                <div class="slider-arrow arrow-left" onclick="changeSlide('silver',-1)"><i class="fa-solid fa-chevron-left"></i></div>
+                <div class="slider-arrow arrow-right" onclick="changeSlide('silver',1)"><i class="fa-solid fa-chevron-right"></i></div>
+                <div class="slider-dots" id="dots-silver">
+                    <span class="dot active"></span><span class="dot"></span><span class="dot"></span>
+                </div>
             </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16">
-                
-                <!-- СЕРЕБРЯНАЯ КНОПКА -->
-                <div class="product-card fade-in-up">
-                    <div class="relative aspect-[4/5] overflow-hidden mb-8 bg-zinc-900 luxury-border">
-                        <div class="image-slider" data-product="silver">
-                            <div class="slider-track">
-                                <div class="slider-slide">
-                                    <img src="images/serebryanaya-knopka-youtube.jpg" alt="Серебряная кнопка" class="product-img">
-                                </div>
-                                <div class="slider-slide">
-                                    <img src="images/serebryanaya-knopka-youtube2.jpg" alt="Серебряная кнопка" class="product-img">
-                                </div>
-                                <div class="slider-slide">
-                                    <img src="images/serebryanaya-knopka-youtube3.jpg" alt="Серебряная кнопка" class="product-img">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="slider-arrow arrow-left" onclick="changeSlide('silver', -1)">
-                            <i class="fa-solid fa-chevron-left"></i>
-                        </div>
-                        <div class="slider-arrow arrow-right" onclick="changeSlide('silver', 1)">
-                            <i class="fa-solid fa-chevron-right"></i>
-                        </div>
-                        
-                        <div class="slider-dots" id="dots-silver">
-                            <span class="dot active"></span>
-                            <span class="dot"></span>
-                            <span class="dot"></span>
-                        </div>
-                        
-                        <div class="absolute bottom-4 left-4 text-xs tracking-widest text-gray-500">NO. 100K</div>
-                    </div>
-                    <div class="text-center px-4">
-                        <h4 class="font-serif text-2xl text-white mb-2">СЕРЕБРЯНАЯ КНОПКА</h4>
-                        <p class="text-gray-400 text-xs tracking-widest uppercase mb-4">Серебряное напыление • 100,000 Подписчиков</p>
-                        <div class="font-serif text-3xl mb-6" style="color: #d4af37;">10 200 руб.</div>
-                        <button onclick="orderViaWhatsapp('Серебряная кнопка')" class="btn-hover-effect w-full border text-black px-10 py-4 text-sm uppercase tracking-widest font-bold" style="border-color: #d4af37; background-color: #d4af37;">
-                            ЗАКАЗАТЬ
-                        </button>
-                    </div>
+            
+            <div class="product-info">
+                <span class="product-meta">Sterling Edition • 100K Subs</span>
+                <h2 class="product-name">Silver Play Button</h2>
+                <p class="product-desc">Классическая награда, выполненная с безупречной точностью. Посеребренная отделка и зеркальная гравировка имени.</p>
+                <span class="price">10 200 ₽</span>
+                <div class="flex flex-col items-center md:items-start gap-4">
+                    <button onclick="orderViaWhatsapp('Серебряная кнопка')" class="btn-order">Заказать сейчас</button>
+                    <button onclick="openModal('images/serebryanaya-knopka-youtube.jpg')" class="text-xs uppercase tracking-widest border-b border-black pb-1 hover:text-gray-500 transition">Просмотр</button>
                 </div>
-
-                <!-- ЗОЛОТАЯ КНОПКА -->
-                <div class="product-card fade-in-up">
-                    <div class="relative aspect-[4/5] overflow-hidden mb-8 bg-zinc-900 luxury-border">
-                        <div class="image-slider" data-product="gold">
-                            <div class="slider-track">
-                                <div class="slider-slide">
-                                    <img src="images/zolotaya-knopka-youtube1.jpg" alt="Золотая кнопка" class="product-img">
-                                </div>
-                                <div class="slider-slide">
-                                    <img src="images/zolotaya-knopka-youtube2.jpg" alt="Золотая кнопка" class="product-img">
-                                </div>
-                                <div class="slider-slide">
-                                    <img src="images/zolotaya-knopka-youtube3.jpg" alt="Золотая кнопка" class="product-img">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="slider-arrow arrow-left" onclick="changeSlide('gold', -1)">
-                            <i class="fa-solid fa-chevron-left"></i>
-                        </div>
-                        <div class="slider-arrow arrow-right" onclick="changeSlide('gold', 1)">
-                            <i class="fa-solid fa-chevron-right"></i>
-                        </div>
-                        
-                        <div class="slider-dots" id="dots-gold">
-                            <span class="dot active"></span>
-                            <span class="dot"></span>
-                            <span class="dot"></span>
-                        </div>
-
-                        <div class="absolute bottom-4 left-4 text-xs tracking-widest" style="color: #d4af37;">NO. 1M</div>
-                    </div>
-                    <div class="text-center px-4">
-                        <h4 class="font-serif text-2xl mb-2" style="color: #d4af37;">ЗОЛОТАЯ КНОПКА</h4>
-                        <p class="text-gray-400 text-xs tracking-widest uppercase mb-4">Покрытие Золото 24K • 1,000,000 Подписчиков</p>
-                        <div class="font-serif text-3xl mb-6" style="color: #d4af37;">12 800 руб.</div>
-                        <button onclick="orderViaWhatsapp('Золотая кнопка')" class="btn-hover-effect w-full border text-black px-10 py-4 text-sm uppercase tracking-widest font-bold" style="border-color: #d4af37; background-color: #d4af37;">
-                            ЗАКАЗАТЬ
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Telegram -->
-                <div class="product-card fade-in-up">
-                    <div class="relative aspect-[4/5] overflow-hidden mb-8 bg-zinc-900 luxury-border">
-                        <div class="image-slider" data-product="telegram">
-                            <div class="slider-track">
-                                <div class="slider-slide">
-                                    <img src="images/IMG_20251113_163002.jpg" alt="Telegram Award" class="product-img">
-                                </div>
-                                <div class="slider-slide">
-                                    <img src="images/IMG_20251113_163002.jpg" alt="Telegram Award" class="product-img">
-                                </div>
-                                <div class="slider-slide">
-                                    <img src="images/IMG_20251113_163011.jpg" alt="Telegram Award" class="product-img">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="slider-arrow arrow-left" onclick="changeSlide('telegram', -1)">
-                            <i class="fa-solid fa-chevron-left"></i>
-                        </div>
-                        <div class="slider-arrow arrow-right" onclick="changeSlide('telegram', 1)">
-                            <i class="fa-solid fa-chevron-right"></i>
-                        </div>
-                        
-                        <div class="slider-dots" id="dots-telegram">
-                            <span class="dot active"></span>
-                            <span class="dot"></span>
-                            <span class="dot"></span>
-                        </div>
-
-                        <div class="absolute bottom-4 left-4 text-xs tracking-widest text-blue-400">TG AWARD</div>
-                    </div>
-                    <div class="text-center px-4">
-                        <h4 class="font-serif text-2xl text-white mb-2">НАГРАДА TELEGRAM</h4>
-                        <p class="text-gray-400 text-xs tracking-widest uppercase mb-4">Кристалл & Алюминий</p>
-                        <div class="font-serif text-3xl mb-6" style="color: #d4af37;">9 800 руб.</div>
-                        <button onclick="orderViaWhatsapp('Награда Telegram')" class="btn-hover-effect w-full border text-black px-10 py-4 text-sm uppercase tracking-widest font-bold" style="border-color: #d4af37; background-color: #d4af37;">
-                            ЗАКАЗАТЬ
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Instagram -->
-                <div class="product-card fade-in-up">
-                    <div class="relative aspect-[4/5] overflow-hidden mb-8 bg-zinc-900 luxury-border">
-                        <div class="image-slider" data-product="instagram">
-                            <div class="slider-track">
-                                <div class="slider-slide">
-                                    <img src="images/IMG_20251113_163002.jpg" alt="Instagram Award" class="product-img">
-                                </div>
-                                <div class="slider-slide">
-                                    <img src="images/IMG_20251113_163002.jpg" alt="Instagram Award" class="product-img">
-                                </div>
-                                <div class="slider-slide">
-                                    <img src="images/IMG_20251113_163011.jpg" alt="Instagram Award" class="product-img">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="slider-arrow arrow-left" onclick="changeSlide('instagram', -1)">
-                            <i class="fa-solid fa-chevron-left"></i>
-                        </div>
-                        <div class="slider-arrow arrow-right" onclick="changeSlide('instagram', 1)">
-                            <i class="fa-solid fa-chevron-right"></i>
-                        </div>
-                        
-                        <div class="slider-dots" id="dots-instagram">
-                            <span class="dot active"></span>
-                            <span class="dot"></span>
-                            <span class="dot"></span>
-                        </div>
-
-                        <div class="absolute bottom-4 left-4 text-xs tracking-widest text-pink-500">IG STAR</div>
-                    </div>
-                    <div class="text-center px-4">
-                        <h4 class="font-serif text-2xl text-white mb-2">КНОПКА INSTAGRAM</h4>
-                        <p class="text-gray-400 text-xs tracking-widest uppercase mb-4">Зеркальный акрил</p>
-                        <div class="font-serif text-3xl mb-6" style="color: #d4af37;">10 500 руб.</div>
-                        <button onclick="orderViaWhatsapp('Кнопка Instagram')" class="btn-hover-effect w-full border text-black px-10 py-4 text-sm uppercase tracking-widest font-bold" style="border-color: #d4af37; background-color: #d4af37;">
-                            ЗАКАЗАТЬ
-                        </button>
-                    </div>
-                </div>
-
-                <!-- ChatGPT -->
-                <div class="product-card fade-in-up">
-                    <div class="relative aspect-[4/5] overflow-hidden mb-8 bg-zinc-900 luxury-border">
-                        <div class="image-slider" data-product="chatgpt">
-                            <div class="slider-track">
-                                <div class="slider-slide">
-                                    <img src="images/IMG_20251113_163002.jpg" alt="ChatGPT Award" class="product-img">
-                                </div>
-                                <div class="slider-slide">
-                                    <img src="images/IMG_20251113_163002.jpg" alt="ChatGPT Award" class="product-img">
-                                </div>
-                                <div class="slider-slide">
-                                    <img src="images/IMG_20251113_163011.jpg" alt="ChatGPT Award" class="product-img">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="slider-arrow arrow-left" onclick="changeSlide('chatgpt', -1)">
-                            <i class="fa-solid fa-chevron-left"></i>
-                        </div>
-                        <div class="slider-arrow arrow-right" onclick="changeSlide('chatgpt', 1)">
-                            <i class="fa-solid fa-chevron-right"></i>
-                        </div>
-                        
-                        <div class="slider-dots" id="dots-chatgpt">
-                            <span class="dot active"></span>
-                            <span class="dot"></span>
-                            <span class="dot"></span>
-                        </div>
-
-                        <div class="absolute bottom-4 left-4 text-xs tracking-widest text-emerald-500">AI PIONEER</div>
-                    </div>
-                    <div class="text-center px-4">
-                        <h4 class="font-serif text-2xl text-white mb-2">НАГРАДА CHATGPT</h4>
-                        <p class="text-gray-400 text-xs tracking-widest uppercase mb-4">Изумрудный оттенок</p>
-                        <div class="font-serif text-3xl mb-6" style="color: #d4af37;">11 200 руб.</div>
-                        <button onclick="orderViaWhatsapp('Награда ChatGPT')" class="btn-hover-effect w-full border text-black px-10 py-4 text-sm uppercase tracking-widest font-bold" style="border-color: #d4af37; background-color: #d4af37;">
-                            ЗАКАЗАТЬ
-                        </button>
-                    </div>
-                </div>
-
-                <!-- ЛАЙК -->
-                <div class="product-card fade-in-up">
-                    <div class="relative aspect-[4/5] overflow-hidden mb-8 bg-zinc-900 luxury-border">
-                        <div class="image-slider" data-product="like">
-                            <div class="slider-track">
-                                <div class="slider-slide">
-                                    <img src="images/Like11.jpg" alt="Like Award" class="product-img">
-                                </div>
-                                <div class="slider-slide">
-                                    <img src="images/Like21.jpg" alt="Like Award" class="product-img">
-                                </div>
-                                <div class="slider-slide">
-                                    <img src="images/Like31.jpg" alt="Like Award" class="product-img">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="slider-arrow arrow-left" onclick="changeSlide('like', -1)">
-                            <i class="fa-solid fa-chevron-left"></i>
-                        </div>
-                        <div class="slider-arrow arrow-right" onclick="changeSlide('like', 1)">
-                            <i class="fa-solid fa-chevron-right"></i>
-                        </div>
-                        
-                        <div class="slider-dots" id="dots-like">
-                            <span class="dot active"></span>
-                            <span class="dot"></span>
-                            <span class="dot"></span>
-                        </div>
-
-                        <div class="absolute bottom-4 left-4 text-xs tracking-widest text-gray-400">THE LIKE</div>
-                    </div>
-                    <div class="text-center px-4">
-                        <h4 class="font-serif text-2xl text-white mb-2">КНОПКА ЛАЙК</h4>
-                        <p class="text-gray-400 text-xs tracking-widest uppercase mb-4">Скульптурный дизайн</p>
-                        <div class="font-serif text-3xl mb-6" style="color: #d4af37;">8 900 руб.</div>
-                        <button onclick="orderViaWhatsapp('Кнопка Лайк')" class="btn-hover-effect w-full border text-black px-10 py-4 text-sm uppercase tracking-widest font-bold" style="border-color: #d4af37; background-color: #d4af37;">
-                            ЗАКАЗАТЬ
-                        </button>
-                    </div>
-                </div>
-
             </div>
-        </div>
-    </section>
+        </article>
 
-    <footer class="bg-black py-12 border-t border-gray-900">
-        <div class="container mx-auto text-center">
-            <p class="font-serif italic mb-4 text-xl" style="color: #d4af37;">Creator Awards</p>
-            <p class="text-gray-600 text-xs uppercase tracking-widest">
-                © 2025 Эксклюзивное Производство. Все права защищены.
-            </p>
+        <div class="divider"></div>
+
+        <!-- Золотая кнопка -->
+        <article class="product-card fade-in" style="animation-delay: 0.2s">
+            <div class="image-slider" data-product="gold">
+                <div class="slider-track">
+                    <div class="slider-slide">
+                        <img src="images/zolotaya-knopka-youtube1.jpg" class="product-img" onerror="this.src='https://placehold.co/600x750/D4AF37/ffffff?text=Gold+Play+Button'">
+                    </div>
+                    <div class="slider-slide">
+                        <img src="images/zolotaya-knopka-youtube2.jpg" class="product-img" onerror="this.src='https://placehold.co/600x750/D4AF37/ffffff?text=Gold+Detail'">
+                    </div>
+                    <div class="slider-slide">
+                        <img src="images/zolotaya-knopka-youtube3.jpg" class="product-img" onerror="this.src='https://placehold.co/600x750/D4AF37/ffffff?text=Gold+Side'">
+                    </div>
+                </div>
+                <div class="slider-arrow arrow-left" onclick="changeSlide('gold',-1)"><i class="fa-solid fa-chevron-left"></i></div>
+                <div class="slider-arrow arrow-right" onclick="changeSlide('gold',1)"><i class="fa-solid fa-chevron-right"></i></div>
+                <div class="slider-dots" id="dots-gold">
+                    <span class="dot active"></span><span class="dot"></span><span class="dot"></span>
+                </div>
+            </div>
+            
+            <div class="product-info">
+                <span class="product-meta" style="color: var(--gold-accent);">Gold Plated • 1 Million Subs</span>
+                <h2 class="product-name">Gold Play Button</h2>
+                <p class="product-desc">Символ вашего триумфа. Покрытие золотом 24K. Выполняется индивидуально мастерами высшего класса за 4 часа.</p>
+                <span class="price">12 800 ₽</span>
+                <div class="flex flex-col items-center md:items-start gap-4">
+                    <button onclick="orderViaWhatsapp('Золотая кнопка')" class="btn-order">Заказать сейчас</button>
+                    <button onclick="openModal('images/zolotaya-knopka-youtube1.jpg')" class="text-xs uppercase tracking-widest border-b border-black pb-1 hover:text-gray-500 transition">Просмотр</button>
+                </div>
+            </div>
+        </article>
+
+        <div class="collection-title">Social Media Exclusive</div>
+
+        <!-- Telegram (без изменений) -->
+        <article class="product-card fade-in" style="animation-delay: 0.3s">
+            <div class="image-slider" data-product="telegram">
+                <div class="slider-track">
+                    <div class="slider-slide"><img src="images/IMG_20251113_163002.jpg" class="product-img" onerror="this.src='https://placehold.co/600x750/2CA5E0/ffffff?text=Telegram+Award'"></div>
+                    <div class="slider-slide"><img src="images/IMG_20251113_163002.jpg" class="product-img" onerror="this.src='https://placehold.co/600x750/2CA5E0/ffffff?text=Telegram+Crystal'"></div>
+                    <div class="slider-slide"><img src="images/IMG_20251113_163011.jpg" class="product-img" onerror="this.src='https://placehold.co/600x750/2CA5E0/ffffff?text=Telegram+Detail'"></div>
+                </div>
+                <div class="slider-arrow arrow-left" onclick="changeSlide('telegram',-1)"><i class="fa-solid fa-chevron-left"></i></div>
+                <div class="slider-arrow arrow-right" onclick="changeSlide('telegram',1)"><i class="fa-solid fa-chevron-right"></i></div>
+                <div class="slider-dots" id="dots-telegram">
+                    <span class="dot active"></span><span class="dot"></span><span class="dot"></span>
+                </div>
+            </div>
+            
+            <div class="product-info">
+                <span class="product-meta">Crystal & Aluminium</span>
+                <h2 class="product-name">The Telegram Award</h2>
+                <p class="product-desc">Минимализм в чистом виде. Кристалл оптического качества и шлифованный алюминий для лучших авторов каналов.</p>
+                <span class="price">9 800 ₽</span>
+                <div class="flex flex-col items-center md:items-start gap-4">
+                    <button onclick="orderViaWhatsapp('Награда Telegram')" class="btn-order">Заказать сейчас</button>
+                    <button onclick="openModal('images/IMG_20251113_163002.jpg')" class="text-xs uppercase tracking-widest border-b border-black pb-1 hover:text-gray-500 transition">Просмотр</button>
+                </div>
+            </div>
+        </article>
+
+        <!-- Instagram (без изменений) -->
+        <article class="product-card fade-in" style="animation-delay: 0.4s">
+            <div class="image-slider" data-product="instagram">
+                <div class="slider-track">
+                    <div class="slider-slide"><img src="images/IMG_20251113_163002.jpg" class="product-img" onerror="this.src='https://placehold.co/600x750/E1306C/ffffff?text=Instagram+Award'"></div>
+                    <div class="slider-slide"><img src="images/IMG_20251113_163002.jpg" class="product-img" onerror="this.src='https://placehold.co/600x750/E1306C/ffffff?text=Insta+Mirror'"></div>
+                    <div class="slider-slide"><img src="images/IMG_20251113_163011.jpg" class="product-img" onerror="this.src='https://placehold.co/600x750/E1306C/ffffff?text=Insta+Detail'"></div>
+                </div>
+                <div class="slider-arrow arrow-left" onclick="changeSlide('instagram',-1)"><i class="fa-solid fa-chevron-left"></i></div>
+                <div class="slider-arrow arrow-right" onclick="changeSlide('instagram',1)"><i class="fa-solid fa-chevron-right"></i></div>
+                <div class="slider-dots" id="dots-instagram">
+                    <span class="dot active"></span><span class="dot"></span><span class="dot"></span>
+                </div>
+            </div>
+            
+            <div class="product-info">
+                <span class="product-meta">Mirror Acrylic</span>
+                <h2 class="product-name">Instagram Star</h2>
+                <p class="product-desc">Яркая индивидуальность. Зеркальный акрил премиум-класса, отражающий ваш успех.</p>
+                <span class="price">10 500 ₽</span>
+                <div class="flex flex-col items-center md:items-start gap-4">
+                    <button onclick="orderViaWhatsapp('Кнопка Instagram')" class="btn-order">Заказать сейчас</button>
+                    <button onclick="openModal('images/IMG_20251113_163002.jpg')" class="text-xs uppercase tracking-widest border-b border-black pb-1 hover:text-gray-500 transition">Просмотр</button>
+                </div>
+            </div>
+        </article>
+        
+        <!-- Кнопка Лайк -->
+        <article class="product-card fade-in" style="animation-delay: 0.5s">
+            <div class="image-slider" data-product="like">
+                <div class="slider-track">
+                    <div class="slider-slide">
+                        <img src="images/Like11.jpg" class="product-img" onerror="this.src='https://placehold.co/600x750/F44336/ffffff?text=Like+Sculpture'">
+                    </div>
+                    <div class="slider-slide">
+                        <img src="images/Like21.jpg" class="product-img" onerror="this.src='https://placehold.co/600x750/F44336/ffffff?text=Like+Back'">
+                    </div>
+                    <div class="slider-slide">
+                        <img src="images/Like31.jpg" class="product-img" onerror="this.src='https://placehold.co/600x750/F44336/ffffff?text=Like+Side'">
+                    </div>
+                </div>
+                <div class="slider-arrow arrow-left" onclick="changeSlide('like',-1)"><i class="fa-solid fa-chevron-left"></i></div>
+                <div class="slider-arrow arrow-right" onclick="changeSlide('like',1)"><i class="fa-solid fa-chevron-right"></i></div>
+                <div class="slider-dots" id="dots-like">
+                    <span class="dot active"></span><span class="dot"></span><span class="dot"></span>
+                </div>
+            </div>
+            
+            <div class="product-info">
+                <span class="product-meta">Sculptural Series</span>
+                <h2 class="product-name">The Like Symbol</h2>
+                <p class="product-desc">Арт-объект для вашего интерьера. Скульптурная форма, воплощающая признание аудитории.</p>
+                <span class="price">8 900 ₽</span>
+                <div class="flex flex-col items-center md:items-start gap-4">
+                    <button onclick="orderViaWhatsapp('Кнопка Лайк')" class="btn-order">Заказать сейчас</button>
+                    <button onclick="openModal('images/Like11.jpg')" class="text-xs uppercase tracking-widest border-b border-black pb-1 hover:text-gray-500 transition">Просмотр</button>
+                </div>
+            </div>
+        </article>
+
+    </main>
+
+    <footer>
+        <div class="max-w-4xl mx-auto">
+            <h3>CREATOR AWARDS</h3>
+            <p class="mb-4">MOSCOW • RUSSIA</p>
+            <div class="w-10 h-px bg-gray-700 mx-auto mb-4"></div>
+            <p>Персонализированное изготовление за 4 часа.</p>
+            <p class="mt-8 text-gray-600">© 2025 All Rights Reserved.</p>
         </div>
     </footer>
 
-    <script>
-        class TouchSlider {
-            constructor(slider) {
-                this.slider = slider;
-                this.track = slider.querySelector('.slider-track');
-                this.productId = slider.dataset.product;
-                this.currentIndex = 0;
-                this.slides = slider.querySelectorAll('.slider-slide');
-                this.totalSlides = this.slides.length;
-                
-                this.startX = 0;
-                this.startY = 0;
-                this.currentX = 0;
-                this.isDragging = false;
-                this.isHorizontalSwipe = false;
-                this.startPos = 0;
-                
-                this.init();
-            }
-            
-            init() {
-                this.slider.addEventListener('touchstart', (e) => this.handleStart(e), { passive: true });
-                this.slider.addEventListener('touchmove', (e) => this.handleMove(e), { passive: false });
-                this.slider.addEventListener('touchend', () => this.handleEnd());
-                
-                this.slider.addEventListener('mousedown', (e) => this.handleStart(e));
-                this.slider.addEventListener('mousemove', (e) => this.handleMove(e));
-                this.slider.addEventListener('mouseup', () => this.handleEnd());
-                this.slider.addEventListener('mouseleave', () => this.handleEnd());
-                
-                this.slider.addEventListener('dragstart', (e) => e.preventDefault());
-            }
-            
-            handleStart(e) {
-                this.isDragging = true;
-                this.isHorizontalSwipe = false;
-                this.startX = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
-                this.startY = e.type.includes('mouse') ? e.pageY : e.touches[0].pageY;
-                this.startPos = this.currentIndex * -100;
-                this.track.classList.add('dragging');
-            }
-            
-            handleMove(e) {
-                if (!this.isDragging) return;
-                
-                this.currentX = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
-                const currentY = e.type.includes('mouse') ? e.pageY : e.touches[0].pageY;
-                
-                const diffX = Math.abs(this.currentX - this.startX);
-                const diffY = Math.abs(currentY - this.startY);
-                
-                if (!this.isHorizontalSwipe && (diffX > 5 || diffY > 5)) {
-                    this.isHorizontalSwipe = diffX > diffY * 1.5;
-                }
-                
-                if (this.isHorizontalSwipe) {
-                    e.preventDefault();
-                    
-                    const diff = this.currentX - this.startX;
-                    const movePercent = (diff / this.slider.offsetWidth) * 100;
-                    
-                    let newPos = this.startPos + movePercent;
-                    const maxPos = 0;
-                    const minPos = -(this.totalSlides - 1) * 100;
-                    
-                    if (newPos > maxPos) newPos = maxPos + (newPos - maxPos) * 0.3;
-                    if (newPos < minPos) newPos = minPos + (newPos - minPos) * 0.3;
-                    
-                    this.track.style.transform = `translateX(${newPos}%)`;
-                }
-            }
-            
-            handleEnd() {
-                if (!this.isDragging) return;
-                
-                this.isDragging = false;
-                this.track.classList.remove('dragging');
-                
-                if (this.isHorizontalSwipe) {
-                    const diff = this.currentX - this.startX;
-                    const threshold = this.slider.offsetWidth * 0.25;
-                    
-                    if (Math.abs(diff) > threshold) {
-                        if (diff > 0 && this.currentIndex > 0) {
-                            this.currentIndex--;
-                        } else if (diff < 0 && this.currentIndex < this.totalSlides - 1) {
-                            this.currentIndex++;
-                        }
-                    }
-                }
-                
-                this.updateSlider();
-                this.isHorizontalSwipe = false;
-            }
-            
-            goToSlide(index) {
-                this.currentIndex = Math.max(0, Math.min(index, this.totalSlides - 1));
-                this.updateSlider();
-            }
-            
-            updateSlider() {
-                const offset = this.currentIndex * -100;
-                this.track.style.transform = `translateX(${offset}%)`;
-                this.updateDots();
-            }
-            
-            updateDots() {
-                const dotsContainer = document.getElementById(`dots-${this.productId}`);
-                if (dotsContainer) {
-                    const dots = dotsContainer.querySelectorAll('.dot');
-                    dots.forEach((dot, index) => {
-                        dot.classList.toggle('active', index === this.currentIndex);
-                    });
-                }
-            }
-        }
-        
-        const sliders = {};
-        
-        function initSliders() {
-            document.querySelectorAll('.image-slider').forEach(sliderEl => {
-                const productId = sliderEl.dataset.product;
-                sliders[productId] = new TouchSlider(sliderEl);
-            });
-        }
-        
-        function changeSlide(productId, direction) {
-            const slider = sliders[productId];
-            if (slider) {
-                slider.goToSlide(slider.currentIndex + direction);
-            }
-        }
+    <a href="https://wa.me/79779662521" class="wa-float">
+        <i class="fab fa-whatsapp"></i>
+    </a>
 
-        const observerOptions = { threshold: 0.1 };
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
-            });
-        }, observerOptions);
-        
-        document.querySelectorAll('.fade-in-up').forEach(el => {
-            observer.observe(el);
+    <div class="modal" id="modal" onclick="closeModal()">
+        <span class="modal-close">&times;</span>
+        <img src="" id="modalImg" class="modal-img">
+    </div>
+
+    <script>
+        // Та же логика JS, она универсальна
+        class TouchSlider{constructor(e){this.slider=e,this.track=e.querySelector(".slider-track"),this.productId=e.dataset.product,this.currentIndex=0,this.slides=e.querySelectorAll(".slider-slide"),this.totalSlides=this.slides.length,this.startX=0,this.startY=0,this.currentX=0,this.isDragging=!1,this.isHorizontalSwipe=!1,this.startPos=0,this.init()}init(){this.slider.addEventListener("touchstart",e=>this.handleStart(e),{passive:!0}),this.slider.addEventListener("touchmove",e=>this.handleMove(e),{passive:!1}),this.slider.addEventListener("touchend",()=>this.handleEnd()),this.slider.addEventListener("mousedown",e=>this.handleStart(e)),this.slider.addEventListener("mousemove",e=>this.handleMove(e)),this.slider.addEventListener("mouseup",()=>this.handleEnd()),this.slider.addEventListener("mouseleave",()=>this.handleEnd()),this.slider.addEventListener("dragstart",e=>e.preventDefault())}handleStart(e){this.isDragging=!0,this.isHorizontalSwipe=!1,this.startX=e.type.includes("mouse")?e.pageX:e.touches[0].pageX,this.startY=e.type.includes("mouse")?e.pageY:e.touches[0].pageY,this.startPos=-100*this.currentIndex,this.track.classList.add("dragging")}handleMove(e){if(!this.isDragging)return;this.currentX=e.type.includes("mouse")?e.pageX:e.touches[0].pageX;const t=e.type.includes("mouse")?e.pageY:e.touches[0].pageY,s=Math.abs(this.currentX-this.startX),i=Math.abs(t-this.startY);if(!this.isHorizontalSwipe&&(s>5||i>5)&&(this.isHorizontalSwipe=s>1.5*i),this.isHorizontalSwipe){e.preventDefault();const t=this.currentX-this.startX,s=t/this.slider.offsetWidth*100;let i=this.startPos+s;const r=0,a=-100*(this.totalSlides-1);i>r&&(i=r+.3*(i-r)),i<a&&(i=a+.3*(i-a)),this.track.style.transform=`translateX(${i}%)`}}handleEnd(){this.isDragging&&(this.isDragging=!1,this.track.classList.remove("dragging"),this.isHorizontalSwipe&&(this.currentX-this.startX>this.slider.offsetWidth*.25&&this.currentIndex>0?this.currentIndex--:this.currentX-this.startX<-.25*this.slider.offsetWidth&&this.currentIndex<this.totalSlides-1&&this.currentIndex++),this.updateSlider(),this.isHorizontalSwipe=!1)}goToSlide(e){this.currentIndex=Math.max(0,Math.min(e,this.totalSlides-1)),this.updateSlider()}updateSlider(){const e=-100*this.currentIndex;this.track.style.transform=`translateX(${e}%)`;const t=document.getElementById(`dots-${this.productId}`);if(t){Array.from(t.children).forEach((e,t)=>{e.classList.toggle("active",t===this.currentIndex)})}}}
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.image-slider').forEach(el => new TouchSlider(el));
         });
 
-        function orderViaWhatsapp(item) {
-            const phone = '79779662521';
-            const message = `Здравствуйте. Я хочу заказать: ${item}.`;
-            const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-            window.open(url, '_blank');
+        function changeSlide(productId, direction) {
+            const sliderEl = document.querySelector(`.image-slider[data-product="${productId}"]`);
+            // Получаем экземпляр класса (в реальном проекте лучше хранить их в Map, но здесь упростим через пересоздание или DOM доступ)
+            // Для простоты здесь просто сдвинем трек, так как у нас нет прямого доступа к instance
+            // В продакшене лучше сохранять instances: const sliders = {}; sliders[id] = new TouchSlider...
         }
-        
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initSliders);
-        } else {
-            initSliders();
+        // Переопределяем JS для кнопок (упрощенно для примера)
+        const sliders = {};
+        document.querySelectorAll('.image-slider').forEach(el => {
+            sliders[el.dataset.product] = new TouchSlider(el);
+        });
+        window.changeSlide = (id, dir) => {
+            const s = sliders[id];
+            s.goToSlide(s.currentIndex + dir);
+        }
+
+        function openModal(src) {
+            const modal = document.getElementById('modal');
+            document.getElementById('modalImg').src = src;
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function orderViaWhatsapp(productName) {
+            const phone = "79779662521";
+            const text = encodeURIComponent(`Здравствуйте. Я хотел бы приобрести ${productName} (Premium Edition).`);
+            window.location.href = `https://wa.me/${phone}?text=${text}`;
         }
     </script>
 </body>
