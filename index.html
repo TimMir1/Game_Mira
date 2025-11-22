@@ -4,144 +4,174 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    <!-- SEO & AI SEARCH OPTIMIZATION -->
     <title>Кнопки Ютуба на заказ | Золотые и Серебряные</title>
     <meta name="description" content="Изготовление и продажа золотых и серебряных кнопок YouTube. Эксклюзивный подарок для блогера.">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&subset=cyrillic&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'gucci-black': '#0a0a0a',
-                        'gucci-gold': '#d4af37',
-                        'gucci-cream': '#f5f5f5',
-                        'gucci-gray': '#333333',
-                    },
-                    fontFamily: {
-                        serif: ['"Playfair Display"', 'serif'],
-                        sans: ['"Lato"', 'sans-serif'],
-                    },
-                    screens: {
-                        'md': '768px',
-                        'lg': '1024px',
-                    }
-                }
-            }
-        }
-    </script>
     <style>
         body {
             background-color: #0a0a0a;
             color: #f5f5f5;
-            -webkit-font-smoothing: antialiased;
+            font-family: 'Lato', sans-serif;
         }
+        
+        .font-serif {
+            font-family: 'Playfair Display', serif;
+        }
+        
         .luxury-border {
             border: 1px solid rgba(212, 175, 55, 0.3);
         }
+        
         .fade-in-up {
             opacity: 0;
             transform: translateY(20px);
             transition: opacity 0.8s ease-out, transform 0.8s ease-out;
         }
-        .visible {
+        
+        .fade-in-up.visible {
             opacity: 1;
             transform: translateY(0);
         }
+        
         .btn-hover-effect {
             transition: all 0.3s ease;
         }
+        
         .btn-hover-effect:hover {
             background-color: #d4af37;
             color: #000;
         }
+        
+        /* Слайдер */
+        .image-slider {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            touch-action: pan-y;
+        }
+        
+        .slider-track {
+            display: flex;
+            height: 100%;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .slider-track.dragging {
+            transition: none;
+        }
+        
+        .slider-slide {
+            min-width: 100%;
+            height: 100%;
+        }
+        
         .product-img {
-            transition: opacity 0.5s ease;
             width: 100%;
             height: 100%;
             object-fit: cover;
+            user-select: none;
         }
+        
+        /* Стрелки */
         .slider-arrow {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.7);
             color: #d4af37;
-            width: 40px;
-            height: 40px;
-            display: flex;
+            width: 48px;
+            height: 48px;
+            display: none;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             z-index: 10;
             border-radius: 50%;
             transition: all 0.3s;
+            backdrop-filter: blur(10px);
         }
+        
+        @media (min-width: 768px) {
+            .slider-arrow {
+                display: flex;
+            }
+        }
+        
         .slider-arrow:hover {
             background: #d4af37;
             color: black;
+            transform: translateY(-50%) scale(1.1);
         }
-        .arrow-left { left: 10px; }
-        .arrow-right { right: 10px; }
+        
+        .arrow-left { left: 15px; }
+        .arrow-right { right: 15px; }
 
-        /* Dots for slider */
+        /* Точки */
         .slider-dots {
             position: absolute;
-            bottom: 15px;
+            bottom: 20px;
             left: 0;
             right: 0;
             display: flex;
             justify-content: center;
-            gap: 8px;
+            gap: 10px;
             z-index: 10;
         }
+        
         .dot {
-            width: 6px;
-            height: 6px;
-            background: rgba(255,255,255,0.5);
+            width: 8px;
+            height: 8px;
+            background: rgba(255,255,255,0.4);
             border-radius: 50%;
+            transition: all 0.3s;
         }
+        
         .dot.active {
             background: #d4af37;
-            transform: scale(1.2);
+            transform: scale(1.3);
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        }
+        
+        .product-card {
+            transition: transform 0.3s ease;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
         }
     </style>
 </head>
-<body class="antialiased overflow-x-hidden">
+<body>
 
     <!-- Navigation -->
-    <nav class="fixed w-full z-50 bg-gucci-black/95 backdrop-blur-md border-b border-gray-800 py-6">
+    <nav class="fixed w-full z-50 bg-black/95 backdrop-blur-md border-b border-gray-800 py-6">
         <div class="container mx-auto text-center cursor-pointer" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
-            <h1 class="font-serif text-2xl md:text-3xl tracking-[0.2em] text-gucci-gold font-bold uppercase">
-                КНОПКИ&nbsp;<span class="text-white">ЮТУБА</span>
+            <h1 class="font-serif text-2xl md:text-3xl tracking-wider text-yellow-600 font-bold uppercase">
+                КНОПКИ <span class="text-white">ЮТУБА</span>
             </h1>
         </div>
     </nav>
 
     <!-- Hero Section -->
     <header class="relative h-screen flex items-center justify-center overflow-hidden">
-        <div class="absolute inset-0 z-0 opacity-30">
-            <div class="absolute top-1/4 left-1/4 w-64 h-64 bg-gray-800 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
-            <div class="absolute top-1/3 right-1/4 w-64 h-64 bg-gucci-gold rounded-full mix-blend-multiply filter blur-3xl animate-blob opacity-20"></div>
-        </div>
-
         <div class="container mx-auto px-6 relative z-10 text-center mt-16">
-            <p class="text-xs md:text-sm tracking-[0.5em] uppercase text-gray-400 mb-6 fade-in-up delay-100">
+            <p class="text-xs md:text-sm tracking-widest uppercase text-gray-400 mb-6 fade-in-up">
                 КОЛЛЕКЦИЯ 2025
             </p>
-            <h2 class="font-serif text-4xl md:text-7xl lg:text-8xl text-white mb-8 leading-tight fade-in-up delay-200">
-                СИМВОЛ <br/> <span class="italic text-gucci-gold">УСПЕХА</span>
+            <h2 class="font-serif text-4xl md:text-7xl lg:text-8xl text-white mb-8 leading-tight fade-in-up">
+                СИМВОЛ <br/> <span class="italic" style="color: #d4af37;">УСПЕХА</span>
             </h2>
-            <p class="font-sans text-gray-300 max-w-xl mx-auto text-sm md:text-lg leading-relaxed mb-12 fade-in-up delay-300">
+            <p class="text-gray-300 max-w-xl mx-auto text-sm md:text-lg leading-relaxed mb-12 fade-in-up">
                 Эксклюзивные награды для тех, кто создает историю. Золотые и Серебряные кнопки YouTube. Ручная работа.
             </p>
-            <a href="#collection" class="inline-block px-12 py-4 border border-white text-white font-sans uppercase tracking-[0.2em] text-xs hover:bg-white hover:text-black transition duration-500 fade-in-up delay-500">
+            <a href="#collection" class="inline-block px-12 py-4 border border-white text-white uppercase tracking-widest text-xs hover:bg-white hover:text-black transition duration-500 fade-in-up">
                 СМОТРЕТЬ КОЛЛЕКЦИЮ
             </a>
         </div>
@@ -149,31 +179,47 @@
 
     <!-- Divider -->
     <div class="flex justify-center py-12">
-        <div class="h-16 w-[1px] bg-gucci-gold opacity-50"></div>
+        <div class="h-16 w-px bg-yellow-600 opacity-50"></div>
     </div>
 
     <!-- Collection Grid -->
-    <section id="collection" class="py-20 px-4 md:px-6 bg-gucci-black">
+    <section id="collection" class="py-20 px-4 md:px-6">
         <div class="container mx-auto max-w-6xl">
             <div class="text-center mb-16 md:mb-24">
                 <h3 class="font-serif text-3xl md:text-4xl text-white mb-4">КАТАЛОГ</h3>
-                <div class="w-24 h-[1px] bg-gucci-gold mx-auto"></div>
+                <div class="w-24 h-px mx-auto" style="background-color: #d4af37;"></div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16">
                 
-                <!-- Silver Item (с вашими фото) -->
+                <!-- Silver Item -->
                 <div class="product-card fade-in-up">
-                    <div class="relative aspect-[4/5] overflow-hidden mb-8 bg-[#1a1a1a] luxury-border group">
-                        <!-- Слайдер изображений -->
-                        <img id="img-silver" src="images/IMG_20251113_162956.jpg" alt="Серебряная кнопка" class="product-img">
+                    <div class="relative aspect-[4/5] overflow-hidden mb-8 bg-zinc-900 luxury-border">
+                        <div class="image-slider" data-product="silver">
+                            <div class="slider-track">
+                                <div class="slider-slide">
+                                    <img src="images/IMG_20251113_163002.jpg" alt="Серебряная кнопка" class="product-img">
+                                </div>
+                                <div class="slider-slide">
+                                    <img src="images/IMG_20251113_163002.jpg" alt="Серебряная кнопка" class="product-img">
+                                </div>
+                                <div class="slider-slide">
+                                    <img src="images/IMG_20251113_163011.jpg" alt="Серебряная кнопка" class="product-img">
+                                </div>
+                            </div>
+                        </div>
                         
-                        <!-- Стрелки управления (появляются при наведении на ПК, всегда доступны на моб) -->
-                        <div class="slider-arrow arrow-left" onclick="changeImage('silver', -1)">
+                        <div class="slider-arrow arrow-left" onclick="changeSlide('silver', -1)">
                             <i class="fa-solid fa-chevron-left"></i>
                         </div>
-                        <div class="slider-arrow arrow-right" onclick="changeImage('silver', 1)">
+                        <div class="slider-arrow arrow-right" onclick="changeSlide('silver', 1)">
                             <i class="fa-solid fa-chevron-right"></i>
+                        </div>
+                        
+                        <div class="slider-dots" id="dots-silver">
+                            <span class="dot active"></span>
+                            <span class="dot"></span>
+                            <span class="dot"></span>
                         </div>
                         
                         <div class="absolute bottom-4 left-4 text-xs tracking-widest text-gray-500">NO. 100K</div>
@@ -181,108 +227,218 @@
                     <div class="text-center px-4">
                         <h4 class="font-serif text-2xl text-white mb-2">СЕРЕБРЯНАЯ КНОПКА</h4>
                         <p class="text-gray-400 text-xs tracking-widest uppercase mb-4">Серебряное напыление • 100,000 Подписчиков</p>
-                        <div class="font-serif text-3xl text-gucci-gold mb-6">10 200 руб.</div>
-                        <button onclick="orderViaWhatsapp('Серебряная кнопка')" class="btn-hover-effect w-full border border-gucci-gold bg-gucci-gold text-black px-10 py-4 text-sm uppercase tracking-widest font-bold hover:bg-white">
+                        <div class="font-serif text-3xl mb-6" style="color: #d4af37;">10 200 руб.</div>
+                        <button onclick="orderViaWhatsapp('Серебряная кнопка')" class="btn-hover-effect w-full border text-black px-10 py-4 text-sm uppercase tracking-widest font-bold" style="border-color: #d4af37; background-color: #d4af37;">
                             ЗАКАЗАТЬ
                         </button>
                     </div>
                 </div>
 
                 <!-- Gold Item -->
-                <div class="product-card fade-in-up delay-100">
-                    <div class="relative aspect-[4/5] overflow-hidden mb-8 bg-[#1a1a1a] luxury-border group">
-                        <img id="img-gold" src="https://placehold.co/600x800/D4AF37/000000/png?text=ЗОЛОТО+ФАС" alt="Золотая кнопка" class="product-img">
+                <div class="product-card fade-in-up">
+                    <div class="relative aspect-[4/5] overflow-hidden mb-8 bg-zinc-900 luxury-border">
+                        <div class="image-slider" data-product="gold">
+                            <div class="slider-track">
+                                <div class="slider-slide">
+                                    <img src="images/IMG_20251113_163002.jpg" alt="Золотая кнопка" class="product-img">
+                                </div>
+                                <div class="slider-slide">
+                                    <img src="images/IMG_20251113_163002.jpg" alt="Золотая кнопка" class="product-img">
+                                </div>
+                                <div class="slider-slide">
+                                    <img src="images/IMG_20251113_163011.jpg" alt="Золотая кнопка" class="product-img">
+                                </div>
+                            </div>
+                        </div>
                         
-                        <div class="slider-arrow arrow-left" onclick="changeImage('gold', -1)"><i class="fa-solid fa-chevron-left"></i></div>
-                        <div class="slider-arrow arrow-right" onclick="changeImage('gold', 1)"><i class="fa-solid fa-chevron-right"></i></div>
+                        <div class="slider-arrow arrow-left" onclick="changeSlide('gold', -1)">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </div>
+                        <div class="slider-arrow arrow-right" onclick="changeSlide('gold', 1)">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </div>
+                        
+                        <div class="slider-dots" id="dots-gold">
+                            <span class="dot active"></span>
+                            <span class="dot"></span>
+                            <span class="dot"></span>
+                        </div>
 
-                        <div class="absolute bottom-4 left-4 text-xs tracking-widest text-gucci-gold">NO. 1M</div>
+                        <div class="absolute bottom-4 left-4 text-xs tracking-widest" style="color: #d4af37;">NO. 1M</div>
                     </div>
                     <div class="text-center px-4">
-                        <h4 class="font-serif text-2xl text-gucci-gold mb-2">ЗОЛОТАЯ КНОПКА</h4>
+                        <h4 class="font-serif text-2xl mb-2" style="color: #d4af37;">ЗОЛОТАЯ КНОПКА</h4>
                         <p class="text-gray-400 text-xs tracking-widest uppercase mb-4">Покрытие Золото 24K • 1,000,000 Подписчиков</p>
-                        <div class="font-serif text-3xl text-gucci-gold mb-6">12 800 руб.</div>
-                        <button onclick="orderViaWhatsapp('Золотая кнопка')" class="btn-hover-effect w-full border border-gucci-gold bg-gucci-gold text-black px-10 py-4 text-sm uppercase tracking-widest font-bold hover:bg-white">
+                        <div class="font-serif text-3xl mb-6" style="color: #d4af37;">12 800 руб.</div>
+                        <button onclick="orderViaWhatsapp('Золотая кнопка')" class="btn-hover-effect w-full border text-black px-10 py-4 text-sm uppercase tracking-widest font-bold" style="border-color: #d4af37; background-color: #d4af37;">
                             ЗАКАЗАТЬ
                         </button>
                     </div>
                 </div>
 
                 <!-- Telegram Item -->
-                <div class="product-card fade-in-up delay-200">
-                    <div class="relative aspect-[4/5] overflow-hidden mb-8 bg-[#1a1a1a] luxury-border group">
-                        <img id="img-telegram" src="https://placehold.co/600x800/2AABEE/FFFFFF/png?text=TG+ФАС" alt="Telegram Award" class="product-img">
+                <div class="product-card fade-in-up">
+                    <div class="relative aspect-[4/5] overflow-hidden mb-8 bg-zinc-900 luxury-border">
+                        <div class="image-slider" data-product="telegram">
+                            <div class="slider-track">
+                                <div class="slider-slide">
+                                    <img src="images/IMG_20251113_163002.jpg" alt="Telegram Award" class="product-img">
+                                </div>
+                                <div class="slider-slide">
+                                    <img src="images/IMG_20251113_163002.jpg" alt="Telegram Award" class="product-img">
+                                </div>
+                                <div class="slider-slide">
+                                    <img src="images/IMG_20251113_163011.jpg" alt="Telegram Award" class="product-img">
+                                </div>
+                            </div>
+                        </div>
                         
-                        <div class="slider-arrow arrow-left" onclick="changeImage('telegram', -1)"><i class="fa-solid fa-chevron-left"></i></div>
-                        <div class="slider-arrow arrow-right" onclick="changeImage('telegram', 1)"><i class="fa-solid fa-chevron-right"></i></div>
+                        <div class="slider-arrow arrow-left" onclick="changeSlide('telegram', -1)">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </div>
+                        <div class="slider-arrow arrow-right" onclick="changeSlide('telegram', 1)">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </div>
+                        
+                        <div class="slider-dots" id="dots-telegram">
+                            <span class="dot active"></span>
+                            <span class="dot"></span>
+                            <span class="dot"></span>
+                        </div>
 
                         <div class="absolute bottom-4 left-4 text-xs tracking-widest text-blue-400">TG AWARD</div>
                     </div>
                     <div class="text-center px-4">
                         <h4 class="font-serif text-2xl text-white mb-2">НАГРАДА TELEGRAM</h4>
                         <p class="text-gray-400 text-xs tracking-widest uppercase mb-4">Кристалл & Алюминий</p>
-                        <div class="font-serif text-3xl text-gucci-gold mb-6">9 800 руб.</div>
-                        <button onclick="orderViaWhatsapp('Награда Telegram')" class="btn-hover-effect w-full border border-gray-600 px-10 py-4 text-sm uppercase tracking-widest text-white hover:border-gucci-gold">
+                        <div class="font-serif text-3xl mb-6" style="color: #d4af37;">9 800 руб.</div>
+                        <button onclick="orderViaWhatsapp('Награда Telegram')" class="btn-hover-effect w-full border border-gray-600 px-10 py-4 text-sm uppercase tracking-widest text-white hover:border-yellow-600">
                             ЗАКАЗАТЬ
                         </button>
                     </div>
                 </div>
 
                 <!-- Instagram Item -->
-                <div class="product-card fade-in-up delay-200">
-                    <div class="relative aspect-[4/5] overflow-hidden mb-8 bg-[#1a1a1a] luxury-border group">
-                        <img id="img-instagram" src="https://placehold.co/600x800/E1306C/FFFFFF/png?text=INSTA+ФАС" alt="Instagram Award" class="product-img">
+                <div class="product-card fade-in-up">
+                    <div class="relative aspect-[4/5] overflow-hidden mb-8 bg-zinc-900 luxury-border">
+                        <div class="image-slider" data-product="instagram">
+                            <div class="slider-track">
+                                <div class="slider-slide">
+                                    <img src="images/IMG_20251113_163002.jpg" alt="Instagram Award" class="product-img">
+                                </div>
+                                <div class="slider-slide">
+                                    <img src="images/IMG_20251113_163002.jpg" alt="Instagram Award" class="product-img">
+                                </div>
+                                <div class="slider-slide">
+                                    <img src="images/IMG_20251113_163011.jpg" alt="Instagram Award" class="product-img">
+                                </div>
+                            </div>
+                        </div>
                         
-                        <div class="slider-arrow arrow-left" onclick="changeImage('instagram', -1)"><i class="fa-solid fa-chevron-left"></i></div>
-                        <div class="slider-arrow arrow-right" onclick="changeImage('instagram', 1)"><i class="fa-solid fa-chevron-right"></i></div>
+                        <div class="slider-arrow arrow-left" onclick="changeSlide('instagram', -1)">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </div>
+                        <div class="slider-arrow arrow-right" onclick="changeSlide('instagram', 1)">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </div>
+                        
+                        <div class="slider-dots" id="dots-instagram">
+                            <span class="dot active"></span>
+                            <span class="dot"></span>
+                            <span class="dot"></span>
+                        </div>
 
                         <div class="absolute bottom-4 left-4 text-xs tracking-widest text-pink-500">IG STAR</div>
                     </div>
                     <div class="text-center px-4">
                         <h4 class="font-serif text-2xl text-white mb-2">КНОПКА INSTAGRAM</h4>
                         <p class="text-gray-400 text-xs tracking-widest uppercase mb-4">Зеркальный акрил</p>
-                        <div class="font-serif text-3xl text-gucci-gold mb-6">10 500 руб.</div>
-                        <button onclick="orderViaWhatsapp('Кнопка Instagram')" class="btn-hover-effect w-full border border-gray-600 px-10 py-4 text-sm uppercase tracking-widest text-white hover:border-gucci-gold">
+                        <div class="font-serif text-3xl mb-6" style="color: #d4af37;">10 500 руб.</div>
+                        <button onclick="orderViaWhatsapp('Кнопка Instagram')" class="btn-hover-effect w-full border border-gray-600 px-10 py-4 text-sm uppercase tracking-widest text-white hover:border-yellow-600">
                             ЗАКАЗАТЬ
                         </button>
                     </div>
                 </div>
 
                 <!-- ChatGPT Item -->
-                <div class="product-card fade-in-up delay-300">
-                    <div class="relative aspect-[4/5] overflow-hidden mb-8 bg-[#1a1a1a] luxury-border group">
-                        <img id="img-chatgpt" src="https://placehold.co/600x800/10A37F/FFFFFF/png?text=GPT+ФАС" alt="ChatGPT Award" class="product-img">
+                <div class="product-card fade-in-up">
+                    <div class="relative aspect-[4/5] overflow-hidden mb-8 bg-zinc-900 luxury-border">
+                        <div class="image-slider" data-product="chatgpt">
+                            <div class="slider-track">
+                                <div class="slider-slide">
+                                    <img src="images/IMG_20251113_163002.jpg" alt="ChatGPT Award" class="product-img">
+                                </div>
+                                <div class="slider-slide">
+                                    <img src="images/IMG_20251113_163002.jpg" alt="ChatGPT Award" class="product-img">
+                                </div>
+                                <div class="slider-slide">
+                                    <img src="images/IMG_20251113_163011.jpg" alt="ChatGPT Award" class="product-img">
+                                </div>
+                            </div>
+                        </div>
                         
-                        <div class="slider-arrow arrow-left" onclick="changeImage('chatgpt', -1)"><i class="fa-solid fa-chevron-left"></i></div>
-                        <div class="slider-arrow arrow-right" onclick="changeImage('chatgpt', 1)"><i class="fa-solid fa-chevron-right"></i></div>
+                        <div class="slider-arrow arrow-left" onclick="changeSlide('chatgpt', -1)">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </div>
+                        <div class="slider-arrow arrow-right" onclick="changeSlide('chatgpt', 1)">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </div>
+                        
+                        <div class="slider-dots" id="dots-chatgpt">
+                            <span class="dot active"></span>
+                            <span class="dot"></span>
+                            <span class="dot"></span>
+                        </div>
 
                         <div class="absolute bottom-4 left-4 text-xs tracking-widest text-emerald-500">AI PIONEER</div>
                     </div>
                     <div class="text-center px-4">
                         <h4 class="font-serif text-2xl text-white mb-2">НАГРАДА CHATGPT</h4>
                         <p class="text-gray-400 text-xs tracking-widest uppercase mb-4">Изумрудный оттенок</p>
-                        <div class="font-serif text-3xl text-gucci-gold mb-6">11 200 руб.</div>
-                        <button onclick="orderViaWhatsapp('Награда ChatGPT')" class="btn-hover-effect w-full border border-gray-600 px-10 py-4 text-sm uppercase tracking-widest text-white hover:border-gucci-gold">
+                        <div class="font-serif text-3xl mb-6" style="color: #d4af37;">11 200 руб.</div>
+                        <button onclick="orderViaWhatsapp('Награда ChatGPT')" class="btn-hover-effect w-full border border-gray-600 px-10 py-4 text-sm uppercase tracking-widest text-white hover:border-yellow-600">
                             ЗАКАЗАТЬ
                         </button>
                     </div>
                 </div>
 
                 <!-- Like Item -->
-                <div class="product-card fade-in-up delay-300">
-                    <div class="relative aspect-[4/5] overflow-hidden mb-8 bg-[#1a1a1a] luxury-border group">
-                        <img id="img-like" src="https://placehold.co/600x800/f5f5f5/000000/png?text=LIKE+ФАС" alt="Like Award" class="product-img">
+                <div class="product-card fade-in-up">
+                    <div class="relative aspect-[4/5] overflow-hidden mb-8 bg-zinc-900 luxury-border">
+                        <div class="image-slider" data-product="like">
+                            <div class="slider-track">
+                                <div class="slider-slide">
+                                    <img src="images/IMG_20251113_163002.jpg" alt="Like Award" class="product-img">
+                                </div>
+                                <div class="slider-slide">
+                                    <img src="images/IMG_20251113_163002.jpg" alt="Like Award" class="product-img">
+                                </div>
+                                <div class="slider-slide">
+                                    <img src="images/IMG_20251113_163011.jpg" alt="Like Award" class="product-img">
+                                </div>
+                            </div>
+                        </div>
                         
-                        <div class="slider-arrow arrow-left" onclick="changeImage('like', -1)"><i class="fa-solid fa-chevron-left"></i></div>
-                        <div class="slider-arrow arrow-right" onclick="changeImage('like', 1)"><i class="fa-solid fa-chevron-right"></i></div>
+                        <div class="slider-arrow arrow-left" onclick="changeSlide('like', -1)">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </div>
+                        <div class="slider-arrow arrow-right" onclick="changeSlide('like', 1)">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </div>
+                        
+                        <div class="slider-dots" id="dots-like">
+                            <span class="dot active"></span>
+                            <span class="dot"></span>
+                            <span class="dot"></span>
+                        </div>
 
                         <div class="absolute bottom-4 left-4 text-xs tracking-widest text-gray-400">THE LIKE</div>
                     </div>
                     <div class="text-center px-4">
                         <h4 class="font-serif text-2xl text-white mb-2">КНОПКА ЛАЙК</h4>
                         <p class="text-gray-400 text-xs tracking-widest uppercase mb-4">Скульптурный дизайн</p>
-                        <div class="font-serif text-3xl text-gucci-gold mb-6">8 900 руб.</div>
-                        <button onclick="orderViaWhatsapp('Кнопка Лайк')" class="btn-hover-effect w-full border border-gray-600 px-10 py-4 text-sm uppercase tracking-widest text-white hover:border-gucci-gold">
+                        <div class="font-serif text-3xl mb-6" style="color: #d4af37;">8 900 руб.</div>
+                        <button onclick="orderViaWhatsapp('Кнопка Лайк')" class="btn-hover-effect w-full border border-gray-600 px-10 py-4 text-sm uppercase tracking-widest text-white hover:border-yellow-600">
                             ЗАКАЗАТЬ
                         </button>
                     </div>
@@ -295,81 +451,130 @@
     <!-- Footer -->
     <footer class="bg-black py-12 border-t border-gray-900">
         <div class="container mx-auto text-center">
-            <p class="font-serif italic text-gucci-gold mb-4 text-xl">Creator Awards</p>
-            <p class="text-gray-600 text-[10px] uppercase tracking-widest">
+            <p class="font-serif italic mb-4 text-xl" style="color: #d4af37;">Creator Awards</p>
+            <p class="text-gray-600 text-xs uppercase tracking-widest">
                 © 2025 Эксклюзивное Производство. Все права защищены.
             </p>
         </div>
     </footer>
 
     <script>
-        // База данных изображений для каждого товара
-        // Ваши фото вставлены в 'silver'
-        const products = {
-            silver: [
-                "images/IMG_20251113_162956.jpg",
-                "images/IMG_20251113_163002.jpg",
-                "images/IMG_20251113_163011.jpg"
-            ],
-            gold: [
-                "images/IMG_20251113_162956.jpg",
-                "images/IMG_20251113_163002.jpg",
-                "images/IMG_20251113_163011.jpg"
-            ],
-            telegram: [
-                "images/IMG_20251113_162956.jpg",
-                "images/IMG_20251113_163002.jpg",
-                "images/IMG_20251113_163011.jpg"
-            ],
-            instagram: [
-                "images/IMG_20251113_162956.jpg",
-                "images/IMG_20251113_163002.jpg",
-                "images/IMG_20251113_163011.jpg"
-            ],
-            chatgpt: [
-                "images/IMG_20251113_162956.jpg",
-                "images/IMG_20251113_163002.jpg",
-                "images/IMG_20251113_163011.jpg"
-            ],
-            like: [
-                "images/IMG_20251113_162956.jpg",
-                "images/IMG_20251113_163002.jpg",
-                "images/IMG_20251113_163011.jpg"
-            ]
-        };
-
-        // Храним текущий индекс фото для каждого товара
-        const currentIndices = {
-            silver: 0,
-            gold: 0,
-            telegram: 0,
-            instagram: 0,
-            chatgpt: 0,
-            like: 0
-        };
-
-        // Функция смены фото в карточке
-        function changeImage(productId, direction) {
-            const images = products[productId];
-            let index = currentIndices[productId];
-
-            index += direction;
-
-            // Зацикливание (после последней идет первая и наоборот)
-            if (index >= images.length) index = 0;
-            if (index < 0) index = images.length - 1;
-
-            currentIndices[productId] = index;
-
-            // Обновляем src картинки
-            const imgElement = document.getElementById(`img-${productId}`);
-            // Добавляем эффект затухания при смене
-            imgElement.style.opacity = 0;
+        // Современная система управления слайдерами
+        class TouchSlider {
+            constructor(slider) {
+                this.slider = slider;
+                this.track = slider.querySelector('.slider-track');
+                this.productId = slider.dataset.product;
+                this.currentIndex = 0;
+                this.slides = slider.querySelectorAll('.slider-slide');
+                this.totalSlides = this.slides.length;
+                
+                this.startX = 0;
+                this.currentX = 0;
+                this.isDragging = false;
+                this.startPos = 0;
+                
+                this.init();
+            }
             
-            setTimeout(() => {
-                imgElement.src = images[index];
-                imgElement.style.opacity = 1;
-            }, 200); // Короткая задержка для плавности
+            init() {
+                // Touch events
+                this.slider.addEventListener('touchstart', (e) => this.handleStart(e), { passive: true });
+                this.slider.addEventListener('touchmove', (e) => this.handleMove(e), { passive: false });
+                this.slider.addEventListener('touchend', () => this.handleEnd());
+                
+                // Mouse events
+                this.slider.addEventListener('mousedown', (e) => this.handleStart(e));
+                this.slider.addEventListener('mousemove', (e) => this.handleMove(e));
+                this.slider.addEventListener('mouseup', () => this.handleEnd());
+                this.slider.addEventListener('mouseleave', () => this.handleEnd());
+                
+                this.slider.addEventListener('dragstart', (e) => e.preventDefault());
+            }
+            
+            handleStart(e) {
+                this.isDragging = true;
+                this.startX = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
+                this.startPos = this.currentIndex * -100;
+                this.track.classList.add('dragging');
+            }
+            
+            handleMove(e) {
+                if (!this.isDragging) return;
+                
+                e.preventDefault();
+                this.currentX = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
+                const diff = this.currentX - this.startX;
+                const movePercent = (diff / this.slider.offsetWidth) * 100;
+                
+                let newPos = this.startPos + movePercent;
+                const maxPos = 0;
+                const minPos = -(this.totalSlides - 1) * 100;
+                
+                if (newPos > maxPos) newPos = maxPos + (newPos - maxPos) * 0.3;
+                if (newPos < minPos) newPos = minPos + (newPos - minPos) * 0.3;
+                
+                this.track.style.transform = `translateX(${newPos}%)`;
+            }
+            
+            handleEnd() {
+                if (!this.isDragging) return;
+                
+                this.isDragging = false;
+                this.track.classList.remove('dragging');
+                
+                const diff = this.currentX - this.startX;
+                const threshold = this.slider.offsetWidth * 0.2;
+                
+                if (Math.abs(diff) > threshold) {
+                    if (diff > 0 && this.currentIndex > 0) {
+                        this.currentIndex--;
+                    } else if (diff < 0 && this.currentIndex < this.totalSlides - 1) {
+                        this.currentIndex++;
+                    }
+                }
+                
+                this.updateSlider();
+            }
+            
+            goToSlide(index) {
+                this.currentIndex = Math.max(0, Math.min(index, this.totalSlides - 1));
+                this.updateSlider();
+            }
+            
+            updateSlider() {
+                const offset = this.currentIndex * -100;
+                this.track.style.transform = `translateX(${offset}%)`;
+                this.updateDots();
+            }
+            
+            updateDots() {
+                const dotsContainer = document.getElementById(`dots-${this.productId}`);
+                if (dotsContainer) {
+                    const dots = dotsContainer.querySelectorAll('.dot');
+                    dots.forEach((dot, index) => {
+                        dot.classList.toggle('active', index === this.currentIndex);
+                    });
+                }
+            }
+        }
+        
+        // Инициализация всех слайдеров
+        const sliders = {};
+        
+        function initSliders() {
+            document.querySelectorAll('.image-slider').forEach(sliderEl => {
+                const productId = sliderEl.dataset.product;
+                sliders[productId] = new TouchSlider(sliderEl);
+            });
+        }
+        
+        // Функция для кнопок
+        function changeSlide(productId, direction) {
+            const slider = sliders[productId];
+            if (slider) {
+                slider.goToSlide(slider.currentIndex + direction);
+            }
         }
 
         // Анимация при скролле
@@ -381,16 +586,24 @@
                 }
             });
         }, observerOptions);
+        
         document.querySelectorAll('.fade-in-up').forEach(el => {
             observer.observe(el);
         });
 
-        // WhatsApp Redirect
+        // WhatsApp
         function orderViaWhatsapp(item) {
             const phone = '79779662521';
             const message = `Здравствуйте. Я хочу заказать: ${item}.`;
             const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
             window.open(url, '_blank');
+        }
+        
+        // Инициализация после загрузки DOM
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initSliders);
+        } else {
+            initSliders();
         }
     </script>
 </body>
