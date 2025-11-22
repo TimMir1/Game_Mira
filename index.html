@@ -54,16 +54,16 @@
             overflow: hidden;
             background: var(--bg-color);
             display: flex;
-            flex-direction: column; /* Вертикальное расположение */
+            flex-direction: column; 
         }
 
-        /* 1. Изображение - 60% высоты экрана */
+        /* 1. Изображение - 55% высоты экрана (уменьшили под текст) */
         .image-slider {
             position: relative;
             width: 100%; 
-            height: 60%; /* Уменьшили высоту фото */
+            height: 55%; 
             z-index: 1;
-            background: #eee; /* Цвет фона пока грузится фото */
+            background: #eee;
         }
         
         .slider-track { display: flex; width: 100%; height: 100%; transition: transform 0.4s ease-out; }
@@ -72,23 +72,23 @@
         .product-img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Заполняет блок, но блок теперь меньше */
+            object-fit: cover; 
             object-position: center;
         }
 
-        /* 2. Контент - 40% высоты экрана */
+        /* 2. Контент - 45% высоты экрана (больше места для крупного текста) */
         .info-area {
             position: relative;
-            height: 40%; /* Оставшееся место под текст */
+            height: 45%; 
             width: 100%;
-            background: var(--bg-color); /* Сплошной фон */
+            background: var(--bg-color); 
             z-index: 10;
-            padding: 24px;
+            padding: 24px 28px; /* Чуть больше отступы по бокам */
             padding-bottom: calc(20px + env(safe-area-inset-bottom));
             display: flex;
             flex-direction: column;
-            justify-content: center; /* Центрируем текст вертикально в блоке */
-            box-shadow: 0 -10px 30px rgba(0,0,0,0.05); /* Легкая тень на стыке */
+            justify-content: center; 
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.05); 
         }
 
         /* Хедер */
@@ -104,38 +104,41 @@
         .brand-text {
             font-family: 'Cinzel', serif;
             color: #fff;
-            font-size: 14px;
+            font-size: 16px; /* Увеличено */
             letter-spacing: 2px;
             text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            font-weight: 600;
         }
 
-        /* Типографика */
+        /* Типографика - УВЕЛИЧЕННЫЕ РАЗМЕРЫ */
         .product-meta {
-            font-size: 10px;
+            font-size: 12px; /* Было 10px */
             text-transform: uppercase;
             letter-spacing: 2px;
             color: #888;
             margin-bottom: 8px;
-            font-weight: 500;
+            font-weight: 600;
         }
         
         .product-name {
             font-family: 'Playfair Display', serif;
-            font-size: 26px; /* Чуть меньше для аккуратности */
+            font-size: 32px; /* Было 26px */
             line-height: 1.1;
             margin-bottom: 12px;
             color: #1A1A1A;
+            font-weight: 600;
         }
 
         .product-desc {
-            font-size: 13px;
-            color: #555;
+            font-size: 16px; /* Было 13px */
+            color: #444;
             margin-bottom: 20px;
             line-height: 1.5;
             display: -webkit-box;
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
+            font-weight: 400;
         }
 
         .action-row {
@@ -143,13 +146,13 @@
             align-items: center;
             justify-content: space-between;
             gap: 15px;
-            margin-top: auto; /* Прижимает кнопку к низу блока контента */
+            margin-top: auto; 
         }
 
         .price {
             font-family: 'Cinzel', serif;
-            font-size: 20px;
-            font-weight: 600;
+            font-size: 24px; /* Было 20px */
+            font-weight: 700;
             color: #1A1A1A;
         }
 
@@ -157,24 +160,24 @@
             background: #1A1A1A;
             color: #fff;
             border: none;
-            padding: 14px 28px;
-            font-size: 12px;
+            padding: 16px 24px; /* Кнопка стала больше */
+            font-size: 14px; /* Текст кнопки крупнее */
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
             font-weight: 600;
             cursor: pointer;
             flex-grow: 1;
-            max-width: 200px;
+            max-width: 220px;
             text-align: center;
-            border-radius: 0; /* Строгий стиль */
+            border-radius: 0; 
         }
 
-        /* Кнопка просмотра фото - теперь на стыке фото и текста */
+        /* Кнопка просмотра фото */
         .btn-view {
             position: absolute;
-            top: -22px; /* Половина кнопки заходит на фото */
+            top: -25px; /* Чуть выше */
             right: 24px;
-            width: 44px; height: 44px;
+            width: 50px; height: 50px; /* Крупнее */
             background: #fff;
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
@@ -182,41 +185,42 @@
             color: #1A1A1A;
             z-index: 30;
             cursor: pointer;
+            font-size: 18px;
         }
 
         /* Точки слайдера */
         .slider-dots {
             position: absolute;
-            bottom: 20px; /* Теперь внизу фото */
+            bottom: 25px; 
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            flex-direction: row; /* Горизонтально */
-            gap: 8px;
+            flex-direction: row; 
+            gap: 10px;
             z-index: 20;
         }
         .dot {
-            width: 6px; height: 6px;
+            width: 8px; height: 8px; /* Точки крупнее */
             background: rgba(255,255,255,0.5);
             border-radius: 50%;
             transition: 0.3s;
             box-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
-        .dot.active { width: 8px; height: 8px; background: #fff; }
+        .dot.active { width: 10px; height: 10px; background: #fff; }
 
         /* WhatsApp */
         .wa-float {
             position: fixed;
-            bottom: calc(20px + env(safe-area-inset-bottom)); /* Чуть ниже чем было */
-            right: 15px;
-            width: 50px; height: 50px;
+            bottom: calc(25px + env(safe-area-inset-bottom));
+            right: 20px;
+            width: 60px; height: 60px; /* Крупнее */
             background: #25D366;
             color: #fff;
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            font-size: 26px;
+            font-size: 32px;
             z-index: 100;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
 
         /* Modal */
@@ -235,7 +239,8 @@
             color: #fff; font-size: 30px; z-index: 210; padding: 20px; cursor: pointer;
         }
     </style>
-    </head>
+
+</head>
 <body>
 
     <a href="https://wa.me/79779662521" class="wa-float"><i class="fab fa-whatsapp"></i></a>
