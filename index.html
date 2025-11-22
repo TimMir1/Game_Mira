@@ -2,414 +2,466 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Creator Awards - Mobile Product</title>
-    
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- Используем более современный и четкий шрифт для заголовков, но сохраняем акцент -->
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Playfair+Display:ital,wght@0,600;0,800;1,600&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Слогострой - Русская Азбука</title>
+    <!-- Tailwind CSS CDN for modern, responsive styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <!-- Tone.js for loading external audio files and simple game sounds -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
     <style>
-        :root {
-            --bg-color: #F9F9F9;
-            --text-dark: #1A1A1A;
-            --accent-gold: #B4975A;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-        body { 
-            background-color: var(--bg-color); 
-            color: var(--text-dark); 
-            font-family: 'Manrope', sans-serif;
-            overflow: hidden; 
-            width: 100%;
-            height: 100%;
-            position: fixed;
-        }
-
-        /* 1. Общий контейнер прокрутки */
-        #snap-container {
-            height: 100dvh; 
-            width: 100%;
-            overflow-y: scroll;
-            scroll-snap-type: y mandatory;
-            scroll-behavior: smooth;
-        }
-
-        /* 2. Экран товара (одна карточка) */
-        .product-screen {
-            position: relative;
-            width: 100%;
-            height: 100dvh; 
-            scroll-snap-align: start;
-            scroll-snap-stop: always;
-            background: var(--bg-color);
-            display: flex;
-            flex-direction: column;
-        }
-        
-        /* 3. Хедер (Логотип и отступ от "челки") */
-        .sticky-header {
-            position: absolute;
-            top: 0; left: 0; width: 100%;
-            padding-top: max(15px, env(safe-area-inset-top)); /* Учет "челки" */
-            padding-bottom: 10px;
-            text-align: center;
-            z-index: 50;
-            background: linear-gradient(to bottom, rgba(249, 249, 249, 0.95), transparent);
-            backdrop-filter: blur(3px);
-            -webkit-backdrop-filter: blur(3px);
-            pointer-events: none; /* Чтобы можно было свайпать под ним */
-        }
-        .brand-logo {
-            font-family: 'Cinzel', serif;
-            font-size: 16px;
-            font-weight: 800;
-            letter-spacing: 3px;
-            color: var(--text-dark);
-            text-shadow: 0 0 5px rgba(255, 255, 255, 0.7);
-        }
-        
-        /* 4. Область Фото (Занимает ~58% экрана) */
-        .image-area-wrapper {
-            width: 100%;
-            /* ИЗМЕНЕНИЕ: Увеличение области фото для предотвращения обрезки нижней панели */
-            height: 58%; 
-            position: relative;
-            /* Дополнительный отступ сверху, чтобы фото не было прямо под логотипом */
-            margin-top: max(50px, env(safe-area-inset-top)); 
-            padding: 0 16px; 
-            z-index: 10;
-        }
-
-        .image-slider {
-            width: 100%;
-            height: 100%;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
-            position: relative;
-        }
-
-        .slider-track { display: flex; width: 100%; height: 100%; transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1); }
-        .slider-slide { min-width: 100%; height: 100%; }
-        .product-img { width: 100%; height: 100%; object-fit: cover; }
-        
-        .slider-dots { position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 10; }
-        .dot { width: 8px; height: 8px; background: rgba(255,255,255,0.7); border-radius: 50%; transition: 0.2s; }
-        .dot.active { background: #fff; transform: scale(1.1); }
-        .btn-view { position: absolute; bottom: 15px; right: 15px; width: 44px; height: 44px; background: rgba(0,0,0,0.6); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 18px; z-index: 10; }
-
-
-        /* 5. Область Инфо (Занимает оставшиеся ~42%) */
-        .info-area {
-            /* ИЗМЕНЕНИЕ: Уменьшение области инфо для предотвращения обрезки нижней панели */
-            height: 42%; 
-            padding: 24px 24px 20px 24px;
-            padding-bottom: calc(20px + env(safe-area-inset-bottom)); /* Учет нижней "челки" */
-            display: flex;
-            flex-direction: column;
-            
-            /* Распределяем контент по всему пространству */
-            justify-content: space-between; 
-            gap: 15px; /* Минимальный зазор между блоками */
-        }
-
-        /* Типографика - КРУПНЫЕ ШРИФТЫ */
-        .top-meta {
-            margin-bottom: 5px; /* Небольшой отступ от заголовка */
-        }
-
-        .product-collection {
-            font-size: 14px; /* Крупнее */
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: #888;
-        }
-
-        .product-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 38px; /* Крупнее, чтобы заполнить место */
-            line-height: 1.05;
-            color: var(--text-dark);
+        /* Custom CSS for the letter blocks */
+        .letter-block {
+            cursor: grab;
+            user-select: none;
+            touch-action: none; /* Prevents default touch scrolling */
+            transition: transform 0.1s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            font-family: 'Inter', sans-serif;
             font-weight: 800;
         }
-
-        .product-desc {
-            /* Убеждаемся, что описание занимает столько места, сколько нужно */
-            flex-grow: 1; 
-            font-size: 17px; /* Очень хорошо читается */
-            line-height: 1.5;
-            color: #444;
-            font-weight: 500;
-            margin-top: 10px; /* Отступ после заголовка */
-            margin-bottom: 25px; /* Отступ перед ценой/кнопкой */
+        /* Style for the empty slots */
+        .slot-active {
+            border: 4px dashed #60a5fa; /* Blue-400 */
         }
-
-        /* Блок цены и кнопки */
-        .bottom-action {
-            display: flex;
-            align-items: center;
-            gap: 20px;
+        /* Style for the feedback messages */
+        .feedback-message {
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            transform: scale(0.8);
         }
-
-        .price-tag {
-            font-family: 'Cinzel', serif;
-            font-size: 32px; /* Цена */
-            color: var(--text-dark);
-            font-weight: 800;
-            flex-shrink: 0; /* Не сжимать цену */
+        .feedback-visible {
+            opacity: 1;
+            transform: scale(1);
         }
-
-        .btn-main {
-            flex-grow: 1;
-            background: var(--text-dark);
-            color: #fff;
-            padding: 16px 20px;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            text-align: center;
-        }
-
-        /* WhatsApp */
-        .wa-float {
-            position: fixed;
-            bottom: calc(20px + env(safe-area-inset-bottom) + 5px); /* Чуть выше кнопки */
-            right: 20px;
-            width: 55px; height: 55px;
-            background: #25D366;
-            color: white;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 30px;
-            box-shadow: 0 5px 15px rgba(37, 211, 102, 0.4);
-            z-index: 100;
-        }
-
-        /* Модалка */
-        .modal {
-            display: none;
-            position: fixed; inset: 0;
-            background: rgba(0,0,0,0.95); z-index: 9999;
-            align-items: center; justify-content: center;
-        }
-        .modal.active { display: flex; }
-        .modal img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        .modal-close { position: absolute; top: 20px; right: 20px; color: #fff; font-size: 36px; padding: 10px; }
     </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
 </head>
-<body>
+<body class="bg-gray-50 flex items-center justify-center min-h-screen p-4">
 
-    <!-- Фиксированный хедер (Логотип) -->
-    <div class="sticky-header">
-        <div class="brand-logo">CREATOR AWARDS</div>
-    </div>
+    <!-- Main Game Container -->
+    <div id="game-container" class="w-full max-w-xl bg-white rounded-3xl shadow-2xl p-6 md:p-10 border-4 border-indigo-200">
+        <h1 class="text-4xl font-extrabold text-indigo-700 text-center mb-6">Слогострой</h1>
+        <p class="text-center text-gray-600 mb-8">Собери слово, перетаскивая буквы в пустые места!</p>
 
-    <!-- Кнопка WhatsApp -->
-    <a href="https://wa.me/79779662521" class="wa-float" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
-
-    <div id="snap-container">
-
-        <!-- 1. СЕРЕБРЯНАЯ КНОПКА -->
-        <div class="product-screen">
-            <div class="image-area-wrapper">
-                <div class="image-slider" data-product="silver">
-                    <div class="slider-track">
-                        <div class="slider-slide"><img src="images/serebryanaya-knopka-youtube.jpg" class="product-img" onerror="this.src='https://placehold.co/800x800/e5e5e5/333?text=Серебряная+1'"></div>
-                        <div class="slider-slide"><img src="images/serebryanaya-knopka-youtube2.jpg" class="product-img" onerror="this.src='https://placehold.co/800x800/e5e5e5/333?text=Серебряная+2'"></div>
-                        <!-- ДОБАВЛЕНО ТРЕТЬЕ ФОТО -->
-                        <div class="slider-slide"><img src="images/serebryanaya-knopka-youtube3.jpg" class="product-img" onerror="this.src='https://placehold.co/800x800/e5e5e5/333?text=Серебряная+3'"></div>
-                    </div>
-                    <!-- ДОБАВЛЕНА ТРЕТЬЯ ТОЧКА -->
-                    <div class="slider-dots" id="dots-silver"><span class="dot active"></span><span class="dot"></span><span class="dot"></span></div>
-                    <div class="btn-view" onclick="openModal('images/serebryanaya-knopka-youtube.jpg')"><i class="fa-regular fa-eye"></i></div>
-                </div>
-            </div>
-
-            <div class="info-area">
-                <div class="top-meta">
-                    <div class="product-collection">Серебряная коллекция</div>
-                    <h1 class="product-title">Серебряная Кнопка</h1>
-                </div>
-                
-                <p class="product-desc">Классическая награда за 100,000 подписчиков. Зеркальное напыление, лазерная гравировка имени канала. Изготовление в Москве за 4 часа.</p>
-                
-                <div class="bottom-action">
-                    <div class="price-tag">10 200 ₽</div>
-                    <div class="btn-main" onclick="order('Серебряная кнопка')">Заказать</div>
-                </div>
-            </div>
+        <!-- Word Display Area (Slots) -->
+        <div id="word-slots" class="flex justify-center gap-2 md:gap-4 h-24 mb-10">
+            <!-- Slots will be inserted here by JS -->
         </div>
 
-        <!-- 2. ЗОЛОТАЯ КНОПКА -->
-        <div class="product-screen">
-            <div class="image-area-wrapper">
-                <div class="image-slider" data-product="gold">
-                    <div class="slider-track">
-                        <div class="slider-slide"><img src="images/zolotaya-knopka-youtube1.jpg" class="product-img" onerror="this.src='https://placehold.co/800x800/d4af37/fff?text=Золотая+1'"></div>
-                        <div class="slider-slide"><img src="images/zolotaya-knopka-youtube2.jpg" class="product-img" onerror="this.src='https://placehold.co/800x800/d4af37/fff?text=Золотая+2'"></div>
-                        <!-- ДОБАВЛЕНО ТРЕТЬЕ ФОТО -->
-                        <div class="slider-slide"><img src="images/zolotaya-knopka-youtube3.jpg" class="product-img" onerror="this.src='https://placehold.co/800x800/d4af37/fff?text=Золотая+3'"></div>
-                    </div>
-                    <!-- ДОБАВЛЕНА ТРЕТЬЯ ТОЧКА -->
-                    <div class="slider-dots" id="dots-gold"><span class="dot active"></span><span class="dot"></span><span class="dot"></span></div>
-                    <div class="btn-view" onclick="openModal('images/zolotaya-knopka-youtube1.jpg')"><i class="fa-regular fa-eye"></i></div>
-                </div>
-            </div>
-
-            <div class="info-area">
-                <div class="top-meta">
-                    <div class="product-collection" style="color:var(--accent-gold)">Gold Plated 24K</div>
-                    <h1 class="product-title">Золотая Кнопка</h1>
-                </div>
-                
-                <p class="product-desc">Награда за 1 миллион подписчиков. Покрытие настоящим золотом 24 карата. Премиальное качество и внушительный вес.</p>
-                
-                <div class="bottom-action">
-                    <div class="price-tag">12 800 ₽</div>
-                    <div class="btn-main" onclick="order('Золотая кнопка')">Заказать</div>
-                </div>
-            </div>
+        <!-- Feedback Message -->
+        <div id="feedback" class="feedback-message text-center h-10 mb-8">
+            <span id="feedback-text" class="text-3xl font-bold text-green-600">Отлично!</span>
         </div>
         
-        <!-- 3. TELEGRAM -->
-        <div class="product-screen">
-            <div class="image-area-wrapper">
-                <div class="image-slider" data-product="tg">
-                    <div class="slider-track">
-                        <div class="slider-slide"><img src="images/IMG_20251113_163002.jpg" class="product-img" onerror="this.src='https://placehold.co/800x800/2CA5E0/fff?text=TG+1'"></div>
-                        <div class="slider-slide"><img src="images/IMG_20251113_163011.jpg" class="product-img" onerror="this.src='https://placehold.co/800x800/2CA5E0/fff?text=TG+2'"></div>
-                        <!-- ДОБАВЛЕНО ТРЕТЬЕ ФОТО -->
-                        <div class="slider-slide"><img src="images/IMG_20251113_163003.jpg" class="product-img" onerror="this.src='https://placehold.co/800x800/2CA5E0/fff?text=TG+3'"></div>
-                    </div>
-                    <!-- ДОБАВЛЕНА ТРЕТЬЯ ТОЧКА -->
-                    <div class="slider-dots" id="dots-tg"><span class="dot active"></span><span class="dot"></span><span class="dot"></span></div>
-                    <div class="btn-view" onclick="openModal('images/IMG_20251113_163002.jpg')"><i class="fa-regular fa-eye"></i></div>
-                </div>
-            </div>
-
-            <div class="info-area">
-                <div class="top-meta">
-                    <div class="product-collection" style="color:#2CA5E0">Crystal & Aluminium</div>
-                    <h1 class="product-title">Награда Telegram</h1>
-                </div>
-                
-                <p class="product-desc">Эксклюзивная награда для авторов каналов. Изысканное сочетание оптического кристалла и шлифованного металла.</p>
-                
-                <div class="bottom-action">
-                    <div class="price-tag">9 800 ₽</div>
-                    <div class="btn-main" onclick="order('Награда Telegram')">Заказать</div>
-                </div>
-            </div>
+        <!-- Loading Indicator -->
+        <div id="loading-indicator" class="text-center py-10">
+             <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500 mx-auto mb-3"></div>
+             <p class="text-indigo-500 font-medium">Загрузка аудио...</p>
         </div>
 
+        <!-- Letter Selection Area (Draggable Blocks) -->
+        <div id="letter-selection" class="flex justify-center flex-wrap gap-3 p-4 bg-indigo-100 rounded-xl shadow-inner min-h-[120px] hidden">
+            <!-- Letter blocks will be inserted here by JS -->
+        </div>
+
+        <!-- Control/Info Area -->
+        <div class="mt-8 text-center">
+            <button id="next-word-button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition duration-300 transform hover:scale-105 opacity-0 pointer-events-none" disabled>
+                Следующее слово
+            </button>
+            <p id="word-info" class="mt-4 text-sm text-gray-500"></p>
+        </div>
     </div>
 
-    <!-- Модальное окно для полного просмотра фото -->
-    <div class="modal" id="modal" onclick="this.classList.remove('active')">
-        <div class="modal-close">&times;</div>
-        <img id="modal-img" src="" alt="Full size product image">
-    </div>
+    <script type="module">
+        // --- Game Data ---
+        const wordData = [
+            { target: "КОТ", translation: "Cat" },
+            { target: "ДОМ", translation: "House" },
+            { target: "МАМА", translation: "Mom" },
+            { target: "СОК", translation: "Juice" },
+            { target: "РЫБА", translation: "Fish" },
+            { target: "КУБИК", translation: "Cube" },
+            { target: "СЛОН", translation: "Elephant" },
+            { target: "ТРАВА", translation: "Grass" },
+        ];
 
-    <script>
-        // Инициализация слайдеров
-        document.querySelectorAll('.image-slider').forEach(slider => {
-            const track = slider.querySelector('.slider-track');
-            const dots = slider.querySelectorAll('.dot');
-            let startX = 0, currentIdx = 0, isDragging = false;
-            const totalSlides = dots.length;
+        // --- Game State & Elements ---
+        let currentWordIndex = 0;
+        let activeDraggable = null;
+        let originalPosition = { x: 0, y: 0 };
+        let currentWordSlots = [];
+        let isDragging = false;
+        let isGameLocked = false;
+        let isAudioReady = false;
 
-            // Touch events
-            slider.addEventListener('touchstart', e => {
-                startX = e.touches[0].clientX;
-                isDragging = true;
-                track.style.transition = 'none'; // Убрать анимацию во время перетаскивания
-            }, {passive: true});
+        const wordSlotsEl = document.getElementById('word-slots');
+        const letterSelectionEl = document.getElementById('letter-selection');
+        const feedbackEl = document.getElementById('feedback');
+        const feedbackTextEl = document.getElementById('feedback-text');
+        const nextWordButton = document.getElementById('next-word-button');
+        const wordInfoEl = document.getElementById('word-info');
+        const loadingIndicatorEl = document.getElementById('loading-indicator');
 
-            slider.addEventListener('touchmove', e => {
-                if (!isDragging) return;
-                const currentX = e.touches[0].clientX;
-                const diff = currentX - startX;
-                // Небольшой превью свайпа
-                track.style.transform = `translateX(calc(-${currentIdx * 100}% + ${diff}px))`;
-            }, {passive: true});
+        // --- Audio Setup (Tone.js & MP3 Loading) ---
+        
+        // !!! МЕСТО, КУДА НУЖНО ВСТАВИТЬ ВАШИ АУДИОФАЙЛЫ !!!
+        // Замените значения (URL) на пути к вашим MP3-файлам.
+        // Используйте абсолютные URL (начиная с http:// или https://) или относительные пути.
+        const LETTER_AUDIO_SOURCES = {
+            'А': 'your_folder/A.mp3', // <-- ЗАМЕНИТЬ
+            'Б': 'your_folder/B.mp3', // <-- ЗАМЕНИТЬ
+            'В': 'your_folder/V.mp3', // <-- ЗАМЕНИТЬ
+            'Г': 'your_folder/G.mp3', // <-- ЗАМЕНИТЬ
+            'Д': 'your_folder/D.mp3', // <-- ЗАМЕНИТЬ
+            'Е': 'your_folder/Ye.mp3', // <-- ЗАМЕНИТЬ
+            'И': 'your_folder/I.mp3', // <-- ЗАМЕНИТЬ
+            'К': 'your_folder/K.mp3', // <-- ЗАМЕНИТЬ
+            'Л': 'your_folder/L.mp3', // <-- ЗАМЕНИТЬ
+            'М': 'your_folder/M.mp3', // <-- ЗАМЕНИТЬ
+            'Н': 'your_folder/N.mp3', // <-- ЗАМЕНИТЬ
+            'О': 'your_folder/O.mp3', // <-- ЗАМЕНИТЬ
+            'Р': 'your_folder/R.mp3', // <-- ЗАМЕНИТЬ
+            'С': 'your_folder/S.mp3', // <-- ЗАМЕНИТЬ
+            'Т': 'your_folder/T.mp3', // <-- ЗАМЕНИТЬ
+            'У': 'your_folder/U.mp3', // <-- ЗАМЕНИТЬ
+            'Ы': 'your_folder/Y.mp3', // <-- ЗАМЕНИТЬ
+            // Добавьте сюда другие буквы, которые вы используете!
+        };
 
-            slider.addEventListener('touchend', e => {
-                if (!isDragging) return;
-                track.style.transition = 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1)'; // Вернуть анимацию
-                const diff = e.changedTouches[0].clientX - startX;
-                
-                if (Math.abs(diff) > 70) { // Порог свайпа
-                    if (diff > 0 && currentIdx > 0) currentIdx--;
-                    else if (diff < 0 && currentIdx < totalSlides - 1) currentIdx++;
-                }
-                update();
-                isDragging = false;
-            });
-            
-            // Мышка (для десктопа/планшета)
-            slider.addEventListener('mousedown', e => {
-                startX = e.clientX;
-                isDragging = true;
-                track.style.transition = 'none';
-            });
-            slider.addEventListener('mousemove', e => {
-                if (!isDragging) return;
-                const currentX = e.clientX;
-                const diff = currentX - startX;
-                track.style.transform = `translateX(calc(-${currentIdx * 100}% + ${diff}px))`;
-            });
-            slider.addEventListener('mouseup', e => {
-                if (!isDragging) return;
-                track.style.transition = 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1)';
-                const diff = e.clientX - startX;
-                if (Math.abs(diff) > 70) {
-                    if (diff > 0 && currentIdx > 0) currentIdx--;
-                    else if (diff < 0 && currentIdx < totalSlides - 1) currentIdx++;
-                }
-                update();
-                isDragging = false;
-            });
-            slider.addEventListener('mouseleave', () => {
-                if (isDragging) {
-                    track.style.transition = 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1)';
-                    update();
-                    isDragging = false;
-                }
-            });
+        // Объект для хранения загруженных аудио плееров Tone.js
+        const letterPlayers = {};
 
-
-            function update() {
-                track.style.transform = `translateX(-${currentIdx * 100}%)`;
-                dots.forEach((d, i) => d.classList.toggle('active', i === currentIdx));
-                
-                // Обновляем картинку для модалки, чтобы открывалась текущая
-                const currentImgSrc = track.children[currentIdx].querySelector('img').src;
-                const viewButton = slider.querySelector('.btn-view');
-                if (viewButton) viewButton.onclick = () => openModal(currentImgSrc);
+        // Синтезатор для простых звуков успеха/ошибки
+        const synth = new Tone.PolySynth(Tone.Synth, {
+            oscillator: { type: "sine" },
+            envelope: {
+                attack: 0.005,
+                decay: 0.1,
+                sustain: 0.05,
+                release: 0.1,
             }
-            update(); // Инициализация
-        });
+        }).toDestination();
+        
+        // Асинхронная функция загрузки всех аудиофайлов
+        async function loadAudioFiles() {
+            const lettersToLoad = Object.keys(LETTER_AUDIO_SOURCES);
+            const loadPromises = [];
 
-        // Функции модалки и заказа
-        function order(item) {
-            // Сразу перекидывает в WhatsApp
-            window.location.href = `https://wa.me/79779662521?text=Здравствуйте! Хочу заказать: ${encodeURIComponent(item)}`;
+            for (const letter of lettersToLoad) {
+                const url = LETTER_AUDIO_SOURCES[letter];
+                
+                if (url && !url.includes('your_folder')) {
+                    const player = new Tone.Player(url).toDestination();
+                    letterPlayers[letter] = player;
+                    loadPromises.push(new Promise(resolve => {
+                        // Ожидаем события загрузки
+                        player.onload = resolve;
+                        // Добавляем таймаут на случай ошибки загрузки, чтобы не заблокировать игру
+                        setTimeout(resolve, 5000); 
+                    }));
+                } else {
+                    // Если URL не заменен, просто игнорируем его и разрешаем промис
+                    console.warn(`[Аудио]: URL для буквы '${letter}' не указан или является placeholder-ом. Звук не будет воспроизведен.`);
+                    loadPromises.push(Promise.resolve());
+                }
+            }
+
+            try {
+                // Ждем загрузки всех файлов
+                await Promise.all(loadPromises);
+                isAudioReady = true;
+                console.log("[Аудио]: Все необходимые аудиофайлы загружены.");
+            } catch (error) {
+                console.error("[Аудио]: Ошибка при загрузке аудиофайлов. Игра запустится без звуков букв.", error);
+            }
         }
-        function openModal(src) {
-            document.getElementById('modal-img').src = src;
-            document.getElementById('modal').classList.add('active');
+
+        // Обновленная функция воспроизведения звука
+        const playLetterSound = (letter) => {
+            if (!isAudioReady) return;
+            if (Tone.context.state !== 'running') { Tone.start(); }
+            const player = letterPlayers[letter];
+            if (player && player.state === 'loaded') {
+                // Останавливаем, если уже играет, и начинаем сначала
+                player.stop(); 
+                player.start();
+            }
+        };
+
+        const playSuccess = () => {
+            if (Tone.context.state !== 'running') { Tone.start(); }
+            synth.triggerAttackRelease("C5", "8n", Tone.now());
+            synth.triggerAttackRelease("E5", "8n", Tone.now() + 0.1);
+            synth.triggerAttackRelease("G5", "8n", Tone.now() + 0.2);
+        };
+
+        const playError = () => {
+            if (Tone.context.state !== 'running') { Tone.start(); }
+            synth.triggerAttackRelease("C4", "16n", Tone.now());
+            synth.triggerAttackRelease("B3", "16n", Tone.now() + 0.1);
+        };
+
+        // --- Utility Functions ---
+
+        /**
+         * Shuffles an array in place.
+         * @param {Array} a items The array containing the items.
+         */
+        function shuffleArray(a) {
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
         }
+
+        // --- Drag and Drop Logic ---
+
+        function getEventPoint(e) {
+            if (e.touches && e.touches.length > 0) {
+                return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            }
+            return { x: e.clientX, y: e.clientY };
+        }
+
+        function startDrag(e) {
+            if (isGameLocked || !isAudioReady) return;
+            const block = e.currentTarget;
+            if (block.classList.contains('placed')) return; // Already correctly placed
+
+            isDragging = true;
+            activeDraggable = block;
+            block.style.zIndex = 1000;
+            block.classList.add('shadow-xl', 'ring-4', 'ring-indigo-400');
+            
+            // Воспроизведение звука буквы (теперь MP3)
+            const letter = block.dataset.letter;
+            playLetterSound(letter);
+
+            // Get original position before dragging starts
+            const rect = block.getBoundingClientRect();
+            originalPosition.x = rect.left;
+            originalPosition.y = rect.top;
+
+            // Prevent default touch/mouse behavior on start
+            e.preventDefault(); 
+        }
+
+        function moveDrag(e) {
+            if (!activeDraggable || !isDragging) return;
+            e.preventDefault(); // Crucial for smooth mobile dragging
+
+            const point = getEventPoint(e);
+            
+            // Calculate new position relative to the viewport
+            const rect = activeDraggable.getBoundingClientRect();
+            const dx = point.x - (rect.left + rect.width / 2);
+            const dy = point.y - (rect.top + rect.height / 2);
+
+            // Apply transform for movement
+            activeDraggable.style.transform = `translate(${dx}px, ${dy}px)`;
+        }
+
+        function endDrag(e) {
+            if (!activeDraggable || !isDragging) return;
+            isDragging = false;
+            
+            activeDraggable.style.zIndex = 10;
+            activeDraggable.classList.remove('shadow-xl', 'ring-4', 'ring-indigo-400');
+
+            // Check collision with word slots
+            const currentRect = activeDraggable.getBoundingClientRect();
+            let placed = false;
+
+            currentWordSlots.forEach(slot => {
+                const slotRect = slot.element.getBoundingClientRect();
+                
+                // Simple overlap check
+                const overlap = (
+                    currentRect.left < slotRect.right &&
+                    currentRect.right > slotRect.left &&
+                    currentRect.top < slotRect.bottom &&
+                    currentRect.bottom > slotRect.top
+                );
+
+                if (overlap && !slot.filled) {
+                    // Check if the letter is correct for the slot
+                    if (activeDraggable.dataset.letter === slot.correctLetter) {
+                        // Correct placement
+                        slot.filled = true;
+                        slot.element.classList.remove('slot-active', 'bg-white');
+                        slot.element.classList.add('bg-indigo-300', 'text-indigo-800', 'border-indigo-400');
+                        activeDraggable.classList.add('placed');
+                        activeDraggable.style.transform = 'none'; // Snap to original letter's position
+                        activeDraggable.style.position = 'absolute'; // Temporarily take out of flow for smooth transition
+                        
+                        // Center the letter inside the slot visually
+                        const finalX = slotRect.left + (slotRect.width / 2) - (currentRect.width / 2);
+                        const finalY = slotRect.top + (slotRect.height / 2) - (currentRect.height / 2);
+
+                        activeDraggable.style.left = `${finalX}px`;
+                        activeDraggable.style.top = `${finalY}px`;
+                        
+                        // Удаляем силуэт и вставляем перетаскиваемый блок в слот
+                        slot.element.innerHTML = ''; 
+                        slot.element.appendChild(activeDraggable);
+                        
+                        // Reset the draggable element's styles to snap it in place inside the slot
+                        activeDraggable.style.position = 'static';
+                        activeDraggable.style.transform = 'none';
+                        activeDraggable.classList.remove('letter-block'); // Remove drag behavior
+
+                        playSuccess();
+                        placed = true;
+                        
+                        checkWinCondition();
+                    } else {
+                        // Incorrect placement
+                        playError();
+                        // Snap back to original position
+                        activeDraggable.style.transform = 'none';
+                    }
+                }
+            });
+
+            if (!placed) {
+                // If not placed correctly, snap back to original position (handled by CSS transition: none)
+                activeDraggable.style.transform = 'none';
+            }
+            
+            activeDraggable = null;
+        }
+
+        // --- Game Flow Functions ---
+
+        function checkWinCondition() {
+            const allFilled = currentWordSlots.every(slot => slot.filled);
+            
+            if (allFilled) {
+                isGameLocked = true;
+                showFeedback("ВЕРНО!", "text-green-600");
+                nextWordButton.classList.remove('opacity-0', 'pointer-events-none');
+                nextWordButton.disabled = false;
+                
+                // Show the translation (info is stored in the first slot's data)
+                const info = currentWordSlots[0].translation;
+                wordInfoEl.textContent = `(${info})`;
+
+                // Final celebration sound
+                setTimeout(playSuccess, 500);
+            }
+        }
+
+        function showFeedback(text, colorClass) {
+            feedbackTextEl.textContent = text;
+            feedbackTextEl.className = colorClass + " text-3xl font-bold";
+            feedbackEl.classList.add('feedback-visible');
+            
+            setTimeout(() => {
+                feedbackEl.classList.remove('feedback-visible');
+            }, 1500);
+        }
+
+        function loadWord(index) {
+            if (index >= wordData.length) {
+                showFeedback("Игра окончена! Молодец!", "text-blue-600");
+                nextWordButton.textContent = "Начать сначала";
+                currentWordIndex = 0; // Loop back for replay
+                return;
+            }
+
+            isGameLocked = false;
+            wordSlotsEl.innerHTML = '';
+            letterSelectionEl.innerHTML = '';
+            currentWordSlots = [];
+            wordInfoEl.textContent = '';
+            nextWordButton.classList.add('opacity-0', 'pointer-events-none');
+            nextWordButton.disabled = true;
+
+            const word = wordData[index];
+            const targetWord = word.target.split('');
+            const scrambledLetters = shuffleArray([...targetWord]); // Get and scramble letters
+
+            // 1. Create Slots
+            targetWord.forEach((letter, idx) => {
+                const slot = document.createElement('div');
+                slot.className = 'w-16 h-20 md:w-20 md:h-24 flex items-center justify-center border-4 border-dashed border-gray-300 rounded-lg slot-active bg-white text-3xl md:text-5xl font-extrabold transition duration-300';
+                slot.dataset.index = idx;
+                slot.dataset.correct = letter;
+                
+                // Добавление силуэта (подсказки) в ячейку
+                slot.innerHTML = `<span class="text-gray-400 opacity-30">${letter}</span>`;
+                
+                // Store slot data
+                const slotData = {
+                    element: slot,
+                    correctLetter: letter,
+                    filled: false,
+                    translation: word.translation
+                };
+                currentWordSlots.push(slotData);
+
+                wordSlotsEl.appendChild(slot);
+            });
+
+            // 2. Create Draggable Letter Blocks
+            scrambledLetters.forEach(letter => {
+                const block = document.createElement('div');
+                block.className = 'letter-block w-14 h-14 md:w-16 md:h-16 flex items-center justify-center bg-indigo-500 text-white text-3xl md:text-4xl rounded-xl transition duration-300 hover:bg-indigo-600';
+                block.textContent = letter;
+                block.dataset.letter = letter;
+
+                // Add drag listeners
+                block.addEventListener('mousedown', startDrag);
+                block.addEventListener('touchstart', startDrag);
+                
+                letterSelectionEl.appendChild(block);
+            });
+        }
+
+        function nextWord() {
+            currentWordIndex++;
+            loadWord(currentWordIndex);
+        }
+
+        // --- Event Listeners and Initialization ---
+
+        async function init() {
+            // Сначала загружаем аудио
+            await loadAudioFiles();
+            
+            // Скрываем индикатор загрузки и показываем поле для выбора букв
+            loadingIndicatorEl.classList.add('hidden');
+            letterSelectionEl.classList.remove('hidden');
+
+            // Global listeners for movement and release
+            document.addEventListener('mousemove', moveDrag);
+            document.addEventListener('touchmove', moveDrag, { passive: false });
+
+            document.addEventListener('mouseup', endDrag);
+            document.addEventListener('touchend', endDrag);
+            
+            nextWordButton.addEventListener('click', nextWord);
+
+            // Start the game
+            shuffleArray(wordData); // Randomize word order
+            loadWord(currentWordIndex);
+        }
+
+        // Wait for the window to load before initializing the game
+        window.onload = init;
+
     </script>
 </body>
 </html>
