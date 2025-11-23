@@ -332,6 +332,7 @@
         let dragOffset = { x: 0, y: 0 };
         let isGameLocked = false;
         let audioReady = false;
+        let letterSoundInterval = null;
 
         // Elements
         const wordSlotsEl = document.getElementById('word-slots');
@@ -346,9 +347,9 @@
         const LETTER_AUDIO_SOURCES = {
             'А': 'audio/A.mp3', // Замените на реальный URL
             'Б': 'audio/B.mp3',
-            'В': 'https://your-domain.com/sounds/В.mp3',
-            'Г': 'https://your-domain.com/sounds/Г.mp3',
-            'Д': 'https://your-domain.com/sounds/Д.mp3',
+            'В': 'audio/V.mp3',
+            'Г': 'audio/G.mp3',
+            'Д': 'audio/D.mp3',
             'Е': 'https://your-domain.com/sounds/Е.mp3',
             'И': 'https://your-domain.com/sounds/И.mp3',
             'К': 'https://your-domain.com/sounds/К.mp3',
@@ -417,6 +418,28 @@
             } else {
                 // Fallback - синтезированный звук если MP3 не загружен
                 synth.triggerAttackRelease(['C4', 'E4'], '0.2');
+            }
+        };
+
+        const startLetterSoundLoop = (letter) => {
+            // Остановить предыдущий интервал если есть
+            if (letterSoundInterval) {
+                clearInterval(letterSoundInterval);
+            }
+
+            // Воспроизвести звук сразу
+            playLetterSound(letter);
+
+            // Повторять звук каждые 800ms пока буква перетаскивается
+            letterSoundInterval = setInterval(() => {
+                playLetterSound(letter);
+            }, 1000);
+        };
+
+        const stopLetterSoundLoop = () => {
+            if (letterSoundInterval) {
+                clearInterval(letterSoundInterval);
+                letterSoundInterval = null;
             }
         };
 
@@ -490,7 +513,7 @@
             monster.classList.add('dragging');
             
             const letter = monster.dataset.letter;
-            playLetterSound(letter);
+            startLetterSoundLoop(letter);
 
             const rect = monster.getBoundingClientRect();
             const point = getEventPoint(e);
@@ -532,6 +555,9 @@
         function endDrag(e) {
             if (!activeDraggable || !isDragging) return;
             isDragging = false;
+            
+            // Остановить повторение звука
+            stopLetterSoundLoop();
             
             const monsterRect = activeDraggable.getBoundingClientRect();
             const centerX = monsterRect.left + monsterRect.width / 2;
