@@ -4,220 +4,436 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Слогострой - Русская Азбука</title>
-    <!-- Tailwind CSS CDN for modern, responsive styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Tone.js for loading external audio files and simple game sounds -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
     <style>
-        /* Custom CSS for the letter blocks */
-        .letter-block {
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Chewy&display=swap');
+        
+        body {
+            font-family: 'Fredoka One', cursive;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+        }
+
+        .letter-monster {
             cursor: grab;
             user-select: none;
-            touch-action: none; /* Prevents default touch scrolling */
-            transition: transform 0.1s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-            font-family: 'Inter', sans-serif;
-            font-weight: 800;
+            touch-action: none;
+            transition: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            position: relative;
+            animation: float 3s ease-in-out infinite;
         }
-        /* Style for the empty slots */
-        .slot-active {
-            border: 4px dashed #60a5fa; /* Blue-400 */
+
+        .letter-monster:hover {
+            transform: scale(1.1) rotate(5deg);
         }
-        /* Style for the feedback messages */
-        .feedback-message {
+
+        .letter-monster.dragging {
+            cursor: grabbing;
+            transform: scale(1.2) rotate(10deg);
+            z-index: 1000;
+            animation: none;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+        }
+
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-5deg); }
+            75% { transform: rotate(5deg); }
+        }
+
+        .letter-monster.wiggle {
+            animation: wiggle 0.5s ease-in-out;
+        }
+
+        .monster-body {
+            width: 80px;
+            height: 80px;
+            border-radius: 40% 40% 50% 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+
+
+        .monster-hair {
+            position: absolute;
+            top: -10px;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .hair-strand {
+            width: 8px;
+            height: 15px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 50% 50% 0 0;
+            animation: hairWave 2s ease-in-out infinite;
+        }
+
+        .hair-strand:nth-child(2) { animation-delay: 0.2s; }
+        .hair-strand:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes hairWave {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(1.3); }
+        }
+
+        .word-slot {
+            width: 90px;
+            height: 90px;
+            border: 4px dashed rgba(255,255,255,0.5);
+            border-radius: 20px;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .word-slot.hover {
+            border-color: #fbbf24;
+            background: rgba(251, 191, 36, 0.2);
+            transform: scale(1.05);
+        }
+
+        .word-slot.filled {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.2);
+            border-style: solid;
+        }
+
+        .slot-letter-shadow {
+            font-size: 4rem;
+            color: rgba(255,255,255,0.2);
+            font-family: 'Fredoka One', cursive;
+            pointer-events: none;
+        }
+
+        .celebration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .star {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(45deg, #fbbf24, #f59e0b);
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+            animation: starBurst 1s ease-out forwards;
+        }
+
+        @keyframes starBurst {
+            0% {
+                transform: translate(0, 0) scale(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--tx), var(--ty)) scale(1) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .game-title {
+            font-family: 'Fredoka One', cursive;
+            font-size: 3.5rem;
+            color: white;
+            text-shadow: 
+                4px 4px 0px #764ba2,
+                6px 6px 0px rgba(0,0,0,0.2);
+            letter-spacing: 2px;
+            animation: titleBounce 2s ease-in-out infinite;
+        }
+
+        @keyframes titleBounce {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .word-definition {
+            font-family: 'Chewy', cursive;
+            font-size: 1.5rem;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            background: rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
             opacity: 0;
-            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
             transform: scale(0.8);
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
-        .feedback-visible {
+
+        .word-definition.show {
             opacity: 1;
             transform: scale(1);
         }
-    </style>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                }
+
+        .next-button {
+            font-family: 'Fredoka One', cursive;
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: #78350f;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 1.5rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            border: 4px solid #fef3c7;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: scale(0);
+            pointer-events: none;
+        }
+
+        .next-button.show {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: all;
+        }
+
+        .next-button:hover {
+            transform: scale(1.1) rotate(-2deg);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.4);
+        }
+
+        .particle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: particleFall 2s ease-out forwards;
+        }
+
+        @keyframes particleFall {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(500px) rotate(720deg);
+                opacity: 0;
             }
         }
-    </script>
+
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-monster {
+            width: 100px;
+            height: 100px;
+            animation: loadingBounce 1s ease-in-out infinite;
+        }
+
+        @keyframes loadingBounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-30px) scale(1.1); }
+        }
+
+        .monster-letter {
+            font-size: 3rem;
+            color: white;
+            font-family: 'Fredoka One', cursive;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+    </style>
 </head>
-<body class="bg-gray-50 flex items-center justify-center min-h-screen p-4">
-
-    <!-- Main Game Container -->
-    <div id="game-container" class="w-full max-w-xl bg-white rounded-3xl shadow-2xl p-6 md:p-10 border-4 border-indigo-200">
-        <h1 class="text-4xl font-extrabold text-indigo-700 text-center mb-6">Слогострой</h1>
-        <p class="text-center text-gray-600 mb-8">Собери слово, перетаскивая буквы в пустые места!</p>
-
-        <!-- Word Display Area (Slots) -->
-        <div id="word-slots" class="flex justify-center gap-2 md:gap-4 h-24 mb-10">
-            <!-- Slots will be inserted here by JS -->
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-monster">
+            <div class="monster-body" style="background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);">
+                <div class="monster-hair">
+                    <div class="hair-strand"></div>
+                    <div class="hair-strand"></div>
+                    <div class="hair-strand"></div>
+                </div>
+            </div>
         </div>
-
-        <!-- Feedback Message -->
-        <div id="feedback" class="feedback-message text-center h-10 mb-8">
-            <span id="feedback-text" class="text-3xl font-bold text-green-600">Отлично!</span>
-        </div>
-        
-        <!-- Loading Indicator -->
-        <div id="loading-indicator" class="text-center py-10">
-             <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500 mx-auto mb-3"></div>
-             <p class="text-indigo-500 font-medium">Загрузка аудио...</p>
-        </div>
-
-        <!-- Letter Selection Area (Draggable Blocks) -->
-        <div id="letter-selection" class="flex justify-center flex-wrap gap-3 p-4 bg-indigo-100 rounded-xl shadow-inner min-h-[120px] hidden">
-            <!-- Letter blocks will be inserted here by JS -->
-        </div>
-
-        <!-- Control/Info Area -->
-        <div class="mt-8 text-center">
-            <button id="next-word-button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition duration-300 transform hover:scale-105 opacity-0 pointer-events-none" disabled>
-                Следующее слово
-            </button>
-            <p id="word-info" class="mt-4 text-sm text-gray-500"></p>
-        </div>
+        <div class="text-white text-2xl mt-8" style="font-family: 'Fredoka One', cursive;">Загрузка...</div>
     </div>
 
-    <script type="module">
-        // --- Game Data ---
+    <!-- Celebration Container -->
+    <div id="celebration" class="celebration"></div>
+
+    <!-- Main Game Container -->
+    <div class="flex flex-col items-center justify-center min-h-screen p-4 relative">
+        <div class="game-title mb-8">Слогострой</div>
+        
+        <!-- Word Slots Container -->
+        <div id="word-slots" class="flex gap-4 mb-12 min-h-[100px]"></div>
+
+        <!-- Word Definition -->
+        <div id="word-definition" class="word-definition mb-8"></div>
+
+        <!-- Letter Monsters Container -->
+        <div id="letter-monsters" class="flex flex-wrap gap-6 justify-center mb-12 min-h-[120px]"></div>
+
+        <!-- Next Word Button -->
+        <button id="next-button" class="next-button">Следующее слово</button>
+    </div>
+
+    <script>
+        // Game Data
         const wordData = [
-            { target: "КОТ", translation: "Cat" },
-            { target: "ДОМ", translation: "House" },
-            { target: "МАМА", translation: "Mom" },
-            { target: "СОК", translation: "Juice" },
-            { target: "РЫБА", translation: "Fish" },
-            { target: "КУБИК", translation: "Cube" },
-            { target: "СЛОН", translation: "Elephant" },
-            { target: "ТРАВА", translation: "Grass" },
+            { target: "КОТ", translation: "Кот - пушистое домашнее животное" },
+            { target: "ДОМ", translation: "Дом - место, где мы живём" },
+            { target: "МАМА", translation: "Мама - самый родной человек" },
+            { target: "СОК", translation: "Сок - вкусный напиток из фруктов" },
+            { target: "РЫБА", translation: "Рыба - животное, живущее в воде" },
+            { target: "СЛОН", translation: "Слон - большое животное с хоботом" },
+            { target: "ЛУНА", translation: "Луна - спутник Земли на небе" },
+            { target: "РОЗА", translation: "Роза - красивый цветок" },
         ];
 
-        // --- Game State & Elements ---
+        // Monster Colors
+        const monsterColors = [
+            'linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)',
+            'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+            'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+            'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+            'linear-gradient(135deg, #ec4899 0%, #db2777 100%)',
+            'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
+        ];
+
+        // Game State
         let currentWordIndex = 0;
         let activeDraggable = null;
-        let originalPosition = { x: 0, y: 0 };
         let currentWordSlots = [];
         let isDragging = false;
+        let dragOffset = { x: 0, y: 0 };
         let isGameLocked = false;
-        let isAudioReady = false;
+        let audioReady = false;
 
+        // Elements
         const wordSlotsEl = document.getElementById('word-slots');
-        const letterSelectionEl = document.getElementById('letter-selection');
-        const feedbackEl = document.getElementById('feedback');
-        const feedbackTextEl = document.getElementById('feedback-text');
-        const nextWordButton = document.getElementById('next-word-button');
-        const wordInfoEl = document.getElementById('word-info');
-        const loadingIndicatorEl = document.getElementById('loading-indicator');
+        const letterMonstersEl = document.getElementById('letter-monsters');
+        const wordDefinitionEl = document.getElementById('word-definition');
+        const nextButtonEl = document.getElementById('next-button');
+        const celebrationEl = document.getElementById('celebration');
+        const loadingScreenEl = document.getElementById('loading-screen');
 
-        // --- Audio Setup (Tone.js & MP3 Loading) ---
-        
-        // !!! МЕСТО, КУДА НУЖНО ВСТАВИТЬ ВАШИ АУДИОФАЙЛЫ !!!
-        // Замените значения (URL) на пути к вашим MP3-файлам.
-        // Используйте абсолютные URL (начиная с http:// или https://) или относительные пути.
+        // Audio Setup - MP3 файлы с произношением букв
+        // !!! ВАЖНО: Замените URL на пути к вашим аудиофайлам !!!
         const LETTER_AUDIO_SOURCES = {
-            'А': 'audio/A.mp3', // <-- ЗАМЕНИТЬ
-            'Б': 'your_folder/B.mp3', // <-- ЗАМЕНИТЬ
-            'В': 'your_folder/V.mp3', // <-- ЗАМЕНИТЬ
-            'Г': 'your_folder/G.mp3', // <-- ЗАМЕНИТЬ
-            'Д': 'your_folder/D.mp3', // <-- ЗАМЕНИТЬ
-            'Е': 'your_folder/Ye.mp3', // <-- ЗАМЕНИТЬ
-            'И': 'your_folder/I.mp3', // <-- ЗАМЕНИТЬ
-            'К': 'your_folder/K.mp3', // <-- ЗАМЕНИТЬ
-            'Л': 'your_folder/L.mp3', // <-- ЗАМЕНИТЬ
-            'М': 'your_folder/M.mp3', // <-- ЗАМЕНИТЬ
-            'Н': 'your_folder/N.mp3', // <-- ЗАМЕНИТЬ
-            'О': 'your_folder/O.mp3', // <-- ЗАМЕНИТЬ
-            'Р': 'your_folder/R.mp3', // <-- ЗАМЕНИТЬ
-            'С': 'your_folder/S.mp3', // <-- ЗАМЕНИТЬ
-            'Т': 'your_folder/T.mp3', // <-- ЗАМЕНИТЬ
-            'У': 'your_folder/U.mp3', // <-- ЗАМЕНИТЬ
-            'Ы': 'your_folder/Y.mp3', // <-- ЗАМЕНИТЬ
-            // Добавьте сюда другие буквы, которые вы используете!
+            'А': 'https://your-domain.com/sounds/А.mp3', // Замените на реальный URL
+            'Б': 'https://your-domain.com/sounds/Б.mp3',
+            'В': 'https://your-domain.com/sounds/В.mp3',
+            'Г': 'https://your-domain.com/sounds/Г.mp3',
+            'Д': 'https://your-domain.com/sounds/Д.mp3',
+            'Е': 'https://your-domain.com/sounds/Е.mp3',
+            'И': 'https://your-domain.com/sounds/И.mp3',
+            'К': 'https://your-domain.com/sounds/К.mp3',
+            'Л': 'https://your-domain.com/sounds/Л.mp3',
+            'М': 'https://your-domain.com/sounds/М.mp3',
+            'Н': 'https://your-domain.com/sounds/Н.mp3',
+            'О': 'https://your-domain.com/sounds/О.mp3',
+            'Р': 'https://your-domain.com/sounds/Р.mp3',
+            'С': 'https://your-domain.com/sounds/С.mp3',
+            'Т': 'https://your-domain.com/sounds/Т.mp3',
+            'У': 'https://your-domain.com/sounds/У.mp3',
+            'Ы': 'https://your-domain.com/sounds/Ы.mp3',
+            'Ю': 'https://your-domain.com/sounds/Ю.mp3',
+            'Я': 'https://your-domain.com/sounds/Я.mp3',
+            'З': 'https://your-domain.com/sounds/З.mp3',
+            'Й': 'https://your-domain.com/sounds/Й.mp3',
+            'П': 'https://your-domain.com/sounds/П.mp3',
+            'Ф': 'https://your-domain.com/sounds/Ф.mp3',
+            'Х': 'https://your-domain.com/sounds/Х.mp3',
+            'Ц': 'https://your-domain.com/sounds/Ц.mp3',
+            'Ч': 'https://your-domain.com/sounds/Ч.mp3',
+            'Ш': 'https://your-domain.com/sounds/Ш.mp3',
+            'Щ': 'https://your-domain.com/sounds/Щ.mp3',
+            'Ь': 'https://your-domain.com/sounds/Ь.mp3',
+            'Ъ': 'https://your-domain.com/sounds/Ъ.mp3',
         };
 
-        // Объект для хранения загруженных аудио плееров Tone.js
         const letterPlayers = {};
+        const synth = new Tone.PolySynth(Tone.Synth).toDestination();
 
-        // Синтезатор для простых звуков успеха/ошибки
-        const synth = new Tone.PolySynth(Tone.Synth, {
-            oscillator: { type: "sine" },
-            envelope: {
-                attack: 0.005,
-                decay: 0.1,
-                sustain: 0.05,
-                release: 0.1,
-            }
-        }).toDestination();
-        
-        // Асинхронная функция загрузки всех аудиофайлов
+        // Загрузка аудиофайлов
         async function loadAudioFiles() {
-            const lettersToLoad = Object.keys(LETTER_AUDIO_SOURCES);
-            const loadPromises = [];
-
-            for (const letter of lettersToLoad) {
-                const url = LETTER_AUDIO_SOURCES[letter];
-                
-                if (url && !url.includes('your_folder')) {
-                    const player = new Tone.Player(url).toDestination();
-                    letterPlayers[letter] = player;
-                    loadPromises.push(new Promise(resolve => {
-                        // Ожидаем события загрузки
-                        player.onload = resolve;
-                        // Добавляем таймаут на случай ошибки загрузки, чтобы не заблокировать игру
-                        setTimeout(resolve, 5000); 
-                    }));
-                } else {
-                    // Если URL не заменен, просто игнорируем его и разрешаем промис
-                    console.warn(`[Аудио]: URL для буквы '${letter}' не указан или является placeholder-ом. Звук не будет воспроизведен.`);
-                    loadPromises.push(Promise.resolve());
-                }
-            }
+            const letters = Object.keys(LETTER_AUDIO_SOURCES);
+            const loadPromises = letters.map(letter => {
+                return new Promise((resolve) => {
+                    const url = LETTER_AUDIO_SOURCES[letter];
+                    if (url && !url.includes('your-domain.com')) {
+                        const player = new Tone.Player(url).toDestination();
+                        player.onstop = () => {};
+                        letterPlayers[letter] = player;
+                        Tone.loaded().then(resolve).catch(() => {
+                            console.warn(`Не удалось загрузить звук для буквы ${letter}`);
+                            resolve();
+                        });
+                    } else {
+                        resolve();
+                    }
+                });
+            });
 
             try {
-                // Ждем загрузки всех файлов
                 await Promise.all(loadPromises);
-                isAudioReady = true;
-                console.log("[Аудио]: Все необходимые аудиофайлы загружены.");
+                console.log('Аудиофайлы загружены');
             } catch (error) {
-                console.error("[Аудио]: Ошибка при загрузке аудиофайлов. Игра запустится без звуков букв.", error);
+                console.warn('Ошибка загрузки аудио:', error);
             }
         }
 
-        // Обновленная функция воспроизведения звука
         const playLetterSound = (letter) => {
-            if (!isAudioReady) return;
-            if (Tone.context.state !== 'running') { Tone.start(); }
+            if (Tone.context.state !== 'running') Tone.start();
+            
             const player = letterPlayers[letter];
-            if (player && player.state === 'loaded') {
-                // Останавливаем, если уже играет, и начинаем сначала
-                player.stop(); 
+            if (player && player.loaded) {
+                player.stop();
                 player.start();
+            } else {
+                // Fallback - синтезированный звук если MP3 не загружен
+                synth.triggerAttackRelease(['C4', 'E4'], '0.2');
             }
         };
 
         const playSuccess = () => {
-            if (Tone.context.state !== 'running') { Tone.start(); }
-            synth.triggerAttackRelease("C5", "8n", Tone.now());
-            synth.triggerAttackRelease("E5", "8n", Tone.now() + 0.1);
-            synth.triggerAttackRelease("G5", "8n", Tone.now() + 0.2);
+            if (Tone.context.state !== 'running') Tone.start();
+            synth.triggerAttackRelease('C5', '8n', Tone.now());
+            synth.triggerAttackRelease('E5', '8n', Tone.now() + 0.1);
+            synth.triggerAttackRelease('G5', '8n', Tone.now() + 0.2);
+            synth.triggerAttackRelease('C6', '4n', Tone.now() + 0.3);
         };
 
         const playError = () => {
-            if (Tone.context.state !== 'running') { Tone.start(); }
-            synth.triggerAttackRelease("C4", "16n", Tone.now());
-            synth.triggerAttackRelease("B3", "16n", Tone.now() + 0.1);
+            if (Tone.context.state !== 'running') Tone.start();
+            synth.triggerAttackRelease('F3', '16n');
         };
 
-        // --- Utility Functions ---
-
-        /**
-         * Shuffles an array in place.
-         * @param {Array} a items The array containing the items.
-         */
+        // Utility Functions
         function shuffleArray(a) {
             for (let i = a.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -226,8 +442,37 @@
             return a;
         }
 
-        // --- Drag and Drop Logic ---
+        function createStarBurst(x, y) {
+            for (let i = 0; i < 12; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                const angle = (i / 12) * Math.PI * 2;
+                const distance = 100 + Math.random() * 100;
+                const tx = Math.cos(angle) * distance;
+                const ty = Math.sin(angle) * distance;
+                star.style.left = x + 'px';
+                star.style.top = y + 'px';
+                star.style.setProperty('--tx', tx + 'px');
+                star.style.setProperty('--ty', ty + 'px');
+                celebrationEl.appendChild(star);
+                setTimeout(() => star.remove(), 1000);
+            }
+        }
 
+        function createParticles(x, y, color) {
+            for (let i = 0; i < 8; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.background = color;
+                particle.style.left = (x - 5) + 'px';
+                particle.style.top = (y - 5) + 'px';
+                particle.style.animationDelay = (i * 0.05) + 's';
+                document.body.appendChild(particle);
+                setTimeout(() => particle.remove(), 2000);
+            }
+        }
+
+        // Drag and Drop Logic
         function getEventPoint(e) {
             if (e.touches && e.touches.length > 0) {
                 return { x: e.touches[0].clientX, y: e.touches[0].clientY };
@@ -236,197 +481,199 @@
         }
 
         function startDrag(e) {
-            if (isGameLocked || !isAudioReady) return;
-            const block = e.currentTarget;
-            if (block.classList.contains('placed')) return; // Already correctly placed
+            if (isGameLocked || !audioReady) return;
+            const monster = e.currentTarget;
+            if (monster.classList.contains('placed')) return;
 
             isDragging = true;
-            activeDraggable = block;
-            block.style.zIndex = 1000;
-            block.classList.add('shadow-xl', 'ring-4', 'ring-indigo-400');
+            activeDraggable = monster;
+            monster.classList.add('dragging');
             
-            // Воспроизведение звука буквы (теперь MP3)
-            const letter = block.dataset.letter;
+            const letter = monster.dataset.letter;
             playLetterSound(letter);
 
-            // Get original position before dragging starts
-            const rect = block.getBoundingClientRect();
-            originalPosition.x = rect.left;
-            originalPosition.y = rect.top;
+            const rect = monster.getBoundingClientRect();
+            const point = getEventPoint(e);
+            dragOffset.x = point.x - rect.left - rect.width / 2;
+            dragOffset.y = point.y - rect.top - rect.height / 2;
 
-            // Prevent default touch/mouse behavior on start
-            e.preventDefault(); 
+            e.preventDefault();
         }
 
         function moveDrag(e) {
             if (!activeDraggable || !isDragging) return;
-            e.preventDefault(); // Crucial for smooth mobile dragging
+            e.preventDefault();
 
             const point = getEventPoint(e);
-            
-            // Calculate new position relative to the viewport
-            const rect = activeDraggable.getBoundingClientRect();
-            const dx = point.x - (rect.left + rect.width / 2);
-            const dy = point.y - (rect.top + rect.height / 2);
+            activeDraggable.style.position = 'fixed';
+            activeDraggable.style.left = (point.x - dragOffset.x - 40) + 'px';
+            activeDraggable.style.top = (point.y - dragOffset.y - 40) + 'px';
 
-            // Apply transform for movement
-            activeDraggable.style.transform = `translate(${dx}px, ${dy}px)`;
+            // Check for slot hover
+            currentWordSlots.forEach(slot => {
+                const slotRect = slot.element.getBoundingClientRect();
+                const monsterRect = activeDraggable.getBoundingClientRect();
+                
+                const overlap = (
+                    monsterRect.left < slotRect.right &&
+                    monsterRect.right > slotRect.left &&
+                    monsterRect.top < slotRect.bottom &&
+                    monsterRect.bottom > slotRect.top
+                );
+
+                if (overlap && !slot.filled) {
+                    slot.element.classList.add('hover');
+                } else {
+                    slot.element.classList.remove('hover');
+                }
+            });
         }
 
         function endDrag(e) {
             if (!activeDraggable || !isDragging) return;
             isDragging = false;
             
-            activeDraggable.style.zIndex = 10;
-            activeDraggable.classList.remove('shadow-xl', 'ring-4', 'ring-indigo-400');
-
-            // Check collision with word slots
-            const currentRect = activeDraggable.getBoundingClientRect();
+            const monsterRect = activeDraggable.getBoundingClientRect();
+            const centerX = monsterRect.left + monsterRect.width / 2;
+            const centerY = monsterRect.top + monsterRect.height / 2;
+            
             let placed = false;
 
             currentWordSlots.forEach(slot => {
+                slot.element.classList.remove('hover');
                 const slotRect = slot.element.getBoundingClientRect();
                 
-                // Simple overlap check
                 const overlap = (
-                    currentRect.left < slotRect.right &&
-                    currentRect.right > slotRect.left &&
-                    currentRect.top < slotRect.bottom &&
-                    currentRect.bottom > slotRect.top
+                    monsterRect.left < slotRect.right &&
+                    monsterRect.right > slotRect.left &&
+                    monsterRect.top < slotRect.bottom &&
+                    monsterRect.bottom > slotRect.top
                 );
 
                 if (overlap && !slot.filled) {
-                    // Check if the letter is correct for the slot
-                    if (activeDraggable.dataset.letter === slot.correctLetter) {
+                    const letter = activeDraggable.dataset.letter;
+                    if (letter === slot.correctLetter) {
                         // Correct placement
                         slot.filled = true;
-                        slot.element.classList.remove('slot-active', 'bg-white');
-                        slot.element.classList.add('bg-indigo-300', 'text-indigo-800', 'border-indigo-400');
+                        slot.element.classList.add('filled');
+                        slot.element.innerHTML = '';
+                        
+                        activeDraggable.style.position = 'static';
+                        activeDraggable.classList.remove('dragging');
                         activeDraggable.classList.add('placed');
-                        activeDraggable.style.transform = 'none'; // Snap to original letter's position
-                        activeDraggable.style.position = 'absolute'; // Temporarily take out of flow for smooth transition
-                        
-                        // Center the letter inside the slot visually
-                        const finalX = slotRect.left + (slotRect.width / 2) - (currentRect.width / 2);
-                        const finalY = slotRect.top + (slotRect.height / 2) - (currentRect.height / 2);
-
-                        activeDraggable.style.left = `${finalX}px`;
-                        activeDraggable.style.top = `${finalY}px`;
-                        
-                        // Удаляем силуэт и вставляем перетаскиваемый блок в слот
-                        slot.element.innerHTML = ''; 
                         slot.element.appendChild(activeDraggable);
                         
-                        // Reset the draggable element's styles to snap it in place inside the slot
-                        activeDraggable.style.position = 'static';
-                        activeDraggable.style.transform = 'none';
-                        activeDraggable.classList.remove('letter-block'); // Remove drag behavior
-
                         playSuccess();
+                        createStarBurst(centerX, centerY);
                         placed = true;
                         
                         checkWinCondition();
                     } else {
                         // Incorrect placement
                         playError();
-                        // Snap back to original position
-                        activeDraggable.style.transform = 'none';
+                        activeDraggable.classList.add('wiggle');
+                        setTimeout(() => activeDraggable.classList.remove('wiggle'), 500);
                     }
                 }
             });
 
-            if (!placed) {
-                // If not placed correctly, snap back to original position (handled by CSS transition: none)
-                activeDraggable.style.transform = 'none';
+            if (!placed && activeDraggable) {
+                activeDraggable.style.position = 'static';
+                activeDraggable.classList.remove('dragging');
             }
             
             activeDraggable = null;
         }
 
-        // --- Game Flow Functions ---
-
+        // Game Flow Functions
         function checkWinCondition() {
             const allFilled = currentWordSlots.every(slot => slot.filled);
             
             if (allFilled) {
                 isGameLocked = true;
-                showFeedback("ВЕРНО!", "text-green-600");
-                nextWordButton.classList.remove('opacity-0', 'pointer-events-none');
-                nextWordButton.disabled = false;
                 
-                // Show the translation (info is stored in the first slot's data)
-                const info = currentWordSlots[0].translation;
-                wordInfoEl.textContent = `(${info})`;
+                // Show definition
+                setTimeout(() => {
+                    wordDefinitionEl.textContent = wordData[currentWordIndex].translation;
+                    wordDefinitionEl.classList.add('show');
+                }, 300);
 
-                // Final celebration sound
-                setTimeout(playSuccess, 500);
+                // Show next button
+                setTimeout(() => {
+                    nextButtonEl.classList.add('show');
+                }, 600);
+
+                // Create massive celebration
+                setTimeout(() => {
+                    const centerX = window.innerWidth / 2;
+                    const centerY = window.innerHeight / 2;
+                    for (let i = 0; i < 30; i++) {
+                        setTimeout(() => {
+                            createStarBurst(
+                                centerX + (Math.random() - 0.5) * 200,
+                                centerY + (Math.random() - 0.5) * 200
+                            );
+                        }, i * 50);
+                    }
+                }, 200);
             }
-        }
-
-        function showFeedback(text, colorClass) {
-            feedbackTextEl.textContent = text;
-            feedbackTextEl.className = colorClass + " text-3xl font-bold";
-            feedbackEl.classList.add('feedback-visible');
-            
-            setTimeout(() => {
-                feedbackEl.classList.remove('feedback-visible');
-            }, 1500);
         }
 
         function loadWord(index) {
             if (index >= wordData.length) {
-                showFeedback("Игра окончена! Молодец!", "text-blue-600");
-                nextWordButton.textContent = "Начать сначала";
-                currentWordIndex = 0; // Loop back for replay
-                return;
+                currentWordIndex = 0;
+                index = 0;
             }
 
             isGameLocked = false;
             wordSlotsEl.innerHTML = '';
-            letterSelectionEl.innerHTML = '';
+            letterMonstersEl.innerHTML = '';
+            wordDefinitionEl.classList.remove('show');
+            nextButtonEl.classList.remove('show');
             currentWordSlots = [];
-            wordInfoEl.textContent = '';
-            nextWordButton.classList.add('opacity-0', 'pointer-events-none');
-            nextWordButton.disabled = true;
 
             const word = wordData[index];
             const targetWord = word.target.split('');
-            const scrambledLetters = shuffleArray([...targetWord]); // Get and scramble letters
+            const scrambledLetters = shuffleArray([...targetWord]);
 
-            // 1. Create Slots
+            // Create Slots
             targetWord.forEach((letter, idx) => {
                 const slot = document.createElement('div');
-                slot.className = 'w-16 h-20 md:w-20 md:h-24 flex items-center justify-center border-4 border-dashed border-gray-300 rounded-lg slot-active bg-white text-3xl md:text-5xl font-extrabold transition duration-300';
-                slot.dataset.index = idx;
-                slot.dataset.correct = letter;
+                slot.className = 'word-slot';
+                slot.innerHTML = `<div class="slot-letter-shadow">${letter}</div>`;
                 
-                // Добавление силуэта (подсказки) в ячейку
-                slot.innerHTML = `<span class="text-gray-400 opacity-30">${letter}</span>`;
-                
-                // Store slot data
                 const slotData = {
                     element: slot,
                     correctLetter: letter,
-                    filled: false,
-                    translation: word.translation
+                    filled: false
                 };
                 currentWordSlots.push(slotData);
-
                 wordSlotsEl.appendChild(slot);
             });
 
-            // 2. Create Draggable Letter Blocks
-            scrambledLetters.forEach(letter => {
-                const block = document.createElement('div');
-                block.className = 'letter-block w-14 h-14 md:w-16 md:h-16 flex items-center justify-center bg-indigo-500 text-white text-3xl md:text-4xl rounded-xl transition duration-300 hover:bg-indigo-600';
-                block.textContent = letter;
-                block.dataset.letter = letter;
-
-                // Add drag listeners
-                block.addEventListener('mousedown', startDrag);
-                block.addEventListener('touchstart', startDrag);
+            // Create Letter Monsters
+            scrambledLetters.forEach((letter, idx) => {
+                const monster = document.createElement('div');
+                monster.className = 'letter-monster';
+                monster.dataset.letter = letter;
+                monster.style.animationDelay = (idx * 0.1) + 's';
                 
-                letterSelectionEl.appendChild(block);
+                const color = monsterColors[idx % monsterColors.length];
+                monster.innerHTML = `
+                    <div class="monster-body" style="background: ${color};">
+                        <div class="monster-hair">
+                            <div class="hair-strand"></div>
+                            <div class="hair-strand"></div>
+                            <div class="hair-strand"></div>
+                        </div>
+                        <div class="monster-letter">${letter}</div>
+                    </div>
+                `;
+
+                monster.addEventListener('mousedown', startDrag);
+                monster.addEventListener('touchstart', startDrag);
+                
+                letterMonstersEl.appendChild(monster);
             });
         }
 
@@ -435,34 +682,32 @@
             loadWord(currentWordIndex);
         }
 
-        // --- Event Listeners and Initialization ---
-
+        // Initialization
         async function init() {
-            // Сначала загружаем аудио
+            // Загружаем аудиофайлы
             await loadAudioFiles();
             
-            // Скрываем индикатор загрузки и показываем поле для выбора букв
-            loadingIndicatorEl.classList.add('hidden');
-            letterSelectionEl.classList.remove('hidden');
+            // Simulate loading
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            audioReady = true;
+            loadingScreenEl.style.opacity = '0';
+            setTimeout(() => {
+                loadingScreenEl.style.display = 'none';
+            }, 500);
 
-            // Global listeners for movement and release
             document.addEventListener('mousemove', moveDrag);
             document.addEventListener('touchmove', moveDrag, { passive: false });
-
             document.addEventListener('mouseup', endDrag);
             document.addEventListener('touchend', endDrag);
             
-            nextWordButton.addEventListener('click', nextWord);
+            nextButtonEl.addEventListener('click', nextWord);
 
-            // Start the game
-            shuffleArray(wordData); // Randomize word order
+            shuffleArray(wordData);
             loadWord(currentWordIndex);
         }
 
-        // Wait for the window to load before initializing the game
         window.onload = init;
-
     </script>
 </body>
 </html>
-
