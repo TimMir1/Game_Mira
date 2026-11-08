@@ -1,0 +1,603 @@
+<title>Листобор-80 в 3D</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;600&family=Unbounded:wght@600&display=swap">
+<style>
+/* Layout: full-screen 3D yard; HUD cards float in the corners, transport bar at the bottom. Single overcast-daylight look in both themes. */
+:root {
+  --sky: #c9d3d6;
+  --card: rgba(250, 251, 247, .92);
+  --ink: #1c2822;
+  --muted: #5a685f;
+  --line: #c6cfc5;
+  --accent: #df5a12;
+  --ok: #3f8a3a;
+  --warn: #d79a12;
+  --display: "Unbounded", "Arial Black", system-ui, sans-serif;
+  --body: "Golos Text", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--sky); color: var(--ink); font-family: var(--body); overflow: hidden; }
+#c { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+.hud { position: fixed; z-index: 2; pointer-events: none; }
+.hud > * { pointer-events: auto; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 4px; padding: 12px 14px; backdrop-filter: blur(6px); box-shadow: 0 2px 10px rgba(30,40,35,.08); }
+#tl { top: calc(12px + env(safe-area-inset-top, 0px)); left: max(12px, env(safe-area-inset-left, 0px)); max-width: min(360px, calc(100vw - 24px)); }
+#tr { top: calc(12px + env(safe-area-inset-top, 0px)); right: max(12px, env(safe-area-inset-right, 0px)); width: 230px; }
+#bar { bottom: calc(12px + env(safe-area-inset-bottom, 0px)); left: max(12px, env(safe-area-inset-left, 0px)); right: max(12px, env(safe-area-inset-right, 0px)); display: flex; justify-content: center; }
+#bar .card { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; justify-content: center; }
+h1 { font-family: var(--display); font-size: 20px; margin: 0 0 2px; letter-spacing: -.01em; }
+h1 span { color: var(--accent); }
+.sub { font-size: 12.5px; color: var(--muted); margin: 0 0 10px; }
+.status { display: flex; gap: 8px; align-items: flex-start; font-size: 14px; font-weight: 500; }
+.dot { width: 10px; height: 10px; border-radius: 50%; background: var(--ok); margin-top: 5px; flex: none; }
+.dot.warn { background: var(--warn); } .dot.acc { background: var(--accent); }
+.hint { font-size: 13px; color: var(--muted); margin: 6px 0 0; line-height: 1.45; }
+.stats { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; font-size: 13px; }
+.stats dt { color: var(--muted); } .stats dd { margin: 0; font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; }
+.bags { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+.bag { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.bag .tube { height: 10px; border: 1px solid var(--line); background: #e6ebe1; margin-top: 3px; position: relative; }
+.bag .tube i { position: absolute; inset: 0 auto 0 0; width: 0; background: #b4691f; }
+.bag .tube b { position: absolute; top: -2px; bottom: -2px; left: 85%; width: 2px; background: var(--accent); }
+.grp { display: flex; gap: 4px; align-items: center; }
+.grp > span { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-right: 2px; }
+button { font: 500 13px var(--body); color: var(--ink); background: #fff; border: 1px solid var(--line); border-radius: 3px; padding: 6px 10px; cursor: pointer; }
+button:hover { border-color: var(--ink); }
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+button[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+#done { position: fixed; z-index: 3; inset: 0; display: grid; place-items: center; background: rgba(28,40,34,.25); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+#done .card { max-width: 420px; padding: 20px 22px; }
+#done h2 { font-family: var(--display); font-size: 18px; margin: 0 0 10px; }
+#done p { margin: 0 0 8px; font-size: 14.5px; line-height: 1.5; }
+.note { font-size: 11.5px; color: var(--muted); }
+@media (max-width: 720px) {
+  #tr { top: auto; bottom: calc(108px + env(safe-area-inset-bottom, 0px)); width: 200px; padding: 8px 10px; }
+  #tl { padding: 10px 12px; }
+  .hint { display: none; }
+  h1 { font-size: 17px; }
+}
+</style>
+
+<canvas id="c" aria-label="3D-сцена: Листобор-80 убирает листья с газона во дворе"></canvas>
+
+<div class="hud" id="tl"><div class="card">
+  <h1>Листобор<span>-80</span></h1>
+  <p class="sub">Газон 16 × 10 м, мокрая листва ≈ 0,4 кг/м²</p>
+  <div class="status"><span class="dot" id="dot"></span><span id="status">Подбор листвы</span></div>
+  <p class="hint" id="hint">Пальцы ротора подцепляют листья и бросают их по шахте в мешки. Оператор только держит рукоять.</p>
+</div></div>
+
+<div class="hud" id="tr"><div class="card">
+  <dl class="stats">
+    <dt>Время работы</dt><dd id="sTime">0:00</dd>
+    <dt>Очищено</dt><dd id="sArea">0 м²</dd>
+    <dt>Собрано</dt><dd id="sKg">0 кг</dd>
+    <dt>Мешков на газоне</dt><dd id="sBags">0</dd>
+    <dt>Усилие на рукояти</dt><dd>≤ 15 Н</dd>
+  </dl>
+  <div class="bags">
+    <div class="bag">мешок Л<div class="tube"><i id="b1"></i><b></b></div></div>
+    <div class="bag">мешок П<div class="tube"><i id="b2"></i><b></b></div></div>
+  </div>
+</div></div>
+
+<div class="hud" id="bar"><div class="card">
+  <div class="grp"><button id="play" aria-pressed="false">Пауза</button><button id="restart">Сначала</button></div>
+  <div class="grp"><span>скорость</span><button data-sp="1">×1</button><button data-sp="3" aria-pressed="true">×3</button><button data-sp="8">×8</button></div>
+  <div class="grp"><span>камера</span><button data-cam="overview">Двор</button><button data-cam="follow" aria-pressed="true">За оператором</button><button data-cam="rotor">Ротор</button><button data-cam="side">Сбоку</button></div>
+</div></div>
+
+<div id="done" hidden><div class="card">
+  <h2>Газон убран</h2>
+  <p id="doneText"></p>
+  <p class="note">Время рассчитано при скорости 3,6 км/ч, каждая разгрузка засчитана как 1 минута. Граблями: оценка 200–300 м²/ч с набивкой мешков.</p>
+  <button id="again">Убрать ещё раз</button>
+</div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+(function () {
+'use strict';
+const $ = (id) => document.getElementById(id);
+const rnd = (a, b) => a + Math.random() * (b - a);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const ease = (t) => t < 0 ? 0 : t > 1 ? 1 : t * t * (3 - 2 * t);
+
+// ---------- renderer / scene ----------
+const canvas = $('c');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xc9d3d6);
+scene.fog = new THREE.Fog(0xc9d3d6, 22, 55);
+const camera = new THREE.PerspectiveCamera(45, 1, 0.05, 200);
+const controls = new THREE.OrbitControls(camera, canvas);
+controls.enableDamping = true; controls.maxPolarAngle = Math.PI * 0.49; controls.minDistance = 1; controls.maxDistance = 40;
+
+scene.add(new THREE.HemisphereLight(0xeef3f4, 0x56663c, 0.8));
+const sun = new THREE.DirectionalLight(0xfff1dc, 0.75);
+sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
+Object.assign(sun.shadow.camera, { left: -5, right: 5, top: 5, bottom: -5, near: 0.5, far: 40 });
+sun.shadow.bias = -0.0008;
+scene.add(sun, sun.target);
+
+// ---------- yard ----------
+function lawnTexture() {
+  const cv = document.createElement('canvas'); cv.width = cv.height = 256;
+  const g = cv.getContext('2d');
+  g.fillStyle = '#5b7d34'; g.fillRect(0, 0, 256, 256);
+  const cols = ['#4f7030', '#68893b', '#577a31', '#728f42', '#4a6a2b'];
+  for (let i = 0; i < 5000; i++) { g.fillStyle = cols[i % 5]; g.fillRect(Math.random() * 256, Math.random() * 256, 1.5, 3); }
+  const t = new THREE.CanvasTexture(cv); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(24, 18); return t;
+}
+const lawn = new THREE.Mesh(new THREE.PlaneGeometry(40, 30), new THREE.MeshLambertMaterial({ map: lawnTexture() }));
+lawn.rotation.x = -Math.PI / 2; lawn.receiveShadow = true; scene.add(lawn);
+const asphalt = new THREE.MeshLambertMaterial({ color: 0x5d6164 });
+const curbM = new THREE.MeshLambertMaterial({ color: 0xbfc2bc });
+[[-6.7, 2.2], [6.9, 2.0]].forEach(([z, w]) => {
+  const p = new THREE.Mesh(new THREE.PlaneGeometry(40, w), asphalt); p.rotation.x = -Math.PI / 2; p.position.set(0, 0.004, z); p.receiveShadow = true; scene.add(p);
+  const c = new THREE.Mesh(new THREE.BoxGeometry(40, 0.15, 0.12), curbM); c.position.set(0, 0.075, z + (z < 0 ? w / 2 : -w / 2)); scene.add(c);
+});
+// trees
+const trunkM = new THREE.MeshLambertMaterial({ color: 0x4a3c31 });
+const birchM = new THREE.MeshLambertMaterial({ color: 0xe4e2da });
+const crownCols = [0xd9a228, 0xc8781e, 0xe0b33a, 0xb85a1d, 0x9c8a2c];
+[[-9, -8.3, 0], [-3.2, -8.5, 1], [3.6, -8.3, 0], [9.6, -8.4, 1], [-12, 0.5, 0], [12, -1.5, 1], [-6, 8.6, 1], [5.2, 8.8, 0]].forEach(([x, z, birch]) => {
+  const t = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.2, 3, 8), birch ? birchM : trunkM);
+  t.position.set(x, 1.5, z); t.castShadow = true; scene.add(t);
+  for (let k = 0; k < 3; k++) {
+    const m = new THREE.Mesh(new THREE.IcosahedronGeometry(rnd(1.1, 1.6), 1), new THREE.MeshLambertMaterial({ color: crownCols[(Math.random() * 5) | 0], flatShading: true }));
+    m.position.set(x + rnd(-0.8, 0.8), rnd(3.2, 4.2), z + rnd(-0.8, 0.8)); scene.add(m);
+  }
+});
+// bench
+(function () {
+  const wood = new THREE.MeshLambertMaterial({ color: 0x7a5232 }), iron = new THREE.MeshLambertMaterial({ color: 0x2b302e });
+  const g = new THREE.Group();
+  for (let i = 0; i < 3; i++) { const s = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.04, 0.12), wood); s.position.set(0, 0.45, -0.16 + i * 0.15); g.add(s); }
+  const back = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.3, 0.04), wood); back.position.set(0, 0.7, -0.26); back.rotation.x = -0.15; g.add(back);
+  [-0.8, 0.8].forEach((x) => { const l = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.45, 0.45), iron); l.position.set(x, 0.22, -0.05); g.add(l); });
+  g.position.set(0.5, 0, -7.2); scene.add(g);
+})();
+
+// ---------- leaves ----------
+const leafShape = new THREE.Shape();
+leafShape.moveTo(0, -0.05); leafShape.quadraticCurveTo(0.04, -0.01, 0, 0.055); leafShape.quadraticCurveTo(-0.04, -0.01, 0, -0.05);
+const leafGeo = new THREE.ShapeGeometry(leafShape); leafGeo.rotateX(-Math.PI / 2);
+const leafMat = new THREE.MeshLambertMaterial({ side: THREE.DoubleSide });
+const leafPalette = [0xc8781e, 0xd9a228, 0xa8501a, 0x8a3b16, 0xe0b33a, 0x7d6a2a, 0xb5652a].map((c) => new THREE.Color(c));
+const N = 12000, AREA = 160, KG_TOTAL = 64, KG_LEAF = KG_TOTAL / N;
+const LX = 8, LZ = 5;
+const leaves = new THREE.InstancedMesh(leafGeo, leafMat, N);
+leaves.frustumCulled = false; leaves.receiveShadow = true; scene.add(leaves);
+const lx = new Float32Array(N), lz = new Float32Array(N), ly = new Float32Array(N), lrot = new Float32Array(N), lsc = new Float32Array(N);
+const lstate = new Uint8Array(N); // 0 ground, 1 flying, 2 collected
+const dummy = new THREE.Object3D();
+const CELL = 0.5, GW = 48;
+let grid = new Map();
+const cellKey = (x, z) => (Math.floor((x + 12) / CELL)) * 1000 + Math.floor((z + 12) / CELL);
+function setLeafGround(i) {
+  dummy.position.set(lx[i], ly[i], lz[i]);
+  dummy.rotation.set(rnd(-0.15, 0.15), lrot[i], rnd(-0.15, 0.15));
+  dummy.scale.setScalar(lsc[i]); dummy.updateMatrix(); leaves.setMatrixAt(i, dummy.matrix);
+}
+function hideLeaf(i) { dummy.position.set(0, -5, 0); dummy.scale.setScalar(0.0001); dummy.updateMatrix(); leaves.setMatrixAt(i, dummy.matrix); }
+function seedLeaves() {
+  grid = new Map();
+  for (let i = 0; i < N; i++) {
+    let x, z;
+    do { x = rnd(-LX, LX); z = rnd(-LZ, LZ); } while (Math.random() > 0.55 + 0.45 * (z < -1.5 ? 1 : 0.6 + 0.4 * Math.sin(x * 0.7) * Math.cos(z * 0.9)));
+    lx[i] = x; lz[i] = z; ly[i] = 0.008 + Math.random() * 0.025; lrot[i] = Math.random() * 6.28; lsc[i] = rnd(0.8, 1.45); lstate[i] = 0;
+    leaves.setColorAt(i, leafPalette[(Math.random() * leafPalette.length) | 0]);
+    setLeafGround(i);
+    const k = cellKey(x, z); if (!grid.has(k)) grid.set(k, []); grid.get(k).push(i);
+  }
+  leaves.instanceMatrix.needsUpdate = true; leaves.instanceColor.needsUpdate = true;
+}
+
+// ambient falling leaves
+const FALL = 70;
+const falling = new THREE.InstancedMesh(leafGeo, leafMat, FALL); falling.frustumCulled = false; scene.add(falling);
+const fl = [];
+const treeSpots = [[-9, -8.3], [-3.2, -8.5], [3.6, -8.3], [9.6, -8.4], [-6, 8.6], [5.2, 8.8]];
+for (let i = 0; i < FALL; i++) { fl.push({}); resetFall(fl[i], true); falling.setColorAt(i, leafPalette[i % leafPalette.length]); }
+function resetFall(f, init) {
+  const t = treeSpots[(Math.random() * treeSpots.length) | 0];
+  f.x = t[0] + rnd(-1.2, 1.2); f.z = t[1] + rnd(-1.2, 1.2); f.y = init ? rnd(0.2, 4) : rnd(3, 4.2);
+  f.ph = Math.random() * 6; f.v = rnd(0.35, 0.6);
+}
+
+// ---------- machine ----------
+const M = new THREE.Group(); scene.add(M);
+const mFrame = new THREE.MeshStandardMaterial({ color: 0x2c3631, roughness: 0.55, metalness: 0.45 });
+const mOrange = new THREE.MeshStandardMaterial({ color: 0xe0601a, roughness: 0.45, metalness: 0.1, side: THREE.DoubleSide });
+const mTire = new THREE.MeshStandardMaterial({ color: 0x1a1d1c, roughness: 0.95 });
+const mHub = new THREE.MeshStandardMaterial({ color: 0xa1aaa6, roughness: 0.35, metalness: 0.7 });
+const mPU = new THREE.MeshStandardMaterial({ color: 0xf2b233, roughness: 0.6 });
+const mGlass = new THREE.MeshStandardMaterial({ color: 0x9fb2a8, roughness: 0.4, metalness: 0.3, transparent: true, opacity: 0.26, side: THREE.DoubleSide, depthWrite: false });
+const mDoor = new THREE.MeshStandardMaterial({ color: 0xe0601a, roughness: 0.4, transparent: true, opacity: 0.4, side: THREE.DoubleSide, depthWrite: false });
+const mFill = new THREE.MeshLambertMaterial({ color: 0xb4691f });
+const mBag = new THREE.MeshStandardMaterial({ color: 0x1f2322, roughness: 0.35, metalness: 0.1 });
+const UP = new THREE.Vector3(0, 1, 0);
+const unitCyl = new THREE.CylinderGeometry(1, 1, 1, 10);
+function rod(a, b, r, mat, parent) {
+  const m = new THREE.Mesh(unitCyl, mat); m.castShadow = true; setRod(m, a, b, r); (parent || M).add(m); return m;
+}
+function setRod(m, a, b, r) {
+  const d = new THREE.Vector3().subVectors(b, a); const L = d.length();
+  m.position.copy(a).addScaledVector(d, 0.5); m.quaternion.setFromUnitVectors(UP, d.normalize()); m.scale.set(r, L, r);
+}
+const V = (x, y, z) => new THREE.Vector3(x, y, z);
+function box(w, h, d, mat, x, y, z, parent) { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); m.position.set(x, y, z); m.castShadow = true; (parent || M).add(m); return m; }
+
+// hopper: x ±0.35, y 0.10..0.65, z -0.50..0.30
+box(0.7, 0.012, 0.8, mFrame, 0, 0.1, -0.1);
+box(0.008, 0.55, 0.8, mGlass, 0.35, 0.375, -0.1).castShadow = false;
+box(0.008, 0.55, 0.8, mGlass, -0.35, 0.375, -0.1).castShadow = false;
+box(0.7, 0.55, 0.008, mGlass, 0, 0.375, 0.3).castShadow = false;
+[[0.35, 0.3], [-0.35, 0.3], [0.35, -0.5], [-0.35, -0.5]].forEach(([x, z]) => rod(V(x, 0.1, z), V(x, 0.65, z), 0.012, mFrame));
+[0.35, -0.35].forEach((x) => { rod(V(x, 0.65, 0.3), V(x, 0.65, -0.5), 0.012, mFrame); rod(V(x, 0.1, 0.3), V(x, 0.1, -0.5), 0.012, mFrame); });
+rod(V(-0.35, 0.65, 0.3), V(0.35, 0.65, 0.3), 0.012, mFrame);
+// bag rims (clamp bars)
+const rimL = box(0.32, 0.02, 0.76, mFrame, 0.17, 0.66, -0.1); rimL.material = mFrame;
+box(0.012, 0.02, 0.76, mFrame, 0, 0.66, -0.1);
+// fill sensor
+const sensor = box(0.04, 0.04, 0.04, mOrange, 0.3, 0.63, -0.46);
+// fill boxes
+const fillGeo = new THREE.BoxGeometry(0.31, 1, 0.74); fillGeo.translate(0, 0.5, 0);
+const fills = [0.17, -0.17].map((x) => { const m = new THREE.Mesh(fillGeo, mFill); m.position.set(x, 0.11, -0.1); m.scale.y = 0.001; M.add(m); return m; });
+// rear door (hinge at bottom rear edge)
+const doorPivot = new THREE.Group(); doorPivot.position.set(0, 0.1, -0.5); M.add(doorPivot);
+const door = box(0.68, 0.55, 0.012, mDoor, 0, 0.275, 0, doorPivot); door.castShadow = false;
+box(0.68, 0.025, 0.025, mOrange, 0, 0.54, 0, doorPivot);
+const DOOR_OPEN = -(Math.PI / 2 + Math.asin(0.1 / 0.55));
+
+// rotor
+const rotor = new THREE.Group(); rotor.position.set(0, 0.14, 0.55); M.add(rotor);
+const core = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.8, 16), mHub); core.rotation.z = Math.PI / 2; rotor.add(core);
+const fingerGeo = new THREE.BoxGeometry(0.014, 0.075, 0.014);
+for (let r = 0; r < 6; r++) for (let k = 0; k < 9; k++) {
+  const th = r * Math.PI / 3 + (k % 2) * 0.25; const f = new THREE.Mesh(fingerGeo, mPU);
+  f.position.set(-0.36 + k * 0.09, 0.0875 * Math.cos(th), 0.0875 * Math.sin(th)); f.rotation.x = th; rotor.add(f);
+}
+// hood + chute (extruded profile in the z-y plane)
+function profileMesh(pts, th, mat) {
+  const outer = [], inner = [];
+  for (let i = 0; i < pts.length; i++) {
+    const a = pts[Math.max(0, i - 1)], b = pts[Math.min(pts.length - 1, i + 1)];
+    const dz = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dz, dy) || 1;
+    outer.push(pts[i]); inner.push([pts[i][0] - dy / L * th, pts[i][1] + dz / L * th]);
+  }
+  const s = new THREE.Shape(); s.moveTo(outer[0][0], outer[0][1]);
+  outer.slice(1).forEach((p) => s.lineTo(p[0], p[1])); inner.reverse().forEach((p) => s.lineTo(p[0], p[1]));
+  const g = new THREE.ExtrudeGeometry(s, { depth: 0.84, bevelEnabled: false });
+  const m = new THREE.Mesh(g, mat); m.rotation.y = -Math.PI / 2; m.position.x = 0.42; m.castShadow = true; M.add(m); return m;
+}
+const hoodPts = [];
+for (let a = -25; a <= 90; a += 7) hoodPts.push([0.55 + 0.165 * Math.cos(a * Math.PI / 180), 0.14 + 0.165 * Math.sin(a * Math.PI / 180)]);
+const bez = (p0, p1, p2, p3, t) => { const u = 1 - t; return [u*u*u*p0[0]+3*u*u*t*p1[0]+3*u*t*t*p2[0]+t*t*t*p3[0], u*u*u*p0[1]+3*u*u*t*p1[1]+3*u*t*t*p2[1]+t*t*t*p3[1]]; };
+for (let t = 0.1; t <= 1.001; t += 0.1) hoodPts.push(bez([0.55, 0.305], [0.40, 0.31], [0.345, 0.5], [0.34, 0.70], t));
+for (let t = 0.2; t <= 1.001; t += 0.2) hoodPts.push(bez([0.34, 0.70], [0.34, 0.76], [0.28, 0.79], [0.18, 0.77], t));
+profileMesh(hoodPts, -0.014, mOrange);
+profileMesh([[0.43, 0.02], [0.37, 0.06], [0.32, 0.15], [0.305, 0.3]], 0.01, mFrame);
+// hood side cheeks
+[0.425, -0.425].forEach((x) => { const c = new THREE.Mesh(new THREE.CircleGeometry(0.17, 20, 0, Math.PI * 1.15), mOrange); c.position.set(x, 0.14, 0.55); c.rotation.y = Math.PI / 2; c.rotation.z = -0.35; M.add(c); });
+// gauge wheels
+const wheelGeo = (r, w) => { const g = new THREE.CylinderGeometry(r, r, w, 20); g.rotateZ(Math.PI / 2); return g; };
+const gWheels = [0.47, -0.47].map((x) => { const w = new THREE.Mesh(wheelGeo(0.08, 0.05), mTire); w.position.set(x, 0.08, 0.8); w.castShadow = true; M.add(w); rod(V(x, 0.08, 0.8), V(x * 0.92, 0.3, 0.6), 0.012, mFrame); return w; });
+// rear hub-motor wheels
+const rWheels = [0.45, -0.45].map((x) => {
+  const g = new THREE.Group(); g.position.set(x, 0.15, -0.22); M.add(g);
+  const t = new THREE.Mesh(wheelGeo(0.15, 0.075), mTire); t.castShadow = true; g.add(t);
+  const h = new THREE.Mesh(wheelGeo(0.075, 0.085), mHub); g.add(h);
+  const s = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.02, 0.2), mOrange); g.add(s);
+  rod(V(x, 0.15, -0.22), V(x * 0.78, 0.25, -0.22), 0.02, mFrame);
+  return g;
+});
+// side brush (right side = -x when facing +z)
+const brush = new THREE.Group(); brush.position.set(-0.53, 0.02, 0.8); M.add(brush);
+const brushDisc = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.1, 0.03, 18), new THREE.MeshStandardMaterial({ color: 0x3a3f3c, roughness: 0.9 })); brush.add(brushDisc);
+for (let i = 0; i < 6; i++) { const b = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.008, 0.02), mPU); b.rotation.y = i * Math.PI / 6; b.position.y = -0.012; brush.add(b); }
+box(0.06, 0.07, 0.06, mFrame, -0.53, 0.09, 0.8);
+rod(V(-0.53, 0.1, 0.8), V(-0.42, 0.25, 0.65), 0.012, mFrame);
+// handle, controls, battery
+[0.36, -0.36].forEach((x) => rod(V(x, 0.65, -0.48), V(x * 0.85, 1.0, -0.86), 0.016, mFrame));
+rod(V(-0.33, 1.0, -0.86), V(0.33, 1.0, -0.86), 0.018, new THREE.MeshStandardMaterial({ color: 0x111, roughness: 0.9 }));
+box(0.12, 0.05, 0.07, mFrame, 0, 1.03, -0.84);
+const led = new THREE.Mesh(new THREE.SphereGeometry(0.012, 8, 8), new THREE.MeshBasicMaterial({ color: 0x3f8a3a })); led.position.set(0, 1.06, -0.84); M.add(led);
+const bat = box(0.09, 0.24, 0.07, new THREE.MeshStandardMaterial({ color: 0x3d4a44, roughness: 0.5 }), -0.335, 0.83, -0.67); bat.rotation.x = -0.83;
+const lever = rod(V(0.27, 1.0, -0.86), V(0.24, 0.93, -0.79), 0.01, mOrange);
+
+// ---------- operator ----------
+const op = new THREE.Group(); M.add(op);
+const jacket = new THREE.MeshLambertMaterial({ color: 0x2d3440 });
+const vest = new THREE.MeshLambertMaterial({ color: 0xff6a13 });
+const refl = new THREE.MeshLambertMaterial({ color: 0xdfe4e6 });
+const skin = new THREE.MeshLambertMaterial({ color: 0xd8a682 });
+const legs = [0.1, -0.1].map((x) => {
+  const p = new THREE.Group(); p.position.set(x, 0.88, 0); op.add(p);
+  const l = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.06, 0.84, 8), jacket); l.position.y = -0.42; l.castShadow = true; p.add(l);
+  const boot = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.07, 0.24), new THREE.MeshLambertMaterial({ color: 0x1b1b1b })); boot.position.set(0, -0.85, 0.04); boot.castShadow = true; p.add(boot);
+  return p;
+});
+const torso = new THREE.Group(); torso.position.y = 0.88; torso.rotation.x = 0.14; op.add(torso);
+const tor = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.16, 0.58, 12), vest); tor.position.y = 0.3; tor.castShadow = true; torso.add(tor);
+[0.18, 0.38].forEach((y) => { const s = new THREE.Mesh(new THREE.CylinderGeometry(0.183, 0.183, 0.035, 12), refl); s.position.y = y; torso.add(s); });
+const head = new THREE.Mesh(new THREE.SphereGeometry(0.1, 14, 12), skin); head.position.y = 0.72; head.castShadow = true; torso.add(head);
+const cap = new THREE.Mesh(new THREE.SphereGeometry(0.105, 14, 8, 0, Math.PI * 2, 0, Math.PI / 2), new THREE.MeshLambertMaterial({ color: 0x23324a })); cap.position.y = 0.74; torso.add(cap);
+const arms = [0, 1].map(() => rod(V(0, 0, 0), V(0, 1, 0), 0.045, jacket));
+const OP_HOME = V(0, 0, -1.33), OP_ASIDE = V(-0.95, 0, -0.95);
+op.position.copy(OP_HOME);
+const tmpA = new THREE.Vector3(), tmpB = new THREE.Vector3();
+
+// ---------- route ----------
+const STRIPS = 15, GAP = 0.7, X0 = -8.6, X1 = 8.6, Z0 = -4.65;
+const route = []; // {x,z,turn,apex,strip}
+(function build() {
+  const push = (x, z, turn, strip, apex) => route.push({ x, z, turn, strip, apex: !!apex });
+  for (let x = -11; x < X0; x += 0.05) push(x, Z0, true, 0);
+  for (let i = 0; i < STRIPS; i++) {
+    const z = Z0 + i * GAP, dir = i % 2 ? -1 : 1, xa = dir > 0 ? X0 : X1, xb = dir > 0 ? X1 : X0;
+    const L = Math.abs(xb - xa);
+    for (let s = 0; s <= L; s += 0.05) push(xa + dir * s, z, false, i);
+    if (i < STRIPS - 1) {
+      const r = GAP / 2, cz = z + r, n = 24;
+      for (let k = 1; k < n; k++) { const ph = -Math.PI / 2 + Math.PI * k / n; push(xb + dir * r * Math.cos(ph), cz + r * Math.sin(ph), true, i, k === n / 2); }
+    } else {
+      for (let s = 0.05; s <= 2.4; s += 0.05) push(xb + dir * s, z, true, i, Math.abs(s - 1.5) < 0.026);
+    }
+  }
+  let d = 0; route[0].d = 0;
+  for (let i = 1; i < route.length; i++) { d += Math.hypot(route[i].x - route[i - 1].x, route[i].z - route[i - 1].z); route[i].d = d; }
+})();
+const ROUTE_LEN = route[route.length - 1].d;
+
+// ---------- simulation state ----------
+let S;
+const bagsOnLawn = [];
+function reset() {
+  bagsOnLawn.forEach((b) => scene.remove(b)); bagsOnLawn.length = 0;
+  flying.length = 0; seedLeaves();
+  S = { s: 0, idx: 0, simTime: 0, hopperKg: 0, collected: 0, bagsOut: 0, mode: 'drive', needUnload: false, uT: 0, unloadBags: [], rotorW: 1, walk: 0, done: false, finalUnload: false };
+  doorPivot.rotation.x = 0; op.position.copy(OP_HOME); fills.forEach((f) => { f.visible = true; f.scale.y = 0.001; });
+  $('done').hidden = true; placeMachine();
+}
+const CAP = 34, WARN = 0.85;
+let yaw = 0;
+function placeMachine() {
+  while (S.idx < route.length - 2 && route[S.idx + 1].d < S.s) S.idx++;
+  const a = route[S.idx], b = route[Math.min(S.idx + 1, route.length - 1)];
+  const seg = Math.max(1e-6, b.d - a.d), t = clamp((S.s - a.d) / seg, 0, 1);
+  M.position.set(a.x + (b.x - a.x) * t, 0, a.z + (b.z - a.z) * t);
+  // heading from a short look-ahead for smoothness
+  const c = route[Math.min(S.idx + 3, route.length - 1)], p = route[Math.max(S.idx - 2, 0)];
+  yaw = Math.atan2(c.x - p.x, c.z - p.z); M.rotation.y = yaw; M.updateMatrixWorld();
+}
+
+const flying = [];
+const qV = new THREE.Vector3();
+function tryPick() {
+  const sy = Math.sin(yaw), cy = Math.cos(yaw);
+  const cx = M.position.x + sy * 0.62, cz = M.position.z + cy * 0.62;
+  for (let gx = -2; gx <= 2; gx++) for (let gz = -2; gz <= 2; gz++) {
+    const arr = grid.get(cellKey(cx + gx * CELL, cz + gz * CELL)); if (!arr) continue;
+    for (let j = 0; j < arr.length; j++) {
+      const i = arr[j]; if (lstate[i]) continue;
+      const dx = lx[i] - M.position.x, dz = lz[i] - M.position.z;
+      const loz = dx * sy + dz * cy, lox = dx * cy - dz * sy;
+      const inRotor = loz > 0.42 && loz < 0.72 && Math.abs(lox) < 0.41;
+      const inBrush = (lox + 0.53) ** 2 + (loz - 0.8) ** 2 < 0.17 * 0.17;
+      if (inRotor || inBrush) {
+        lstate[i] = 1;
+        const x0 = clamp(lox, -0.6, 0.6), xi = clamp(lox * 0.85, -0.3, 0.3);
+        flying.push({ i, t: 0, dur: rnd(0.32, 0.46), p0: [x0, ly[i], loz], p1: [xi, 0.03, 0.42], p2: [xi * 0.9, 0.95, 0.36], p3: [xi * 0.85, 0.2 + 0.4 * (S.hopperKg / CAP), rnd(-0.4, 0.15)], sp: rnd(8, 18) });
+      }
+    }
+  }
+}
+function updateFlying(dt) {
+  for (let k = flying.length - 1; k >= 0; k--) {
+    const f = flying[k]; f.t += dt; const u = Math.min(1, f.t / f.dur), w = 1 - u;
+    const b = (n) => w * w * w * f.p0[n] + 3 * w * w * u * f.p1[n] + 3 * w * u * u * f.p2[n] + u * u * u * f.p3[n];
+    qV.set(b(0), b(1), b(2)).applyMatrix4(M.matrixWorld);
+    if (u >= 1) { hideLeaf(f.i); lstate[f.i] = 2; S.hopperKg += KG_LEAF; S.collected++; flying.splice(k, 1); continue; }
+    dummy.position.copy(qV); dummy.rotation.set(f.t * f.sp, f.t * f.sp * 0.7, f.t * 3); dummy.scale.setScalar(lsc[f.i]); dummy.updateMatrix(); leaves.setMatrixAt(f.i, dummy.matrix);
+  }
+}
+
+// unloading sequence (seconds of animation)
+const U = { stop: 0.9, door: 2.1, bag1: 3.7, bag2: 5.3, tie: 6.0, close: 7.4 };
+function makeBag(x) {
+  const g = new THREE.Group();
+  const body = new THREE.Mesh(new THREE.BoxGeometry(0.31, 0.5, 0.31), mBag); body.position.y = 0.25; body.castShadow = true; g.add(body);
+  const top = new THREE.Mesh(new THREE.ConeGeometry(0.15, 0.1, 10), mBag); top.position.y = 0.55; g.add(top);
+  const knot = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 6), mBag); knot.position.y = 0.62; knot.scale.setScalar(0.01); g.add(knot);
+  g.userData.knot = knot; g.position.set(x, 0.11, -0.1); M.add(g); return g;
+}
+function bagSlide(g, x, u) {
+  // inside → over hinge → onto lawn behind the machine, tilted along the ramp
+  const e = ease(u);
+  if (e < 0.35) { const k = e / 0.35; g.position.set(x, 0.11, -0.1 - 0.3 * k); g.rotation.x = 0; }
+  else { const k = (e - 0.35) / 0.65; g.position.set(x, 0.11 - 0.11 * k, -0.4 - 0.85 * k); g.rotation.x = Math.sin(k * Math.PI) * -0.18; }
+}
+function stepUnload(dt) {
+  S.uT += dt; const t = S.uT;
+  S.simTime += dt * (60 / U.close);
+  S.rotorW = Math.max(0, 1 - t / 0.6);
+  if (t < U.door && t > U.stop) { const k = ease((t - U.stop) / (U.door - U.stop)); doorPivot.rotation.x = DOOR_OPEN * k; op.position.lerpVectors(OP_HOME, OP_ASIDE, k); }
+  if (t >= U.door && S.unloadBags.length === 0) { fills[0].visible = false; S.unloadBags.push(makeBag(0.17)); }
+  if (t >= U.door && t < U.bag1) bagSlide(S.unloadBags[0], 0.17, (t - U.door) / (U.bag1 - U.door));
+  if (t >= U.bag1 && S.unloadBags.length === 1) { bagSlide(S.unloadBags[0], 0.17, 1); fills[1].visible = false; S.unloadBags.push(makeBag(-0.17)); }
+  if (t >= U.bag1 && t < U.bag2) bagSlide(S.unloadBags[1], -0.17, (t - U.bag1) / (U.bag2 - U.bag1));
+  if (t >= U.bag2 && t < U.tie) { bagSlide(S.unloadBags[1], -0.17, 1); const k = ease((t - U.bag2) / (U.tie - U.bag2)); S.unloadBags.forEach((b) => b.userData.knot.scale.setScalar(Math.max(0.01, k))); }
+  if (t >= U.tie && S.unloadBags.length) {
+    // leave bags on the lawn in world space
+    S.unloadBags.forEach((b) => { b.userData.knot.scale.setScalar(1); b.updateMatrixWorld(); const wp = new THREE.Vector3(); b.getWorldPosition(wp); M.remove(b); b.position.set(wp.x, 0, wp.z); b.rotation.set(0, yaw + rnd(-0.2, 0.2), 0); scene.add(b); bagsOnLawn.push(b); });
+    S.unloadBags = []; S.bagsOut += 2; S.hopperKg = 0; fills.forEach((f) => { f.visible = true; f.scale.y = 0.001; });
+  }
+  if (t >= U.tie && t < U.close) { const k = ease((t - U.tie) / (U.close - U.tie)); doorPivot.rotation.x = DOOR_OPEN * (1 - k); op.position.lerpVectors(OP_ASIDE, OP_HOME, k); }
+  if (t >= U.close) {
+    doorPivot.rotation.x = 0; op.position.copy(OP_HOME); S.uT = 0; S.needUnload = false;
+    if (S.finalUnload) { S.mode = 'done'; finish(); } else { S.mode = 'drive'; if (autoCam && camMode === 'side') setCam(prevCam); }
+  }
+}
+
+function stepDrive(dt) {
+  const r = route[S.idx];
+  const v = r.turn ? 0.5 : 1.0;
+  S.rotorW = Math.min(1, S.rotorW + dt * 2);
+  let dist = v * dt; S.simTime += dt;
+  while (dist > 0 && S.mode === 'drive') {
+    const st = Math.min(0.04, dist); dist -= st;
+    const prevIdx = S.idx; S.s = Math.min(ROUTE_LEN, S.s + st); placeMachine();
+    S.walk += st * 5.2;
+    rWheels.forEach((w) => (w.rotation.x += st / 0.15)); gWheels.forEach((w) => (w.rotation.x += st / 0.08));
+    tryPick();
+    if (S.hopperKg >= CAP * WARN) S.needUnload = true;
+    for (let k = prevIdx; k <= S.idx; k++) if (route[k].apex && S.needUnload) { startUnload(false); break; }
+    if (S.s >= ROUTE_LEN) { if (S.hopperKg > 0.5) startUnload(true); else { S.mode = 'done'; finish(); } }
+  }
+}
+let prevCam = 'follow';
+function startUnload(final) {
+  S.mode = 'unload'; S.uT = 0; S.finalUnload = final;
+  if (autoCam) { prevCam = camMode === 'side' ? prevCam : camMode; setCam('side', true); }
+}
+function finish() {
+  const area = Math.round(AREA * S.collected / N), kg = (S.collected * KG_LEAF).toFixed(0);
+  const mm = Math.floor(S.simTime / 60), ss = Math.round(S.simTime % 60);
+  $('doneText').textContent = `Газон ${AREA} м² убран за ${mm} мин ${ss} с. Собрано ${kg} кг мокрой листвы (${Math.round(100 * S.collected / N)}%), на газоне стоят ${S.bagsOut} мешков. Граблями та же площадь заняла бы примерно 35–50 минут. Оператор не поднял ни одного мешка.`;
+  $('done').hidden = false;
+}
+
+// ---------- camera ----------
+let camMode = 'follow', autoCam = true, camTween = 0;
+const CAMS = {
+  follow: { off: V(1.7, 2.6, -3.3), look: V(0, 0.35, 0.6) },
+  rotor: { off: V(-1.35, 0.6, 1.5), look: V(0, 0.3, 0.45) },
+  side: { off: V(2.6, 1.5, -1.6), look: V(0.2, 0.35, -0.8) },
+};
+function setCam(mode, auto) {
+  camMode = mode; camTween = 1;
+  document.querySelectorAll('[data-cam]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.cam === mode)));
+  if (mode === 'overview') { camera.position.set(-2, 13, 15); controls.target.set(0, 0, -0.5); }
+  if (!auto) autoCam = true;
+}
+let userOrbit = false, lastM = new THREE.Vector3();
+controls.addEventListener('start', () => { if (camMode !== 'overview') userOrbit = true; });
+function updateCamera(dt) {
+  if (camMode === 'overview') return;
+  const c = CAMS[camMode];
+  if (userOrbit) { // keep user's angle, translate with machine
+    tmpA.subVectors(M.position, lastM); camera.position.add(tmpA); controls.target.add(tmpA);
+  } else {
+    const k = 1 - Math.exp(-dt * (camTween > 0 ? 3 : 4));
+    tmpA.copy(c.off).applyMatrix4(M.matrixWorld); tmpB.copy(c.look).applyMatrix4(M.matrixWorld);
+    camera.position.lerp(tmpA, k); controls.target.lerp(tmpB, k);
+    camTween = Math.max(0, camTween - dt);
+  }
+}
+
+// ---------- UI ----------
+let speed = 3, paused = false;
+document.querySelectorAll('[data-sp]').forEach((b) => b.addEventListener('click', () => {
+  speed = +b.dataset.sp; document.querySelectorAll('[data-sp]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+}));
+document.querySelectorAll('[data-cam]').forEach((b) => b.addEventListener('click', () => { userOrbit = false; setCam(b.dataset.cam); }));
+$('play').addEventListener('click', () => { paused = !paused; $('play').textContent = paused ? 'Пуск' : 'Пауза'; $('play').setAttribute('aria-pressed', String(paused)); });
+$('restart').addEventListener('click', () => { reset(); userOrbit = false; setCam(camMode === 'overview' ? 'overview' : 'follow'); });
+$('again').addEventListener('click', () => { reset(); userOrbit = false; setCam('follow'); });
+
+let lastStatus = '';
+function setStatus(text, hint, cls) {
+  if (text === lastStatus) return; lastStatus = text;
+  $('status').textContent = text; $('hint').textContent = hint; $('dot').className = 'dot ' + (cls || '');
+}
+function updateHUD() {
+  const mm = Math.floor(S.simTime / 60), ss = Math.floor(S.simTime % 60);
+  $('sTime').textContent = `${mm}:${String(ss).padStart(2, '0')}`;
+  $('sArea').textContent = `${Math.round(AREA * S.collected / N)} м²`;
+  $('sKg').textContent = `${(S.collected * KG_LEAF).toFixed(1)} кг`;
+  $('sBags').textContent = String(S.bagsOut);
+  const f = Math.min(1, S.hopperKg / CAP);
+  $('b1').style.width = $('b2').style.width = (f * 100).toFixed(0) + '%';
+  led.material.color.setHex(f >= WARN ? 0xdf5a12 : f > 0.6 ? 0xd79a12 : 0x3f8a3a);
+  if (S.mode === 'drive') {
+    const r = route[S.idx];
+    if (S.needUnload) setStatus('Мешки на 85%: разгрузка на развороте', 'Датчик у кромки мешков увидел листья. Машина дособирает полосу и остановится на краю газона.', 'warn');
+    else if (r.turn) setStatus(`Разворот на месте · полоса ${Math.min(r.strip + 2, STRIPS)} из ${STRIPS}`, 'Два мотор-колеса крутятся с разной скоростью, поэтому машина разворачивается от лёгкого нажима на рукоять.');
+    else setStatus(`Подбор листвы · полоса ${r.strip + 1} из ${STRIPS}`, 'Боковая щётка подгоняет листья к ротору, пальцы бросают их по оранжевой шахте в мешки. Перекрытие полос 10 см.');
+  } else if (S.mode === 'unload') {
+    const t = S.uT;
+    if (t < U.stop) setStatus('Стоп, ротор останавливается', 'Последние листья долетают в мешки. Курок отпущен, машина стоит на тормозе моторов.', 'acc');
+    else if (t < U.door) setStatus('Рычаг сброса: борт откидывается', 'Зажим мешков отпущен, задний борт ложится на газон под углом около 10°. Оператор отходит в сторону.', 'acc');
+    else if (t < U.bag2) setStatus('Мешок съезжает по аппарели', 'Мешок 17 кг сдвигается по гладкому борту усилием около 1 кгс. Поднимать его не нужно.', 'acc');
+    else if (t < U.tie) setStatus('Мешки стоят, их завязывают', 'Оба мешка стоят на газоне вне полос уборки. Их заберёт вывоз.', 'acc');
+    else setStatus('Новые мешки, борт закрыт', 'Пустые мешки вставлены в зажим сверху. Цикл разгрузки в жизни занимает около минуты.', 'acc');
+  } else if (S.mode === 'done') setStatus('Готово', 'Газон убран. Нажмите «Сначала», чтобы посмотреть ещё раз.');
+}
+
+// ---------- loop ----------
+function resize() {
+  const w = window.innerWidth, h = window.innerHeight;
+  renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+}
+window.addEventListener('resize', resize);
+const clock = new THREE.Clock();
+function frame() {
+  const dtReal = Math.min(0.05, clock.getDelta());
+  lastM.copy(M.position);
+  if (!paused) {
+    const dt = dtReal * speed;
+    if (S.mode === 'drive') stepDrive(dt);
+    else if (S.mode === 'unload') stepUnload(dtReal * Math.min(speed, 2));
+    updateFlying(S.mode === 'unload' ? dtReal * Math.min(speed, 2) : dt);
+    leaves.instanceMatrix.needsUpdate = true;
+    // rotor, brush, operator
+    rotor.rotation.x += dtReal * 22 * S.rotorW;
+    brush.rotation.y += dtReal * 9 * S.rotorW;
+    const walking = S.mode === 'drive' ? 1 : 0;
+    legs[0].rotation.x = Math.sin(S.walk) * 0.38 * walking; legs[1].rotation.x = -Math.sin(S.walk) * 0.38 * walking;
+    op.position.y = Math.abs(Math.cos(S.walk)) * 0.025 * walking;
+    // falling leaves
+    for (let i = 0; i < FALL; i++) {
+      const f = fl[i]; f.y -= f.v * dtReal; f.ph += dtReal * 2;
+      if (f.y < 0.02) resetFall(f, false);
+      dummy.position.set(f.x + Math.sin(f.ph) * 0.3, f.y, f.z + Math.cos(f.ph * 0.7) * 0.2);
+      dummy.rotation.set(Math.sin(f.ph) * 0.8, f.ph, Math.cos(f.ph) * 0.6); dummy.scale.setScalar(1.1); dummy.updateMatrix(); falling.setMatrixAt(i, dummy.matrix);
+    }
+    falling.instanceMatrix.needsUpdate = true;
+  }
+  M.updateMatrixWorld();
+  // arms to the grip (or hanging when stepped aside)
+  const atGrip = op.position.distanceTo(OP_HOME) < 0.05;
+  [0.2, -0.2].forEach((sx, k) => {
+    tmpA.set(op.position.x + sx, op.position.y + 1.42, op.position.z + 0.05);
+    if (atGrip) tmpB.set(sx * 1.2, 1.0, -0.86); else tmpB.set(tmpA.x + sx * 0.2, tmpA.y - 0.6, tmpA.z + 0.06);
+    setRod(arms[k], tmpA, tmpB, 0.045);
+  });
+  // shadow follows machine
+  sun.position.set(M.position.x + 5, 11, M.position.z + 4); sun.target.position.copy(M.position);
+  updateCamera(dtReal);
+  controls.update();
+  updateHUD();
+  renderer.render(scene, camera);
+  requestAnimationFrame(frame);
+}
+
+resize(); reset();
+// start a little into the lawn so the first frame already shows work in progress
+for (let i = 0; i < 360; i++) { stepDrive(1 / 30); updateFlying(1 / 30); }
+leaves.instanceMatrix.needsUpdate = true;
+tmpA.copy(CAMS.follow.off).applyMatrix4(M.matrixWorld); camera.position.copy(tmpA);
+tmpB.copy(CAMS.follow.look).applyMatrix4(M.matrixWorld); controls.target.copy(tmpB);
+requestAnimationFrame(frame);
+})();
+</script>
