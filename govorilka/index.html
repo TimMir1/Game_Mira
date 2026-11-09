@@ -571,8 +571,7 @@ async function roundBlow(t){
     if (!alive(t)) return; await say(praise()); await sleep(900); alive(t) && next();
   };
   $('#blowBtn').onclick = () => { if (finished) return; prog += total/7; sfx.puff(); apply(); };
-  okAction = () => { $('#blowBtn').click(); okAction && null; };
-  const keepOk = okAction; $('#okBtn').addEventListener('click', () => { if (alive(t) && !finished) okAction = keepOk; });
+  okAction = () => $('#blowBtn').click();     // 👍 работает как «дуть» без микрофона
 
   await sleep(250); if(!alive(t)) return;
   await say(intro); if(!alive(t)) return;
