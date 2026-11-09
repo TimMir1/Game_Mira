@@ -1,0 +1,11 @@
+{
+  "name": "Говорилка — игра для развития речи",
+  "short_name": "Говорилка",
+  "start_url": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fff4e6",
+  "theme_color": "#fff4e6",
+  "lang": "ru",
+  "icons": [{ "src": "icon.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }]
+}
