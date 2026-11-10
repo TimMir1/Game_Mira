@@ -1,0 +1,1550 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Стиральная машина в разрезе</title>
+<style>
+:root{
+  --bg1:#eef2f6;--bg2:#d9e0e8;--panel:rgba(255,255,255,.9);--text:#18202b;--muted:#5f6b7a;
+  --accent:#1f6feb;--accent-ink:#fff;--border:rgba(15,23,42,.1);--shadow:0 8px 30px rgba(15,23,42,.14);
+  --label:rgba(255,255,255,.93);--chip:rgba(127,127,127,.12);--warn:#c2410c;
+  --water:#2f8cff;--heat:#e5484d;--dirt:#8a6a3d;--ok:#18a058;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg1:#1b2028;--bg2:#0d1014;--panel:rgba(24,28,35,.9);--text:#edf1f6;--muted:#9aa5b4;
+    --accent:#5b9bff;--accent-ink:#06101f;--border:rgba(255,255,255,.1);--shadow:0 8px 30px rgba(0,0,0,.5);
+    --label:rgba(28,32,40,.93);--chip:rgba(255,255,255,.08);--warn:#fb923c;
+  }
+}
+:root[data-theme="dark"]{
+  --bg1:#1b2028;--bg2:#0d1014;--panel:rgba(24,28,35,.9);--text:#edf1f6;--muted:#9aa5b4;
+  --accent:#5b9bff;--accent-ink:#06101f;--border:rgba(255,255,255,.1);--shadow:0 8px 30px rgba(0,0,0,.5);
+  --label:rgba(28,32,40,.93);--chip:rgba(255,255,255,.08);--warn:#fb923c;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;color:var(--text);
+  font-family:Inter,"SF Pro Text","Segoe UI",Roboto,system-ui,sans-serif;
+  background:radial-gradient(120% 90% at 40% 20%,var(--bg1),var(--bg2));background-color:var(--bg2)}
+#app{position:fixed;inset:0}
+#app canvas{display:block;touch-action:none}
+button{font:inherit;color:inherit}
+.card{position:fixed;background:var(--panel);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);z-index:5}
+.hidden{display:none!important}
+
+#hud{top:16px;left:16px;width:300px;padding:13px 15px}
+#hud h1{margin:0 0 3px;font-size:16.5px;font-weight:680;letter-spacing:-.01em}
+#hud .sub{margin:0 0 10px;font-size:12px;color:var(--muted);line-height:1.45}
+.read{display:grid;grid-template-columns:repeat(3,1fr);gap:8px 10px}
+.read span{display:block;font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.read b{display:block;font-size:15px;font-weight:650;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.read .wide{grid-column:span 3}
+.leds{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.led{font-size:11px;padding:3px 8px;border-radius:99px;background:var(--chip);color:var(--muted);font-weight:560}
+.led.on{color:#fff}
+.led.on[data-k="valve"]{background:var(--water)}
+.led.on[data-k="heater"]{background:var(--heat)}
+.led.on[data-k="motor"]{background:var(--accent);color:var(--accent-ink)}
+.led.on[data-k="pump"]{background:#0e9f9a}
+.led.on[data-k="lock"]{background:var(--warn)}
+
+#panel{top:16px;right:16px;width:300px;max-height:calc(100% - 32px);overflow:auto;padding:6px 12px 12px}
+#panel section{padding:8px 0;border-bottom:1px solid var(--border)}
+#panel section:last-child{border-bottom:0}
+#panel h2{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:4px 2px 8px;font-weight:650}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.btn{all:unset;box-sizing:border-box;cursor:pointer;padding:7px 11px;border-radius:10px;font-size:12.5px;font-weight:560;
+  background:var(--chip);text-align:center;transition:background .15s}
+.btn:hover{background:rgba(127,127,127,.2)}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.btn[aria-pressed="true"],.btn.primary{background:var(--accent);color:var(--accent-ink)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.row{display:flex;gap:6px;margin-top:8px;align-items:center}
+.row .btn{flex:1}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.hint{font-size:11.5px;color:var(--muted);margin:8px 2px 0;line-height:1.4;min-height:1em}
+.hint.warn{color:var(--warn)}
+.seg{display:flex;background:var(--chip);border-radius:10px;padding:2px;flex:1}
+.seg .btn{background:transparent;padding:5px 0;flex:1;border-radius:8px;font-size:12px}
+.seg .btn[aria-pressed="true"]{background:var(--accent)}
+.lblsmall{font-size:12px;color:var(--muted);white-space:nowrap}
+.bar{margin:6px 2px 8px}
+.bar .t{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px}
+.bar .t b{font-variant-numeric:tabular-nums;font-weight:600}
+.bar .track{height:7px;border-radius:9px;background:var(--chip);overflow:hidden}
+.bar .fill{height:100%;border-radius:9px;width:0;transition:width .3s}
+input[type=range]{width:100%;accent-color:var(--accent)}
+
+#explain{left:332px;right:332px;bottom:calc(16px + env(safe-area-inset-bottom));padding:10px 14px 12px}
+#steps{display:flex;gap:4px;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin}
+.st{flex:none;font-size:11px;padding:3px 8px;border-radius:99px;background:var(--chip);color:var(--muted);white-space:nowrap}
+.st.done{opacity:.55;text-decoration:line-through}
+.st.cur{background:var(--accent);color:var(--accent-ink);font-weight:650}
+#stepTitle{font-size:14px;font-weight:650;margin:4px 0 3px}
+#stepText{margin:0;font-size:12.5px;line-height:1.5;color:var(--text);opacity:.88}
+
+#info{left:16px;bottom:calc(16px + env(safe-area-inset-bottom));width:300px;padding:12px 14px;max-height:45%;overflow:auto}
+#info h3{margin:0 26px 6px 0;font-size:14.5px}
+#info p{margin:0;font-size:12.5px;line-height:1.5}
+#info .x{position:absolute;top:6px;right:6px;padding:4px 9px}
+
+#fab{position:fixed;top:16px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:6}
+.fabb{position:static;padding:8px 13px;border-radius:12px;cursor:pointer;font-size:13px;font-weight:600;white-space:nowrap}
+.fabb[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+#panel.closed{display:none}
+body.nopanel #explain{right:16px}
+body.clean #hud,body.clean #panel,body.clean #explain,body.clean #info{display:none!important}
+body.iso #explain{display:none}
+.phead{display:flex;align-items:center;gap:6px;position:sticky;top:-6px;margin:0 -12px;padding:8px 12px;background:var(--panel);z-index:2;border-bottom:1px solid var(--border)}
+.tabs{display:flex;flex:1;background:var(--chip);border-radius:10px;padding:2px}
+.tab{all:unset;flex:1;text-align:center;padding:6px 0;border-radius:8px;font-size:12.5px;font-weight:600;cursor:pointer;color:var(--muted)}
+.tab[aria-selected="true"]{background:var(--bg1);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.tab:focus-visible{outline:2px solid var(--accent)}
+.btn.icon{padding:6px 10px}
+.plist h3{font-size:11.5px;margin:10px 2px 6px;color:var(--muted);font-weight:650}
+.plist .chips .btn{font-size:12px;padding:6px 9px}
+.plist .btn.sel{background:var(--accent);color:var(--accent-ink)}
+#info .acts{display:flex;gap:6px;margin-top:10px}
+#info .acts .btn{flex:1}
+
+.lbl{background:var(--label);color:var(--text);border:1px solid var(--border);
+  border-radius:8px;padding:3px 7px;font-size:11px;font-weight:600;white-space:nowrap;cursor:pointer;
+  box-shadow:0 2px 8px rgba(0,0,0,.12);pointer-events:auto;user-select:none}
+.lbl:hover{background:var(--accent);color:var(--accent-ink)}
+#loading{position:fixed;inset:0;display:grid;place-items:center;color:var(--muted);font-size:14px}
+
+@media (max-width:1180px){
+  #explain{left:16px;right:332px}
+  #info{left:16px;bottom:auto;top:250px}
+}
+@media (max-width:760px){
+  #hud{right:16px;width:auto;padding:10px 12px;top:calc(8px + env(safe-area-inset-top))}
+  #hud .sub,#hud h1{display:none}
+  .read{grid-template-columns:repeat(3,1fr);gap:4px 8px}
+  .read b{font-size:13px}.read span{font-size:9.5px}
+  .leds{margin-top:6px}
+  #fab{top:auto;left:auto;right:16px;transform:none;bottom:calc(16px + env(safe-area-inset-bottom));flex-direction:column}
+  .fabb{padding:9px 11px;font-size:16px}.fabb .t{display:none}
+  #panel{top:auto;left:16px;right:70px;width:auto;bottom:calc(16px + env(safe-area-inset-bottom));max-height:62%}
+  #explain,body.nopanel #explain{left:16px;right:70px;padding:8px 10px 9px}
+  body:not(.nopanel) #explain{display:none}
+  #stepText{font-size:11.5px;max-height:5.6em;overflow:auto}
+  #stepTitle{font-size:13px}
+  #info{left:16px;right:16px;width:auto;top:auto;bottom:calc(150px + env(safe-area-inset-bottom));max-height:35%}
+  .lbl{font-size:9.5px;padding:2px 5px}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="loading">Загрузка 3D…</div>
+
+<div id="hud" class="card">
+  <h1>Стиральная машина в разрезе</h1>
+  <p class="sub">Фронтальная машина с инверторным мотором прямого привода и генератором пузырей — как у современных Samsung. Вращайте модель, нажимайте на детали и подписи.</p>
+  <div class="read">
+    <div class="wide"><span>Сейчас</span><b id="rPhase">Ожидание</b></div>
+    <div><span>Вода</span><b id="rWater">0 л</b></div>
+    <div><span>Темп.</span><b id="rTemp">15 °C</b></div>
+    <div><span>Обороты</span><b id="rRpm">0</b></div>
+    <div><span>Мощность</span><b id="rPow">2 Вт</b></div>
+    <div><span>Осталось</span><b id="rTime">—</b></div>
+    <div><span>Бельё</span><b id="rCloth">грязное</b></div>
+  </div>
+  <div class="leds">
+    <span class="led" data-k="valve">Клапан</span>
+    <span class="led" data-k="heater">ТЭН</span>
+    <span class="led" data-k="motor">Мотор</span>
+    <span class="led" data-k="pump">Насос</span>
+    <span class="led" data-k="lock">Замок</span>
+  </div>
+</div>
+
+<div id="panel" class="card" aria-label="Управление">
+  <div class="phead">
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" data-tab="run" aria-selected="true">Стирка</button>
+      <button class="tab" role="tab" data-tab="parts" aria-selected="false">Детали</button>
+      <button class="tab" role="tab" data-tab="view" aria-selected="false">Вид</button>
+    </div>
+    <button class="btn icon" id="panelHide" aria-label="Свернуть панель" title="Свернуть панель">✕</button>
+  </div>
+  <div class="pane" data-pane="run">
+  <section>
+    <h2>Программа</h2>
+    <div class="chips" id="progs"></div>
+    <div class="row">
+      <button class="btn primary" id="btnStart">▶ Старт</button>
+      <button class="btn" id="btnStop">■ Стоп</button>
+    </div>
+    <div class="row"><span class="lblsmall">Скорость</span>
+      <div class="seg" id="speed">
+        <button class="btn" data-s="0.5" aria-pressed="false">×0,5</button>
+        <button class="btn" data-s="1" aria-pressed="true">×1</button>
+        <button class="btn" data-s="2" aria-pressed="false">×2</button>
+        <button class="btn" data-s="5" aria-pressed="false">×5</button>
+      </div>
+    </div>
+  </section>
+  <section>
+    <h2>Ручное управление узлами</h2>
+    <div class="grid3" id="manual">
+      <button class="btn" data-m="valve" aria-pressed="false">💧 Вода</button>
+      <button class="btn" data-m="heater" aria-pressed="false">🔥 ТЭН</button>
+      <button class="btn" data-m="pump" aria-pressed="false">⤵ Слив</button>
+      <button class="btn" data-m="wash" aria-pressed="false">↻ Стирка</button>
+      <button class="btn" data-m="spin" aria-pressed="false">⟳ Отжим</button>
+      <button class="btn" data-m="door" aria-pressed="false">🚪 Дверца</button>
+    </div>
+    <p class="hint" id="manualHint">Включайте узлы по отдельности и смотрите, что происходит.</p>
+  </section>
+  <section>
+    <h2>Грязь и износ</h2>
+    <div class="bar"><div class="t"><span>Налёт за барабаном</span><b id="vDirt"></b></div><div class="track"><div class="fill" id="fDirt" style="background:var(--dirt)"></div></div></div>
+    <div class="bar"><div class="t"><span>Накипь на ТЭНе</span><b id="vScale"></b></div><div class="track"><div class="fill" id="fScale" style="background:#a8a29e"></div></div></div>
+    <div class="bar"><div class="t"><span>Фильтр насоса забит</span><b id="vLint"></b></div><div class="track"><div class="fill" id="fLint" style="background:#64748b"></div></div></div>
+    <div class="row">
+      <button class="btn" id="btnAge">+30 стирок при 40°</button>
+      <button class="btn" id="btnFilter">Почистить фильтр</button>
+    </div>
+  </section>
+  </div>
+  <div class="pane hidden" data-pane="parts">
+  <section>
+    <h2>Разборка</h2>
+    <div class="bar"><div class="t"><span>Разобрать машину</span><b id="vEx">0%</b></div>
+      <input type="range" id="ex" min="0" max="100" value="0" aria-label="Степень разборки"></div>
+    <div class="row"><button class="btn" id="btnEx">⇔ Разобрать</button><button class="btn" id="btnAsm">Собрать</button></div>
+    <p class="hint">Детали разъезжаются по своим осям: барабан выходит вперёд, ротор и статор мотора — назад, ТЭН вытягивается из бака, корпус раскрывается.</p>
+  </section>
+  <section class="plist">
+    <h2>Все детали</h2>
+    <div id="partList"></div>
+    <p class="hint">Нажмите на деталь — камера подлетит к ней. В карточке есть «Только эта деталь», чтобы скрыть всё остальное.</p>
+  </section>
+  </div>
+  <div class="pane hidden" data-pane="view">
+  <section>
+    <h2>Вид</h2>
+    <div class="bar"><div class="t"><span>Прозрачность корпуса</span><b id="vOp"></b></div>
+      <input type="range" id="op" min="0" max="100" value="82" aria-label="Прозрачность корпуса"></div>
+    <div class="chips">
+      <button class="btn" id="tCab" aria-pressed="true">Корпус</button>
+      <button class="btn" id="tTub" aria-pressed="true">Бак</button>
+      <button class="btn" id="tLbl" aria-pressed="true">Подписи</button>
+      <button class="btn" id="tRot" aria-pressed="false">Автоповорот</button>
+    </div>
+    <div class="chips" style="margin-top:8px" id="cams">
+      <button class="btn" data-c="iso">Общий</button>
+      <button class="btn" data-c="front">Спереди</button>
+      <button class="btn" data-c="side">Сбоку</button>
+      <button class="btn" data-c="back">Сзади</button>
+      <button class="btn" data-c="low">Снизу</button>
+      <button class="btn" data-c="motor">Мотор</button>
+    </div>
+  </section>
+  </div>
+</div>
+
+<div id="explain" class="card">
+  <div id="steps"></div>
+  <div id="stepTitle">Готова к работе</div>
+  <p id="stepText"></p>
+</div>
+
+<div id="info" class="card hidden" role="dialog" aria-live="polite">
+  <button class="btn x" id="infoClose" aria-label="Закрыть">✕</button>
+  <h3 id="infoTitle"></h3>
+  <p id="infoText"></p>
+  <div class="acts"><button class="btn" id="btnFocus">🔍 Приблизить</button><button class="btn" id="btnIso">◎ Только эта деталь</button></div>
+</div>
+<div id="fab"><button id="panelToggle" class="card fabb" aria-pressed="true" title="Панель управления">⚙<span class="t"> Панель</span></button><button id="cleanToggle" class="card fabb" aria-pressed="false" title="Скрыть все панели (клавиша H)">👁<span class="t"> Только модель</span></button></div>
+
+<script type="importmap">
+{"imports":{
+  "three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const $ = id => document.getElementById(id);
+const v3 = (x, y, z) => new THREE.Vector3(x, y, z);
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+const rnd = (a, b) => a + Math.random() * (b - a);
+
+/* ================= описание деталей ================= */
+const PARTS = {
+  cabinet:{n:'Корпус',t:'Стальной корпус. Сам он почти ничего не делает: внутри на пружинах и амортизаторах подвешен весь моющий узел — бак, барабан, мотор и ТЭН. Ползунок «Прозрачность корпуса» делает его стеклянным.'},
+  control:{n:'Панель управления и плата',t:'Мозг машины. Микроконтроллер читает датчики (уровень воды, температуру, обороты мотора, замок люка) и по программе включает клапан, ТЭН, мотор и насос. На дисплее — температура, оставшееся время и обороты.'},
+  door:{n:'Дверца люка',t:'Стеклянная «чаша» дверцы заходит внутрь барабана, чтобы бельё не прижималось к резине. Пока в баке вода или барабан вращается, дверцу держит замок.'},
+  lock:{n:'Замок люка (УБЛ)',t:'Устройство блокировки люка. Нагреваемая биметаллическая пластина или электромагнит запирает язычок дверцы. Пока плата не получила сигнал «заперто», стирка не начнётся. После окончания замок открывается примерно через минуту.'},
+  gasket:{n:'Манжета люка',t:'Резиновая «гармошка» между баком и корпусом: бак качается, а манжета держит воду. В нижних складках застаивается вода, ворс и волосы — частое место плесени, её стоит протирать насухо.'},
+  tub:{n:'Бак',t:'Неподвижная пластиковая ёмкость, в которой находится вода. Барабан вращается внутри бака, не касаясь его. Между ними зазор 2–3 см — скрытое место, где копится грязь. Внизу — углубление (приямок) с ТЭНом и выходом на слив.'},
+  drum:{n:'Барабан',t:'Нержавеющая сталь с тысячами мелких отверстий (у Samsung — «алмазный» рельеф с мелкими отверстиями, чтобы ткань не затягивало). Вода свободно проходит сквозь стенки: уровень в барабане и в баке одинаковый.'},
+  lifter:{n:'Рёбра барабана',t:'Поднимают бельё при вращении. Наверху вещи отрываются и падают обратно в воду — удар и трение и есть механическая стирка. При ~50 об/мин центробежная сила меньше силы тяжести, и бельё падает; выше ~64 об/мин (барабан Ø44 см) оно прилипает к стенке — так начинается отжим.'},
+  spider:{n:'Крестовина',t:'Алюминиевая трёхлучевая крестовина привинчена к задней стенке барабана и держит вал. Она находится в «грязной» зоне за барабаном: налёт, соли жёсткой воды и щёлочь порошка со временем разъедают алюминий — частая причина дорогого ремонта.'},
+  shaft:{n:'Вал барабана',t:'Стальной вал запрессован в крестовину барабана, проходит сквозь сальник и два подшипника в задней стенке бака, а на его конце болтом закреплён ротор мотора. Вал и ротор вращаются вместе с барабаном.'},
+  motorAll:{n:'Мотор целиком (прямой привод)',t:'Инверторный мотор прямого привода (Direct Drive): ротор с магнитами — на валу барабана, статор с катушками — на задней стенке бака, датчик Холла следит за положением ротора, а плата инвертора подаёт ток на катушки. Ремня и щёток нет, поэтому мотор тише, меньше изнашивается и точно управляет барабаном. Включите «Только эта деталь» и «Разобрать», чтобы рассмотреть все части.'},
+  motor:{n:'Ротор мотора',t:'Стальной «колокол» с 32 постоянными магнитами (красные — северный полюс, синие — южный) насажен прямо на вал барабана — без ремня и шкивов. Катушки статора создают вращающееся магнитное поле, магниты тянутся за ним и крутят барабан. Окна и рёбра на крышке нужны для охлаждения и жёсткости.'},
+  stator:{n:'Статор мотора',t:'Неподвижная часть мотора, привинченная к задней стенке бака: сердечник из тонких стальных пластин и 24 медные катушки. Плата подаёт ток в катушки по очереди — подсветка показывает, какие сейчас под током. «Волна» бежит по кругу и тянет за собой магниты ротора: чем быстрее волна, тем выше обороты.'},
+  hall:{n:'Датчик Холла',t:'Маленький датчик на краю статора чувствует, какой магнит ротора — северный или южный — проходит мимо. По нему плата знает положение и скорость барабана и вовремя переключает катушки. По нему же машина оценивает вес белья и дисбаланс.'},
+  inverter:{n:'Плата инвертора мотора',t:'Делает из сетевого напряжения три фазы тока нужной частоты (провода U, V, W идут к статору). Силовые транзисторы стоят на алюминиевом радиаторе, конденсаторы сглаживают напряжение. Меняя частоту, плата плавно задаёт обороты от 0 до 1400 в минуту и направление вращения.'},
+  bearing:{n:'Подшипники',t:'Два шариковых подшипника в ступице на задней стенке бака держат вал барабана. Передний, ближе к барабану, больше — на него приходится основная нагрузка. Изношенные подшипники гудят и стучат на отжиме.'},
+  seal:{n:'Сальник',t:'Резиновое кольцо с пружинкой обжимает вал со стороны воды и не пускает её к подшипникам. Если сальник износился, вода вымывает смазку — подшипники ржавеют и разрушаются.'},
+  mains:{n:'Сетевой фильтр и шнур',t:'Фильтр подавляет электрические помехи от мотора и инвертора, чтобы они не уходили в домашнюю сеть. Шнур обязательно с заземлением: машина работает с водой.'},
+  heater:{n:'ТЭН (нагреватель)',t:'Трубчатый нагреватель ~2 кВт лежит в приямке на дне бака, под барабаном. Внутри трубки — спираль в изоляции из оксида магния. Включается, только когда прессостат подтвердил, что ТЭН под водой, иначе перегорит. На жёсткой воде обрастает накипью: она плохо проводит тепло, и нагрев идёт дольше.'},
+  ntc:{n:'Датчик температуры (NTC)',t:'Термистор, вставленный рядом с ТЭНом: его сопротивление падает при нагреве. По нему плата включает и выключает ТЭН, удерживая заданную температуру.'},
+  valve:{n:'Заливной клапан',t:'Электромагнитный клапан на входе воды. Пока на катушку подано питание, мембрана открыта и вода из водопровода идёт в машину. Сняли питание — клапан закрылся (он нормально закрытый, ради безопасности).'},
+  inlet:{n:'Заливной шланг',t:'Подаёт холодную воду из водопровода (около 15 °C). Горячую воду машина готовит сама ТЭНом.'},
+  dispenser:{n:'Лоток для моющих средств',t:'Три отсека: предварительная стирка, основная и кондиционер. Плата направляет воду в нужный отсек, и она смывает средство в бак. Кондиционер забирается только на последнем полоскании — через сифон.'},
+  bubble:{n:'Генератор пузырей (EcoBubble)',t:'Технология Samsung: воздушный насос вдувает воздух в смесь воды и порошка ещё до бака. Получается пена, которая быстрее проникает в ткань и хорошо отстирывает даже в холодной воде.'},
+  pressure:{n:'Прессостат (датчик уровня)',t:'Трубка идёт от дна бака к датчику. Чем больше воды — тем сильнее сжат воздух в трубке, и мембрана датчика это чувствует. Так плата знает, когда закрыть клапан, и разрешает включать ТЭН.'},
+  pump:{n:'Сливной насос',t:'Небольшой насос с крыльчаткой. Откачивает воду из нижней точки бака во время слива и отжима.'},
+  filter:{n:'Фильтр насоса',t:'Ловит ворс, волосы, монеты и пуговицы, чтобы они не сломали крыльчатку насоса. Открывается за лючком внизу спереди. Когда он забит, вода уходит медленно, и машина показывает ошибку слива.'},
+  drainhose:{n:'Сливной шланг',t:'Поднимается петлёй выше уровня воды в баке — иначе вода вытекала бы самотёком (эффект сифона).'},
+  springs:{n:'Пружины подвески',t:'Бак висит на пружинах сверху. Вместе с противовесами он весит 25–30 кг и может качаться, поэтому вибрация отжима почти не передаётся на корпус.'},
+  dampers:{n:'Амортизаторы',t:'Амортизаторы снизу гасят раскачку бака, особенно при разгоне через резонанс (примерно 200–400 об/мин), когда бак качает сильнее всего. Смотрите на тряску бака во время отжима.'},
+  counterweight:{n:'Противовесы',t:'Бетонные блоки на баке. Утяжеляют его, чтобы неравномерно разложенное бельё (дисбаланс) меньше раскачивало бак.'},
+  dirt:{n:'Грязь за барабаном',t:'Грязная вода проходит через отверстия барабана в зазор между ним и баком. После слива на внешней стороне барабана, крестовине и стенках бака остаются ворс, остатки порошка, кожный жир и соли жёсткой воды. При частой стирке на 20–40 °C это превращается в биоплёнку и плесень — отсюда запах. Лечится программой «Чистка барабана» (70 °C, без белья) примерно раз в месяц.'},
+  clothes:{n:'Бельё',t:'По ходу стирки вещи светлеют: грязь переходит в воду. Следите, как рёбра поднимают вещи и как они падают, а на отжиме прилипают к стенке.'},
+};
+
+/* ================= рендер ================= */
+const app = $('app');
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.localClippingEnabled = true;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+app.appendChild(renderer.domElement);
+const labelRenderer = new CSS2DRenderer();
+labelRenderer.setSize(innerWidth, innerHeight);
+Object.assign(labelRenderer.domElement.style, { position: 'absolute', top: '0', left: '0', pointerEvents: 'none' });
+app.appendChild(labelRenderer.domElement);
+
+const scene = new THREE.Scene();
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+scene.add(new THREE.HemisphereLight(0xffffff, 0x8899aa, 0.6));
+const sun = new THREE.DirectionalLight(0xffffff, 1.4); sun.position.set(6, 12, 8); scene.add(sun);
+
+const camera = new THREE.PerspectiveCamera(38, innerWidth / innerHeight, 0.1, 200);
+camera.position.set(11, 8.5, 14);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(0, 4.2, 0);
+controls.enableDamping = true; controls.minDistance = 4; controls.maxDistance = 40;
+controls.update();
+
+/* ================= помощники ================= */
+const pick = [];
+const partMeshes = {};
+function tag(obj, key) {
+  obj.userData.part = key; pick.push(obj);
+  (partMeshes[key] ||= []).push(obj);
+  return obj;
+}
+function add(parent, geo, mat, key, p = [0, 0, 0], r = [0, 0, 0]) {
+  const m = new THREE.Mesh(geo, mat);
+  m.position.set(...p); m.rotation.set(...r);
+  parent.add(m);
+  if (key) tag(m, key);
+  return m;
+}
+const std = (o) => new THREE.MeshStandardMaterial(o);
+const glassy = (color, opacity, extra = {}) => new THREE.MeshStandardMaterial({ color, transparent: true, opacity, depthWrite: false, side: THREE.DoubleSide, roughness: .4, metalness: .1, ...extra });
+const curve = pts => new THREE.CatmullRomCurve3(pts.map(p => v3(...p)), false, 'centripetal');
+function pipe(parent, pts, r, mat, key) {
+  const c = curve(pts);
+  const m = add(parent, new THREE.TubeGeometry(c, Math.max(24, pts.length * 14), r, 10, false), mat, key);
+  return { c, m };
+}
+function ringLine(parent, R, z, mat, seg = 72) {
+  const pts = []; for (let i = 0; i <= seg; i++) { const a = i / seg * Math.PI * 2; pts.push(v3(Math.cos(a) * R, Math.sin(a) * R, z)); }
+  const l = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), mat); parent.add(l); return l;
+}
+
+/* ================= пол ================= */
+{
+  const c = document.createElement('canvas'); c.width = c.height = 256;
+  const g = c.getContext('2d'); const gr = g.createRadialGradient(128, 128, 10, 128, 128, 128);
+  gr.addColorStop(0, 'rgba(0,0,0,.28)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(0, 0, 256, 256);
+  const fl = new THREE.Mesh(new THREE.PlaneGeometry(16, 14), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthWrite: false }));
+  fl.rotation.x = -Math.PI / 2; fl.position.y = 0.001; fl.userData.keep = true; scene.add(fl);
+}
+
+/* ================= корпус ================= */
+// единицы: 1 = 1 дм. Корпус 60 × 85 × 55 см
+const W = 6, H = 8.5, D = 5.5, FZ = D / 2;
+const TY = 4.2;                     // ось бака/барабана
+const cabGroup = new THREE.Group(); scene.add(cabGroup);
+const cabMat = new THREE.MeshPhysicalMaterial({ color: 0xf3f5f8, roughness: .32, metalness: .05, clearcoat: .6, transparent: true, opacity: .18, depthWrite: false, side: THREE.DoubleSide });
+const edgeMat = new THREE.LineBasicMaterial({ color: 0x5b6878, transparent: true, opacity: .55 });
+function panel(geo, p) {
+  const m = add(cabGroup, geo, cabMat, 'cabinet', p);
+  const e = new THREE.LineSegments(new THREE.EdgesGeometry(geo, 25), edgeMat); e.position.copy(m.position); cabGroup.add(e); m.userData.edge = e;
+  return m;
+}
+{
+  const s = new THREE.Shape(); s.moveTo(-W / 2, 0); s.lineTo(W / 2, 0); s.lineTo(W / 2, H); s.lineTo(-W / 2, H); s.closePath();
+  const h = new THREE.Path(); h.absarc(0, TY, 1.5, 0, Math.PI * 2, true); s.holes.push(h);
+  panel(new THREE.ExtrudeGeometry(s, { depth: .06, bevelEnabled: false, curveSegments: 48 }), [0, 0, FZ - .06]);
+  panel(new THREE.BoxGeometry(W, H, .05), [0, H / 2, -FZ]);
+  panel(new THREE.BoxGeometry(.05, H, D), [-W / 2, H / 2, 0]);
+  panel(new THREE.BoxGeometry(.05, H, D), [W / 2, H / 2, 0]);
+  panel(new THREE.BoxGeometry(W, .05, D), [0, H - .025, 0]);
+  panel(new THREE.BoxGeometry(W, .12, D), [0, .25, 0]);
+}
+// ножки
+const footMat = std({ color: 0x30353c, roughness: .7 });
+for (const x of [-2.6, 2.6]) for (const z of [-2.3, 2.3]) add(scene, new THREE.CylinderGeometry(.22, .26, .2, 16), footMat, null, [x, .1, z]);
+
+// панель управления
+const ctrlMat = std({ color: 0x242a33, roughness: .35, metalness: .2, transparent: true, opacity: .3, depthWrite: false });
+add(scene, new THREE.BoxGeometry(3.9, 1.0, .1), ctrlMat, 'control', [1.0, 7.95, FZ + .02]);
+const dispCanvas = document.createElement('canvas'); dispCanvas.width = 320; dispCanvas.height = 110;
+const dispTex = new THREE.CanvasTexture(dispCanvas); dispTex.colorSpace = THREE.SRGBColorSpace;
+add(scene, new THREE.PlaneGeometry(1.5, .52), new THREE.MeshBasicMaterial({ map: dispTex, toneMapped: false }), 'control', [.55, 7.95, FZ + .075]);
+const knob = add(scene, new THREE.CylinderGeometry(.33, .35, .18, 32), std({ color: 0xc9ced6, metalness: .8, roughness: .25 }), 'control', [2.3, 7.95, FZ + .14], [Math.PI / 2, 0, 0]);
+add(scene, new THREE.BoxGeometry(.05, .2, .02), std({ color: 0x2f6df6 }), 'control', [2.3, 8.15, FZ + .24]);
+// плата
+add(scene, new THREE.BoxGeometry(2.4, .7, .06), std({ color: 0x1f7a4d, roughness: .6 }), 'control', [1.0, 7.95, FZ - .45]);
+for (let i = 0; i < 6; i++) add(scene, new THREE.BoxGeometry(.22, .18, .1), std({ color: 0x111 }), 'control', [0.1 + i * .36, 7.95 + (i % 2 ? .12 : -.12), FZ - .4]);
+
+/* ================= подвесной узел: бак, барабан, мотор ================= */
+const tubBase = v3(0, TY, 0);
+const tub = new THREE.Group(); tub.position.copy(tubBase); scene.add(tub);
+const TUB_R = 2.5, TUB_Z0 = -2.0, TUB_Z1 = 1.4, TUB_ZC = (TUB_Z0 + TUB_Z1) / 2, TUB_L = TUB_Z1 - TUB_Z0;
+const DR_R = 2.2, DR_Z0 = -1.75, DR_Z1 = 1.15, DR_ZC = (DR_Z0 + DR_Z1) / 2, DR_L = DR_Z1 - DR_Z0;
+
+const tubMat = new THREE.MeshPhysicalMaterial({ color: 0x9fb0c2, roughness: .45, transparent: true, opacity: .2, depthWrite: false, side: THREE.DoubleSide });
+const tubLine = new THREE.LineBasicMaterial({ color: 0x6f8296, transparent: true, opacity: .6 });
+const tubShell = new THREE.Group(); tub.add(tubShell);
+{
+  const g = new THREE.CylinderGeometry(TUB_R, TUB_R, TUB_L, 72, 1, true); g.rotateX(Math.PI / 2);
+  add(tubShell, g, tubMat, 'tub', [0, 0, TUB_ZC]);
+  add(tubShell, new THREE.CircleGeometry(TUB_R, 72), tubMat, 'tub', [0, 0, TUB_Z0]);
+  add(tubShell, new THREE.RingGeometry(1.62, TUB_R, 72), tubMat, 'tub', [0, 0, TUB_Z1]);
+  // приямок с ТЭНом
+  add(tubShell, new THREE.BoxGeometry(.9, .45, 3.1), tubMat, 'tub', [0, -2.55, -.2]);
+  ringLine(tubShell, TUB_R, TUB_Z0, tubLine); ringLine(tubShell, TUB_R, TUB_Z1, tubLine); ringLine(tubShell, 1.62, TUB_Z1, tubLine);
+  for (const a of [0, Math.PI / 2, Math.PI]) {
+    const l = new THREE.Line(new THREE.BufferGeometry().setFromPoints([v3(Math.cos(a) * TUB_R, Math.sin(a) * TUB_R, TUB_Z0), v3(Math.cos(a) * TUB_R, Math.sin(a) * TUB_R, TUB_Z1)]), tubLine);
+    tubShell.add(l);
+  }
+}
+// противовесы
+const concrete = std({ color: 0x8c8f93, roughness: .95, transparent: true, opacity: .75 });
+add(tub, new THREE.BoxGeometry(3.0, .5, .5), concrete, 'counterweight', [0, 2.62, 1.15]);
+add(tub, new THREE.BoxGeometry(.9, 1.0, .5), concrete, 'counterweight', [-1.95, -1.25, 1.15], [0, 0, -.5]);
+add(tub, new THREE.BoxGeometry(.9, 1.0, .5), concrete, 'counterweight', [1.95, -1.25, 1.15], [0, 0, .5]);
+
+// ---- барабан (вращается) ----
+const drum = new THREE.Group(); drum.position.z = 0; tub.add(drum);
+function perfTexture() {
+  const c = document.createElement('canvas'); c.width = 512; c.height = 256; const g = c.getContext('2d');
+  g.fillStyle = '#fff'; g.fillRect(0, 0, 512, 256); g.fillStyle = '#000';
+  for (let y = 0; y < 16; y++) for (let x = 0; x < 32; x++) {
+    g.beginPath(); g.arc(x * 16 + (y % 2 ? 8 : 0) + 4, y * 16 + 8, 3.6, 0, Math.PI * 2); g.fill();
+  }
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(5, 2); return t;
+}
+const drumMat = new THREE.MeshStandardMaterial({ color: 0xd5dbe2, metalness: .85, roughness: .28, alphaMap: perfTexture(), transparent: true, opacity: .62, alphaTest: .35, side: THREE.DoubleSide, depthWrite: false });
+{
+  const g = new THREE.CylinderGeometry(DR_R, DR_R, DR_L, 72, 1, true); g.rotateX(Math.PI / 2);
+  add(drum, g, drumMat, 'drum', [0, 0, DR_ZC]);
+  const back = drumMat.clone(); back.alphaMap = perfTexture(); back.alphaMap.repeat.set(3, 3);
+  add(drum, new THREE.CircleGeometry(DR_R, 72), back, 'drum', [0, 0, DR_Z0]);
+  const solid = std({ color: 0xd5dbe2, metalness: .85, roughness: .3, transparent: true, opacity: .55, side: THREE.DoubleSide, depthWrite: false });
+  add(drum, new THREE.RingGeometry(1.45, DR_R, 72), solid, 'drum', [0, 0, DR_Z1]);
+  const lip = new THREE.CylinderGeometry(1.45, 1.52, .22, 72, 1, true); lip.rotateX(Math.PI / 2);
+  add(drum, lip, solid, 'drum', [0, 0, DR_Z1 + .1]);
+  const ld = new THREE.LineBasicMaterial({ color: 0x8a96a3, transparent: true, opacity: .7 });
+  ringLine(drum, DR_R, DR_Z0, ld); ringLine(drum, DR_R, DR_Z1, ld); ringLine(drum, 1.45, DR_Z1, ld);
+  // рёбра
+  const lm = std({ color: 0xbfc8d2, metalness: .7, roughness: .3, transparent: true, opacity: .9 });
+  const lg = new THREE.CylinderGeometry(.06, .26, .42, 4, 1); // клиновидное ребро
+  lg.rotateY(Math.PI / 4); lg.scale(1, 1, 7.6);
+  for (let k = 0; k < 3; k++) {
+    const a = k * Math.PI * 2 / 3;
+    add(drum, lg, lm, 'lifter', [Math.cos(a) * (DR_R - .2), Math.sin(a) * (DR_R - .2), DR_ZC], [0, 0, a + Math.PI / 2]);
+  }
+  // крестовина
+  const al = std({ color: 0xa9b0b8, metalness: .75, roughness: .45 });
+  for (let k = 0; k < 3; k++) {
+    const a = k * Math.PI * 2 / 3 + Math.PI / 2;
+    add(drum, new THREE.BoxGeometry(.32, 2.1, .18), al, 'spider', [Math.cos(a) * 1.05, Math.sin(a) * 1.05, DR_Z0 - .1], [0, 0, a - Math.PI / 2]);
+  }
+  add(drum, new THREE.CylinderGeometry(.38, .38, .22, 24), al, 'spider', [0, 0, DR_Z0 - .12], [Math.PI / 2, 0, 0]);
+  // вал
+  add(drum, new THREE.CylinderGeometry(.11, .11, .95, 16), std({ color: 0x9aa1aa, metalness: .9, roughness: .2 }), 'shaft', [0, 0, -2.2], [Math.PI / 2, 0, 0]);
+}
+// ---- мотор прямого привода: ротор (вращается вместе с валом) ----
+const rotor = new THREE.Group(); tub.add(rotor);
+const RZ = -2.36;
+{
+  const shell = std({ color: 0x454c55, metalness: .75, roughness: .35, transparent: true, opacity: .5, side: THREE.DoubleSide, depthWrite: false });
+  const rim = new THREE.CylinderGeometry(1.6, 1.6, .42, 72, 1, true); rim.rotateX(Math.PI / 2);
+  add(rotor, rim, shell, 'motor', [0, 0, RZ]);
+  const sh = new THREE.Shape(); sh.absarc(0, 0, 1.6, 0, Math.PI * 2, false);
+  for (let k = 0; k < 8; k++) { const a = k / 8 * Math.PI * 2, h = new THREE.Path(); h.absellipse(Math.cos(a) * 1.0, Math.sin(a) * 1.0, .3, .16, 0, Math.PI * 2, true, a); sh.holes.push(h); }
+  { const h = new THREE.Path(); h.absarc(0, 0, .15, 0, Math.PI * 2, true); sh.holes.push(h); }
+  add(rotor, new THREE.ExtrudeGeometry(sh, { depth: .05, bevelEnabled: false, curveSegments: 24 }), shell, 'motor', [0, 0, RZ - .26]);
+  const rib = std({ color: 0x5a626c, metalness: .7, roughness: .4 });
+  for (let k = 0; k < 8; k++) { const a = (k + .5) / 8 * Math.PI * 2; add(rotor, new THREE.BoxGeometry(.07, .95, .07), rib, 'motor', [Math.cos(a) * 1.0, Math.sin(a) * 1.0, RZ - .28], [0, 0, a - Math.PI / 2]); }
+  add(rotor, new THREE.CylinderGeometry(.32, .36, .12, 24), std({ color: 0x6b737d, metalness: .8, roughness: .3 }), 'motor', [0, 0, RZ - .29], [Math.PI / 2, 0, 0]);
+  add(rotor, new THREE.CylinderGeometry(.13, .13, .07, 6), std({ color: 0xc0c6cd, metalness: .9, roughness: .2 }), 'motor', [0, 0, RZ - .37], [Math.PI / 2, 0, 0]);
+  const mN = std({ color: 0xd94848, roughness: .45, metalness: .3 }), mS = std({ color: 0x3b6fd9, roughness: .45, metalness: .3 });
+  for (let i = 0; i < 32; i++) { const a = i / 32 * Math.PI * 2; add(rotor, new THREE.BoxGeometry(.1, .28, .34), i % 2 ? mN : mS, 'motor', [Math.cos(a) * 1.52, Math.sin(a) * 1.52, RZ], [0, 0, a]); }
+}
+// ---- статор (неподвижен, на баке) ----
+const statorG = new THREE.Group(); tub.add(statorG);
+const SZ = -2.33;
+const coilMats = [];
+{
+  const lam = std({ color: 0x6d757f, metalness: .8, roughness: .35 });
+  add(statorG, new THREE.CylinderGeometry(.93, .93, .3, 48), lam, 'stator', [0, 0, SZ], [Math.PI / 2, 0, 0]);
+  const lamLine = new THREE.LineBasicMaterial({ color: 0x3a4049 });
+  for (let k = 0; k < 5; k++) ringLine(statorG, .935, SZ - .12 + k * .06, lamLine, 48);
+  for (let i = 0; i < 24; i++) {
+    const a = i / 24 * Math.PI * 2, r = a - Math.PI / 2;
+    add(statorG, new THREE.BoxGeometry(.11, .46, .3), lam, 'stator', [Math.cos(a) * 1.12, Math.sin(a) * 1.12, SZ], [0, 0, r]);
+    add(statorG, new THREE.BoxGeometry(.25, .05, .3), lam, 'stator', [Math.cos(a) * 1.37, Math.sin(a) * 1.37, SZ], [0, 0, r]);
+    const m = std({ color: 0xb46a2c, metalness: .6, roughness: .35, emissive: 0xff7a1a, emissiveIntensity: 0 });
+    coilMats.push(m);
+    add(statorG, new THREE.BoxGeometry(.2, .28, .36), m, 'stator', [Math.cos(a) * 1.13, Math.sin(a) * 1.13, SZ], [0, 0, r]);
+  }
+  const plastic = std({ color: 0x23272d, roughness: .7 });
+  add(statorG, new THREE.CylinderGeometry(.62, .7, .36, 6), plastic, 'stator', [0, 0, SZ + .02], [Math.PI / 2, 0, 0]);
+  for (let k = 0; k < 6; k++) { const a = k / 6 * Math.PI * 2 + .5; add(statorG, new THREE.CylinderGeometry(.06, .06, .1, 6), std({ color: 0xc9ced6, metalness: .9 }), 'stator', [Math.cos(a) * .62, Math.sin(a) * .62, SZ + .22], [Math.PI / 2, 0, 0]); }
+  add(statorG, new THREE.BoxGeometry(.32, .2, .14), std({ color: 0xf2f2f2, roughness: .6 }), 'stator', [.45, .98, SZ + .2]);
+  // датчик Холла
+  const ha = THREE.MathUtils.degToRad(97.5);
+  add(statorG, new THREE.BoxGeometry(.2, .1, .22), std({ color: 0x111418, roughness: .5 }), 'hall', [Math.cos(ha) * 1.3, Math.sin(ha) * 1.3, SZ + .2], [0, 0, ha - Math.PI / 2]);
+  add(statorG, new THREE.SphereGeometry(.035, 8, 6), std({ color: 0x222, emissive: 0x39ff88, emissiveIntensity: 1 }), 'hall', [Math.cos(ha) * 1.3, Math.sin(ha) * 1.3 + .07, SZ + .26]);
+  pipe(statorG, [[Math.cos(ha) * 1.3, Math.sin(ha) * 1.3, SZ + .3], [.1, 1.2, SZ + .32], [.4, 1.05, SZ + .28]], .02, std({ color: 0x111 }), 'hall');
+}
+// ---- подшипники и сальник ----
+const bearingG = new THREE.Group(); tub.add(bearingG);
+{
+  add(bearingG, new THREE.CylinderGeometry(.34, .34, .26, 24, 1, true), glassy(0x7c848e, .35), 'bearing', [0, 0, TUB_Z0 - .1], [Math.PI / 2, 0, 0]);
+  const st = std({ color: 0xdfe3e8, metalness: .95, roughness: .15 });
+  [[TUB_Z0 - .02, 1], [TUB_Z0 - .18, .85]].forEach(([z, k]) => {
+    add(bearingG, new THREE.TorusGeometry(.22 * k, .04 * k, 10, 36), st, 'bearing', [0, 0, z]);
+    add(bearingG, new THREE.TorusGeometry(.13, .025, 8, 36), st, 'bearing', [0, 0, z]);
+    for (let i = 0; i < 9; i++) { const a = i / 9 * Math.PI * 2; add(bearingG, new THREE.SphereGeometry(.035 * k + .005, 10, 8), st, 'bearing', [Math.cos(a) * (.175 * k + .01), Math.sin(a) * (.175 * k + .01), z]); }
+  });
+}
+const sealG = new THREE.Group(); tub.add(sealG);
+add(sealG, new THREE.TorusGeometry(.17, .045, 10, 32), std({ color: 0x15181c, roughness: .8 }), 'seal', [0, 0, TUB_Z0 + .06]);
+
+// ---- ТЭН и датчик ----
+const HY = -2.62;
+const heaterMat = std({ color: 0xb87333, metalness: .7, roughness: .35, emissive: 0xff3300, emissiveIntensity: 0 });
+const heaterCurve = curve([[-.2, HY, 1.35], [-.2, HY, -1.15], [-.17, HY, -1.48], [0, HY, -1.6], [.17, HY, -1.48], [.2, HY, -1.15], [.2, HY, 1.35]]);
+add(tub, new THREE.TubeGeometry(heaterCurve, 120, .055, 10, false), heaterMat, 'heater');
+add(tub, new THREE.BoxGeometry(.7, .35, .08), std({ color: 0x8a9099, metalness: .7 }), 'heater', [0, HY, 1.38]);
+for (const x of [-.2, .2]) add(tub, new THREE.CylinderGeometry(.03, .03, .25, 8), std({ color: 0xd0a040, metalness: .9 }), 'heater', [x, HY, 1.5], [Math.PI / 2, 0, 0]);
+add(tub, new THREE.CylinderGeometry(.045, .045, .5, 10), std({ color: 0x222831 }), 'ntc', [0, HY + .02, 1.15], [Math.PI / 2, 0, 0]);
+// накипь
+const scaleMesh = new THREE.InstancedMesh(new THREE.SphereGeometry(1, 6, 5), std({ color: 0xe8e2d4, roughness: 1 }), 220);
+scaleMesh.count = 0; tub.add(scaleMesh); tag(scaleMesh, 'heater');
+{
+  const d = new THREE.Object3D(), p = v3(0, 0, 0);
+  for (let i = 0; i < 220; i++) {
+    heaterCurve.getPointAt(Math.random(), p);
+    const a = Math.random() * Math.PI * 2;
+    d.position.set(p.x + Math.cos(a) * .055, p.y + Math.sin(a) * .055, p.z);
+    d.scale.setScalar(rnd(.018, .04)); d.updateMatrix(); scaleMesh.setMatrixAt(i, d.matrix);
+  }
+}
+
+/* ================= вода ================= */
+const WR = 2.46, WL = TUB_L - .04;
+const clipPlane = new THREE.Plane(v3(0, -1, 0), 0);
+const waterMat = new THREE.MeshStandardMaterial({ color: 0x4aa8ff, transparent: true, opacity: .42, roughness: .15, metalness: 0, clippingPlanes: [clipPlane], depthWrite: false, side: THREE.DoubleSide });
+{
+  const g = new THREE.CylinderGeometry(WR, WR, WL, 72, 1, false); g.rotateX(Math.PI / 2);
+  add(tub, g, waterMat, null, [0, 0, TUB_ZC]).renderOrder = 2;
+  add(tub, new THREE.BoxGeometry(.86, .42, 3.06), waterMat, null, [0, -2.55, -.2]).renderOrder = 2;
+}
+const surfGeo = new THREE.PlaneGeometry(1, WL, 24, 14); surfGeo.rotateX(-Math.PI / 2);
+const surfBase = surfGeo.attributes.position.array.slice();
+const surfMat = new THREE.MeshStandardMaterial({ color: 0x7cc4ff, transparent: true, opacity: .5, roughness: .05, metalness: .1, side: THREE.DoubleSide, depthWrite: false });
+const surf = add(tub, surfGeo, surfMat, null, [0, -TUB_R, TUB_ZC]); surf.renderOrder = 3;
+
+function segArea(h, R) { const d = R - h; return R * R * Math.acos(clamp(d / R, -1, 1)) - d * Math.sqrt(Math.max(0, 2 * R * h - h * h)); }
+function levelFromLiters(V) { // литры = дм³
+  if (V <= 0) return 0;
+  let lo = 0, hi = 2 * WR;
+  for (let i = 0; i < 28; i++) { const m = (lo + hi) / 2; if (segArea(m, WR) * WL < V) lo = m; else hi = m; }
+  return (lo + hi) / 2;
+}
+
+/* ================= грязь в зазоре ================= */
+const SPOTS = 700;
+const spotGeo = new THREE.CircleGeometry(1, 9);
+const spotMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1, side: THREE.DoubleSide, transparent: true, opacity: .92, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 });
+const dirtCols = [0x5b4630, 0x6e5536, 0x3d3a2c, 0x2c3a2a, 0x7a6a50, 0x262626, 0x4f5a3a];
+function makeSpots(parent, place) {
+  const m = new THREE.InstancedMesh(spotGeo, spotMat, SPOTS); m.count = 0; m.frustumCulled = false;
+  const d = new THREE.Object3D(), c = new THREE.Color();
+  for (let i = 0; i < SPOTS; i++) {
+    place(d, i); d.updateMatrix(); m.setMatrixAt(i, d.matrix);
+    m.setColorAt(i, c.setHex(dirtCols[i % dirtCols.length]));
+  }
+  parent.add(m); tag(m, 'dirt'); return m;
+}
+const dirtDrum = makeSpots(drum, (d, i) => {
+  if (i % 5 === 0) { // задняя стенка и крестовина
+    const a = Math.random() * Math.PI * 2, r = Math.sqrt(Math.random()) * DR_R * .97;
+    d.position.set(Math.cos(a) * r, Math.sin(a) * r, DR_Z0 - .015); d.lookAt(d.position.x, d.position.y, DR_Z0 - 1);
+  } else {
+    const a = Math.random() * Math.PI * 2, z = rnd(DR_Z0 + .05, DR_Z1 - .05), r = DR_R + .012;
+    d.position.set(Math.cos(a) * r, Math.sin(a) * r, z); d.lookAt(Math.cos(a) * 5, Math.sin(a) * 5, z);
+  }
+  d.scale.setScalar(rnd(.04, .16) * (Math.random() < .1 ? 1.8 : 1));
+});
+const dirtTub = makeSpots(tub, (d) => {
+  const a = -Math.PI / 2 + (Math.random() - .5) * Math.PI * 1.7 * Math.pow(Math.random(), .6);
+  const z = rnd(TUB_Z0 + .05, TUB_Z1 - .05), r = TUB_R - .015;
+  d.position.set(Math.cos(a) * r, Math.sin(a) * r, z); d.lookAt(0, 0, z);
+  d.scale.setScalar(rnd(.05, .18));
+});
+
+/* ================= бельё ================= */
+const clothGeo = new THREE.IcosahedronGeometry(1, 2);
+{ const p = clothGeo.attributes.position; for (let i = 0; i < p.count; i++) { const k = 1 + (Math.sin(p.getX(i) * 7) * Math.cos(p.getZ(i) * 5) * .12); p.setXYZ(i, p.getX(i) * k, p.getY(i) * k, p.getZ(i) * k); } clothGeo.computeVertexNormals(); }
+const CLOTH_COLS = [0xe5484d, 0x2f6df6, 0xf2f2f2, 0xf5c518, 0x2fb36a, 0xf472b6, 0x1e3a8a, 0x9ca3af];
+const DIRTY = new THREE.Color(0x6b5a45);
+const clothes = [];
+const clothGroup = new THREE.Group(); tub.add(clothGroup);
+CLOTH_COLS.forEach((col, i) => {
+  const mat = std({ color: col, roughness: .9 });
+  const sx = rnd(.45, .6), sy = rnd(.16, .22), sz = rnd(.38, .55);
+  const m = add(clothGroup, clothGeo, mat, 'clothes'); m.scale.set(sx, sy, sz);
+  const c = { m, mat, base: new THREE.Color(col), z: -1.35 + i * (2.3 / 7) + rnd(-.1, .1), Rw: DR_R - .2 - sy * .9, a: rnd(-.6, .6), rest: rnd(-.55, .55),
+    st: 'wall', x: 0, y: 0, vx: 0, vy: 0, th: rnd(-.2, .2), rot0: rnd(0, 6), spin: rnd(-4, 4) };
+  m.position.z = c.z; clothes.push(c);
+});
+
+/* ================= манжета, дверца, замок ================= */
+const rubber = new THREE.MeshStandardMaterial({ color: 0x3b4149, roughness: .8, transparent: true, opacity: .55, side: THREE.DoubleSide, depthWrite: false });
+{
+  const prof = [[1.62, 0], [1.78, .25], [1.6, .55], [1.75, .85], [1.55, 1.2], [1.5, 1.35]].map(p => new THREE.Vector2(p[0], p[1]));
+  const g = new THREE.LatheGeometry(prof, 64); g.rotateX(Math.PI / 2);
+  add(scene, g, rubber, 'gasket', [0, TY, TUB_Z1]);
+}
+const doorPivot = new THREE.Group(); doorPivot.position.set(-1.78, TY, FZ + .04); scene.add(doorPivot);
+{
+  const off = 1.78;
+  add(doorPivot, new THREE.TorusGeometry(1.62, .17, 18, 72), std({ color: 0xd9dee5, metalness: .6, roughness: .3, transparent: true, opacity: .85 }), 'door', [off, 0, .12]);
+  add(doorPivot, new THREE.TorusGeometry(1.42, .07, 12, 72), std({ color: 0x30363e, roughness: .5 }), 'door', [off, 0, .08]);
+  const prof = [[0, 1.0], [.55, .97], [.95, .82], [1.22, .55], [1.38, .25], [1.45, 0]].map(p => new THREE.Vector2(p[0], p[1]));
+  const g = new THREE.LatheGeometry(prof, 64); g.rotateX(-Math.PI / 2);
+  add(doorPivot, g, new THREE.MeshPhysicalMaterial({ color: 0xa6d4ff, transparent: true, opacity: .2, roughness: .05, metalness: 0, side: THREE.DoubleSide, depthWrite: false }), 'door', [off, 0, .12]);
+  add(doorPivot, new THREE.BoxGeometry(.22, .9, .2), std({ color: 0x9aa3ad, metalness: .7, roughness: .3 }), 'door', [off + 1.62, 0, .18]);
+  add(doorPivot, new THREE.BoxGeometry(.12, .2, .32), std({ color: 0x6b7280, metalness: .7 }), 'door', [off + 1.55, 0, -.1]);
+  add(doorPivot, new THREE.BoxGeometry(.2, .5, .25), std({ color: 0x6b7280 }), 'door', [.05, 0, .08]);
+}
+const lockLed = std({ color: 0x3a3f46, emissive: 0xff5a1f, emissiveIntensity: 0 });
+add(scene, new THREE.BoxGeometry(.32, .5, .36), std({ color: 0xeeeeee, roughness: .6 }), 'lock', [1.62, TY, FZ - .35]);
+add(scene, new THREE.SphereGeometry(.07, 12, 8), lockLed, 'lock', [1.62, TY + .3, FZ - .3]);
+
+/* ================= подача воды ================= */
+const hoseMat = new THREE.MeshStandardMaterial({ color: 0xa9c4e0, transparent: true, opacity: .45, roughness: .4, depthWrite: false, side: THREE.DoubleSide });
+const drainMat = new THREE.MeshStandardMaterial({ color: 0x9aa3ad, transparent: true, opacity: .45, roughness: .5, depthWrite: false, side: THREE.DoubleSide });
+// заливной шланг и клапан
+const inletHose = pipe(scene, [[2.1, 7.9, -4.6], [2.15, 7.9, -3.6], [2.2, 7.9, -2.75], [2.2, 7.9, -2.5]], .1, hoseMat, 'inlet');
+add(scene, new THREE.BoxGeometry(.55, .45, .55), std({ color: 0xeef0f2, roughness: .5 }), 'valve', [2.2, 7.9, -2.25]);
+add(scene, new THREE.CylinderGeometry(.18, .18, .32, 18), std({ color: 0xc7372f, roughness: .6 }), 'valve', [2.2, 8.25, -2.25]);
+add(scene, new THREE.CylinderGeometry(.18, .18, .32, 18), std({ color: 0x8a8f96, roughness: .6 }), 'valve', [1.85, 7.9, -2.25], [0, 0, Math.PI / 2]);
+const valveLed = std({ color: 0x223, emissive: 0x2f8cff, emissiveIntensity: 0 });
+add(scene, new THREE.SphereGeometry(.07, 10, 8), valveLed, 'valve', [2.2, 8.45, -2.25]);
+// лоток
+const DRW = { x0: -2.85, x1: -.95, y0: 7.45, y1: 8.2, z0: .55, z1: FZ };
+const drawerMat = glassy(0xe9edf2, .35);
+const drawerFrontMat = std({ color: 0xe8ebef, roughness: .4, transparent: true, opacity: .3, depthWrite: false });
+add(scene, new THREE.BoxGeometry(DRW.x1 - DRW.x0, DRW.y1 - DRW.y0, DRW.z1 - DRW.z0), drawerMat, 'dispenser', [(DRW.x0 + DRW.x1) / 2, (DRW.y0 + DRW.y1) / 2, (DRW.z0 + DRW.z1) / 2]);
+add(scene, new THREE.BoxGeometry(DRW.x1 - DRW.x0, DRW.y1 - DRW.y0 + .05, .1), drawerFrontMat, 'dispenser', [(DRW.x0 + DRW.x1) / 2, (DRW.y0 + DRW.y1) / 2, FZ + .05]);
+for (const x of [-2.2, -1.6]) add(scene, new THREE.BoxGeometry(.03, .6, 1.5), glassy(0xcfd6de, .5), 'dispenser', [x, 7.8, 1.85]);
+const powder = add(scene, new THREE.BoxGeometry(.55, .3, 1.2), std({ color: 0xffffff, roughness: 1 }), 'dispenser', [-2.52, 7.66, 1.85]);
+const softener = add(scene, new THREE.BoxGeometry(.5, .22, 1.0), std({ color: 0x7dd3fc, roughness: .2, transparent: true, opacity: .8 }), 'dispenser', [-1.9, 7.62, 1.85]);
+powder.geometry.translate(0, .15, 0); powder.position.y = 7.51;
+softener.geometry.translate(0, .11, 0); softener.position.y = 7.51;
+// бункер и шланг в бак + генератор пузырей
+add(scene, new THREE.CylinderGeometry(.5, .16, .35, 18), glassy(0xcfd6de, .5), 'dispenser', [-1.9, 7.25, 1.0]);
+add(scene, new THREE.BoxGeometry(.5, .4, .5), std({ color: 0xdfe5ec, roughness: .5, transparent: true, opacity: .8 }), 'bubble', [-1.85, 6.85, 1.05]);
+add(scene, new THREE.CylinderGeometry(.16, .16, .35, 16), std({ color: 0x5b6b7c }), 'bubble', [-2.4, 6.85, 1.05], [0, 0, Math.PI / 2]);
+const fillHose = pipe(scene, [[-1.9, 7.1, 1.0], [-1.85, 6.95, 1.05], [-1.82, 6.7, 1.06], [-1.6, 6.45, 1.08], [-1.3, 6.35, 1.1]], .1, hoseMat, 'inlet');
+// трубки от клапана к отсекам
+const valveToMainPts = [[2.2, 7.95, -2.0], [1.4, 8.05, -1.5], [0, 8.05, -.6], [-1.6, 8.05, .3], [-2.45, 8.05, .7], [-2.5, 8.05, 1.5], [-2.5, 7.75, 1.9], [-2.2, 7.45, 1.5], [-1.9, 7.3, 1.0]];
+const valveToSoftPts = [[2.2, 7.95, -2.0], [1.4, 8.05, -1.5], [0, 8.05, -.6], [-1.6, 8.05, .3], [-1.9, 8.05, .7], [-1.9, 8.05, 1.5], [-1.9, 7.75, 1.9], [-1.9, 7.45, 1.4], [-1.9, 7.3, 1.0]];
+pipe(scene, valveToMainPts.slice(0, 5), .08, hoseMat, 'inlet');
+// прессостат
+pipe(scene, [[.35, 1.55, -1.5], [1.1, 1.5, -1.8], [1.95, 2.4, -1.85], [2.05, 5.5, -1.7], [2.0, 7.7, -1.6]], .045, hoseMat, 'pressure');
+add(scene, new THREE.CylinderGeometry(.32, .32, .16, 24), std({ color: 0xf0f2f4, roughness: .5 }), 'pressure', [2.0, 7.95, -1.6], [Math.PI / 2, 0, 0]);
+const pressLed = std({ color: 0x223, emissive: 0x2f8cff, emissiveIntensity: 0 });
+add(scene, new THREE.CylinderGeometry(.16, .16, .05, 20), pressLed, 'pressure', [2.0, 7.95, -1.5], [Math.PI / 2, 0, 0]);
+
+/* ================= слив ================= */
+const sumpToPump = pipe(scene, [[0, 1.45, 1.0], [.1, 1.05, 1.15], [.7, .78, 1.35], [1.35, .72, 1.55]], .14, drainMat, 'pump');
+add(scene, new THREE.CylinderGeometry(.42, .42, .4, 24), std({ color: 0x4b5563, roughness: .6, transparent: true, opacity: .85 }), 'pump', [1.8, .72, 1.5], [Math.PI / 2, 0, 0]);
+add(scene, new THREE.CylinderGeometry(.3, .3, .55, 20), std({ color: 0x2b3038, roughness: .5 }), 'pump', [1.8, .72, 1.0], [Math.PI / 2, 0, 0]);
+const impeller = new THREE.Group(); impeller.position.set(1.8, .72, 1.5); scene.add(impeller);
+for (let k = 0; k < 4; k++) add(impeller, new THREE.BoxGeometry(.06, .6, .3), std({ color: 0xe5e7eb }), 'pump', [0, 0, 0], [0, 0, k * Math.PI / 4]);
+// фильтр
+add(scene, new THREE.CylinderGeometry(.28, .28, 1.0, 20, 1, true), glassy(0xcfd6de, .35), 'filter', [1.8, .72, 2.2], [Math.PI / 2, 0, 0]);
+add(scene, new THREE.CylinderGeometry(.36, .36, .12, 24), std({ color: 0x1f2937 }), 'filter', [1.8, .72, FZ + .02], [Math.PI / 2, 0, 0]);
+const lintMesh = add(scene, new THREE.CylinderGeometry(.22, .25, .8, 12), std({ color: 0x8d8478, roughness: 1 }), 'filter', [1.8, .72, 2.2], [Math.PI / 2, 0, 0]);
+add(scene, new THREE.BoxGeometry(.9, .7, .05), std({ color: 0xe9ecef, transparent: true, opacity: .5, depthWrite: false }), 'filter', [1.8, .72, FZ + .04]);
+const pumpToOut = pipe(scene, [[2.05, .72, 1.3], [2.4, .65, .3], [2.5, .7, -1.6], [2.55, 2.0, -2.45], [2.55, 7.3, -2.5], [2.55, 7.95, -2.75], [2.55, 7.6, -3.4], [2.55, 5, -3.6], [2.55, 1.2, -3.7], [2.55, .45, -3.7]], .12, drainMat, 'drainhose');
+add(scene, new THREE.CylinderGeometry(.3, .3, .5, 18), std({ color: 0x9ca3af, roughness: .7 }), 'drainhose', [2.55, .25, -3.7]);
+
+/* ================= плата мотора и питание ================= */
+{
+  const IV = v3(-1.0, 7.3, -2.58);
+  add(scene, new THREE.BoxGeometry(1.7, .8, .05), std({ color: 0x1f7a4d, roughness: .6 }), 'inverter', [IV.x, IV.y, IV.z]);
+  const alu = std({ color: 0xc7ccd2, metalness: .8, roughness: .35 });
+  add(scene, new THREE.BoxGeometry(.75, .5, .06), alu, 'inverter', [IV.x - .35, IV.y, IV.z + .06]);
+  for (let k = 0; k < 7; k++) add(scene, new THREE.BoxGeometry(.035, .5, .28), alu, 'inverter', [IV.x - .68 + k * .11, IV.y, IV.z + .22]);
+  add(scene, new THREE.BoxGeometry(.4, .25, .08), std({ color: 0x111418 }), 'inverter', [IV.x + .2, IV.y - .18, IV.z + .06]);
+  for (const dx of [.45, .7]) add(scene, new THREE.CylinderGeometry(.1, .1, .32, 16), std({ color: 0x1e3a8a, roughness: .5 }), 'inverter', [IV.x + dx, IV.y + .12, IV.z + .2], [Math.PI / 2, 0, 0]);
+  [[0xd32f2f, -.06], [0xf2c94c, 0], [0x2f6df6, .06]].forEach(([c, dx]) => pipe(scene,
+    [[.45 + dx, TY + .98, SZ + .14], [.55 + dx, TY + 1.7, -2.5], [.1 + dx, TY + 2.6, -2.6], [-.4 + dx, IV.y - .4, IV.z + .05], [-.3 + dx, IV.y - .3, IV.z + .05]], .025, std({ color: c, roughness: .6 }), 'inverter'));
+  // сетевой фильтр и шнур
+  add(scene, new THREE.BoxGeometry(.45, .3, .3), std({ color: 0x9aa3ad, metalness: .5, roughness: .4 }), 'mains', [-2.4, 7.95, -2.4]);
+  pipe(scene, [[-2.4, 7.95, -2.55], [-2.4, 7.9, -2.9], [-2.45, 7.2, -3.3], [-2.5, 3, -3.4], [-2.5, .5, -3.5], [-2.5, .2, -4.2]], .05, std({ color: 0x2b2f35, roughness: .7 }), 'mains');
+  pipe(scene, [[-2.2, 7.95, -2.3], [-1.6, 8.05, -1.5], [-.2, 8.05, .5], [.6, 7.95, 2.1]], .025, std({ color: 0x5b6470 }), 'mains');
+}
+
+/* ================= подвеска ================= */
+const springGeo = (() => { const pts = []; const N = 160, T = 9; for (let i = 0; i <= N; i++) { const t = i / N, a = t * T * Math.PI * 2; pts.push(v3(Math.cos(a) * .17, -t, Math.sin(a) * .17)); } return new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), N * 2, .028, 6, false); })();
+const steel = std({ color: 0x9aa3ad, metalness: .85, roughness: .3 });
+const springs = [-1.6, 1.6].map(x => {
+  const m = add(scene, springGeo, steel, 'springs');
+  return { m, top: v3(x, 8.3, -.3), local: v3(x, Math.sqrt(TUB_R * TUB_R - x * x) + .02, -.3) };
+});
+for (const s of springs) add(scene, new THREE.BoxGeometry(.4, .15, .4), steel, 'springs', [s.top.x, s.top.y + .07, s.top.z]);
+for (const x of [-1.5, 1.5]) {
+  add(scene, new THREE.CylinderGeometry(.13, .13, 1.15, 16), std({ color: 0x2f343b, roughness: .5 }), 'dampers', [x, .35 + .575, -.3]);
+  add(tub, new THREE.CylinderGeometry(.05, .05, 1.1, 10), steel, 'dampers', [x, -1.98 - .5, -.3]);
+}
+
+/* ================= частицы ================= */
+const dropGeo = new THREE.SphereGeometry(1, 8, 6);
+const _v = v3(0, 0, 0), _m = new THREE.Matrix4();
+class Flow {
+  constructor(parent, c, { n = 40, size = .07, color = 0x3d9bff, speed = 3 } = {}) {
+    this.c = c; this.len = c.getLength(); this.n = n; this.size = size; this.speed = speed;
+    this.mat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: .9, depthWrite: false });
+    this.mesh = new THREE.InstancedMesh(dropGeo, this.mat, n); this.mesh.frustumCulled = false; this.mesh.renderOrder = 4;
+    parent.add(this.mesh);
+    this.off = Array.from({ length: n }, () => Math.random()); this.sz = this.off.map(() => rnd(.65, 1.15));
+    this.k = 0; this.t = 0;
+  }
+  update(dt, on, rate = 1) {
+    this.k += ((on ? 1 : 0) - this.k) * Math.min(1, dt * 5);
+    this.t += dt * this.speed * rate / this.len;
+    this.mesh.visible = this.k > .02;
+    if (!this.mesh.visible) return;
+    for (let i = 0; i < this.n; i++) {
+      const u = (this.off[i] + this.t) % 1;
+      this.c.getPointAt(u, _v);
+      const s = this.size * this.sz[i] * this.k;
+      _m.makeScale(s, s, s).setPosition(_v); this.mesh.setMatrixAt(i, _m);
+    }
+    this.mesh.instanceMatrix.needsUpdate = true;
+  }
+}
+const fInlet = new Flow(scene, inletHose.c, { n: 14 });
+const fMain = new Flow(scene, curve(valveToMainPts), { n: 55 });
+const fSoft = new Flow(scene, curve(valveToSoftPts), { n: 55 });
+const fFill = new Flow(scene, fillHose.c, { n: 18 });
+const fFoam = new Flow(scene, fillHose.c, { n: 14, color: 0xffffff, size: .06, speed: 2.6 });
+// внутри бака: вода стекает по зазору между баком и барабаном
+const pourPts = []; for (let i = 0; i <= 10; i++) { const a = THREE.MathUtils.degToRad(122 + i * 14.5); pourPts.push([Math.cos(a) * 2.36, Math.sin(a) * 2.36, 1.1 - i * .05]); }
+const fPour = new Flow(tub, curve(pourPts), { n: 34, speed: 3.6 });
+const fDrain1 = new Flow(scene, sumpToPump.c, { n: 18, color: 0x7aa7c7, size: .09 });
+const fDrain2 = new Flow(scene, pumpToOut.c, { n: 70, color: 0x7aa7c7, size: .08, speed: 4 });
+
+function makeInst(parent, n, mat, geo = dropGeo) { const m = new THREE.InstancedMesh(geo, mat, n); m.frustumCulled = false; m.renderOrder = 4; parent.add(m); return m; }
+const FOAM_N = 160, SPECK_N = 220, HB_N = 50, SPRAY_N = 180;
+const foam = makeInst(tub, FOAM_N, std({ color: 0xffffff, roughness: .2, transparent: true, opacity: .85 }));
+const foamP = Array.from({ length: FOAM_N }, () => ({ u: Math.random(), v: Math.random(), s: rnd(.05, .13), ph: rnd(0, 6) }));
+const specks = makeInst(tub, SPECK_N, std({ color: 0x5a4632, roughness: 1 }), new THREE.BoxGeometry(1, 1, 1));
+const speckP = Array.from({ length: SPECK_N }, () => ({ a: rnd(0, 6.28), r: Math.sqrt(Math.random()) * 2.4, z: rnd(TUB_Z0 + .1, TUB_Z1 - .1), s: rnd(.02, .045), w: rnd(.2, .6) }));
+const hBub = makeInst(tub, HB_N, new THREE.MeshBasicMaterial({ color: 0xe8f6ff, transparent: true, opacity: .8, depthWrite: false }));
+const hbP = Array.from({ length: HB_N }, () => ({ x: (Math.random() < .5 ? -.2 : .2) + rnd(-.05, .05), z: rnd(-1.5, 1.3), ph: Math.random(), s: rnd(.025, .05) }));
+const spray = makeInst(tub, SPRAY_N, new THREE.MeshBasicMaterial({ color: 0x5fb0ff, transparent: true, opacity: .85, depthWrite: false }));
+const sprayP = Array.from({ length: SPRAY_N }, () => ({ life: 0, a: 0, z: 0 }));
+
+/* ================= подписи ================= */
+const labels = [];
+function label(key, parent, p, text) {
+  const el = document.createElement('div'); el.dataset.key = key; el.className = 'lbl'; el.textContent = text || PARTS[key].n;
+  el.addEventListener('pointerdown', e => e.stopPropagation());
+  el.addEventListener('click', e => { e.stopPropagation(); select(key); });
+  const o = new CSS2DObject(el); o.position.set(...p); o.userData.key = key; parent.add(o); labels.push(o); return o;
+}
+label('door', doorPivot, [1.78, 1.95, .2], 'Дверца');
+label('drum', tub, [-1.0, 1.1, -.3], 'Барабан');
+label('tub', tub, [2.5, .6, .8], 'Бак');
+label('heater', tub, [0, -2.85, -.9], 'ТЭН');
+label('motor', tub, [-1.15, 1.45, -2.75], 'Ротор мотора');
+label('stator', tub, [1.05, -.95, -2.45], 'Статор');
+label('inverter', scene, [-1.0, 7.9, -2.6], 'Плата мотора');
+label('bearing', tub, [.45, -.5, -2.1], 'Подшипники');
+label('spider', tub, [.9, -1.0, -1.95], 'Крестовина');
+label('valve', scene, [2.2, 8.75, -2.25], 'Заливной клапан');
+label('dispenser', scene, [-1.9, 8.55, 1.6], 'Лоток для порошка');
+label('bubble', scene, [-2.75, 6.6, 1.05], 'Генератор пузырей');
+label('pressure', scene, [2.0, 8.4, -1.4], 'Датчик уровня');
+label('pump', scene, [1.4, .3, 1.0], 'Насос');
+label('filter', scene, [2.1, 1.25, 2.6], 'Фильтр');
+label('drainhose', scene, [2.55, 8.25, -2.75], 'Сливной шланг');
+label('springs', scene, [-1.6, 7.6, -.3], 'Пружина');
+label('dampers', scene, [-1.5, 1.4, -.3], 'Амортизатор');
+label('counterweight', tub, [0, 3.0, 1.15], 'Противовес');
+label('control', scene, [1.0, 8.65, FZ], 'Плата и дисплей');
+label('dirt', tub, [-2.4, -1.5, -.9], 'Грязь за барабаном');
+label('gasket', scene, [-1.75, 2.6, 2.3], 'Манжета');
+label('lock', scene, [1.9, TY - .5, FZ - .2], 'Замок');
+
+/* ================= разборка ================= */
+const EXP = [];
+function exOff(o, off) { EXP.push({ o, base: o.position.clone(), off: v3(...off) }); }
+const OFF = {
+  control: [0, 1.4, 2.4], dispenser: [-.6, 1.9, 2.4], bubble: [-1.4, .5, 2.4], valve: [1.2, 1.6, -1.6], pressure: [1.3, 1.4, -.4],
+  inverter: [-.3, 1.7, -2.8], mains: [-1.3, 1.2, -2.8], pump: [1.6, -.1, 2.6], filter: [1.6, -.1, 4.0], lock: [1.0, 0, 3.2],
+  gasket: [0, 0, 3.8], heater: [0, 0, 3.2], ntc: [0, 0, 3.2], motor: [0, 0, -2.6], stator: [0, 0, -1.5], hall: [0, 0, -1.5],
+  bearing: [0, 0, -.75], seal: [0, 0, -.35], drum: [0, 0, 2.4], lifter: [0, 0, 2.4], spider: [0, 0, 2.4], shaft: [0, 0, 2.4],
+  clothes: [0, 0, 2.4], counterweight: [0, 1.5, .6], inlet: [0, 0, 0], door: [0, 0, 5.4],
+};
+exOff(drum, OFF.drum); exOff(clothGroup, OFF.drum); exOff(rotor, OFF.motor); exOff(statorG, OFF.stator);
+exOff(bearingG, OFF.bearing); exOff(sealG, OFF.seal); exOff(doorPivot, OFF.door); exOff(impeller, OFF.pump);
+for (const [k, list] of Object.entries(partMeshes)) for (const m of list) {
+  if (m.parent !== scene && m.parent !== tub && m.parent !== cabGroup) continue;
+  let off = null;
+  if (k === 'cabinet') {
+    const q = m.position;
+    off = q.z > 2 ? [0, 0, 4.6] : q.z < -2 ? [0, 0, -4.4] : Math.abs(q.x) > 2.5 ? [Math.sign(q.x) * 3.2, 0, 0] : q.y > 8 ? [0, 3.4, 0] : null;
+    if (off && m.userData.edge) exOff(m.userData.edge, off);
+  } else if (k === 'counterweight') off = m.position.y > 2 ? [0, 1.5, .6] : [Math.sign(m.position.x) * 1.3, -.2, .8];
+  else if (OFF[k] && !['drum', 'lifter', 'spider', 'shaft', 'clothes', 'motor', 'stator', 'hall', 'bearing', 'seal', 'door'].includes(k)) off = OFF[k];
+  if (off) exOff(m, off);
+}
+for (const l of labels) if ((l.parent === scene || l.parent === tub) && OFF[l.userData.key]) exOff(l, OFF[l.userData.key]);
+
+/* ================= изоляция и фокус ================= */
+const ISO_KEYS = { motorAll: ['motor', 'stator', 'hall', 'inverter', 'shaft', 'bearing', 'seal'] };
+const keysOf = k => ISO_KEYS[k] || (k === 'dirt' ? ['dirt'] : [k]);
+const renderables = [];
+scene.traverse(o => { if (o.isMesh || o.isLine) renderables.push(o); });
+cabGroup.children.forEach(o => o.userData.part ||= 'cabinet');
+tubShell.children.forEach(o => o.userData.part ||= 'tub');
+drum.children.forEach(o => o.userData.part ||= 'drum');
+statorG.children.forEach(o => o.userData.part ||= 'stator');
+let iso = null, isoSaved = null, labelsOn = true;
+function setIso(k) {
+  if (k === iso) k = null;
+  if (!iso && k) { isoSaved = { vis: renderables.map(r => r.visible), cab: cabGroup.visible, tub: tubShell.visible }; cabGroup.visible = tubShell.visible = true; }
+  if (iso && !k && isoSaved) { renderables.forEach((r, i) => r.visible = isoSaved.vis[i]); cabGroup.visible = isoSaved.cab; tubShell.visible = isoSaved.tub; }
+  iso = k ? new Set(keysOf(k)) : null; iso && (iso.key = k);
+  $('btnIso').textContent = iso ? '◎ Показать всё' : '◎ Только эта деталь';
+  document.body.classList.toggle('iso', !!iso);
+  applyLabels();
+}
+let focusSet = null;
+function applyLabels() { const f = iso || focusSet; labels.forEach(l => l.visible = labelsOn && (!f || f.has(l.userData.key))); }
+function applyIso() {
+  if (!iso) return;
+  for (const r of renderables) r.visible = !!(r.userData.keep || iso.has(r.userData.part));
+}
+const FOCUS_DIR = { back: [-.55, .35, -1], front: [.6, .2, 1], right: [.9, .45, -.5] };
+const FOCUS_OF = { motorAll: 'back', motor: 'back', stator: 'back', hall: 'back', inverter: 'back', shaft: 'back', bearing: 'back', seal: 'back', spider: 'back', mains: 'back',
+  pump: 'front', filter: 'front', heater: 'front', ntc: 'front', lock: 'front', valve: 'right', pressure: 'right', drainhose: 'right' };
+function focus(k) {
+  const box = new THREE.Box3();
+  let keys = keysOf(k); if (k === 'dirt') keys = ['drum'];
+  scene.updateMatrixWorld(true);
+  for (const kk of keys) for (const m of partMeshes[kk] || []) if (!m.isInstancedMesh) box.expandByObject(m);
+  if (box.isEmpty()) return;
+  const c = box.getCenter(v3(0, 0, 0)), sz = box.getSize(v3(0, 0, 0)).length();
+  const dir = FOCUS_OF[k] ? v3(...FOCUS_DIR[FOCUS_OF[k]]).normalize() : camera.position.clone().sub(controls.target).normalize();
+  const dist = Math.max(3.5, sz * 1.5 + 2.8) * (innerWidth < 760 ? 1.35 : 1);
+  flyTo(c.clone().addScaledVector(dir, dist), c);
+  focusSet = new Set(keysOf(k)); applyLabels();
+}
+let camAnim = null;
+function flyTo(p, t) { camAnim = { p0: camera.position.clone(), t0: controls.target.clone(), p1: p.clone(), t1: t.clone(), k: 0 }; }
+const PLIST = [
+  ['Мотор и привод', ['motorAll', 'motor', 'stator', 'hall', 'inverter', 'shaft', 'bearing', 'seal', 'spider']],
+  ['Барабан, бак, подвеска', ['drum', 'lifter', 'tub', 'counterweight', 'springs', 'dampers', 'dirt', 'clothes']],
+  ['Вода: подача, нагрев, слив', ['inlet', 'valve', 'dispenser', 'bubble', 'pressure', 'heater', 'ntc', 'pump', 'filter', 'drainhose']],
+  ['Корпус и управление', ['cabinet', 'control', 'door', 'lock', 'gasket', 'mains']],
+];
+{
+  const box = $('partList');
+  for (const [title, keys] of PLIST) {
+    const h = document.createElement('h3'); h.textContent = title; box.appendChild(h);
+    const ch = document.createElement('div'); ch.className = 'chips';
+    for (const k of keys) {
+      const b = document.createElement('button'); b.className = 'btn'; b.dataset.k = k; b.textContent = PARTS[k].n.replace(/ \(.*\)$/, '');
+      b.onclick = () => { select(k); focus(k); if (innerWidth < 760) setPanel(false); };
+      ch.appendChild(b);
+    }
+    box.appendChild(ch);
+  }
+}
+
+/* ================= выбор деталей ================= */
+const sel = { key: null, box: new THREE.Box3(), helper: null };
+sel.helper = new THREE.Box3Helper(sel.box, 0x1f6feb); sel.helper.visible = false; scene.add(sel.helper);
+function select(key) {
+  sel.key = key; const p = PARTS[key]; if (!p) return;
+  $('infoTitle').textContent = p.n;
+  let t = p.t;
+  if (key === 'dirt') t += ` Сейчас налёт: ${Math.round(S.dirt * 100)}%.`;
+  if (key === 'heater') t += ` Накипь сейчас: ${Math.round(S.scale * 100)}%.`;
+  if (key === 'filter') t += ` Заполнен на ${Math.round(S.lint * 100)}%.`;
+  $('infoText').textContent = t;
+  $('info').classList.remove('hidden');
+  document.querySelectorAll('#partList .btn').forEach(b => b.classList.toggle('sel', b.dataset.k === key));
+  if (iso && iso.key !== key) setIso(null);
+}
+$('infoClose').onclick = () => { sel.key = null; focusSet = null; setIso(null); $('info').classList.add('hidden'); document.querySelectorAll('#partList .btn').forEach(b => b.classList.remove('sel')); };
+$('btnFocus').onclick = () => sel.key && focus(sel.key);
+$('btnIso').onclick = () => { if (!sel.key) return; const was = !!iso; setIso(sel.key); if (!was) focus(sel.key); };
+const ray = new THREE.Raycaster(); const ndc = new THREE.Vector2();
+let downXY = null;
+renderer.domElement.addEventListener('pointerdown', e => { downXY = [e.clientX, e.clientY]; });
+renderer.domElement.addEventListener('pointerup', e => {
+  if (!downXY || Math.hypot(e.clientX - downXY[0], e.clientY - downXY[1]) > 6) return;
+  const hit = raycast(e); if (hit) select(hit);
+});
+sel.helper.userData.keep = true;
+renderer.domElement.addEventListener('pointermove', e => { if (e.buttons) return; renderer.domElement.style.cursor = raycast(e) ? 'pointer' : 'grab'; });
+function visibleDeep(o) { while (o) { if (!o.visible) return false; o = o.parent; } return true; }
+function raycast(e) {
+  const r = renderer.domElement.getBoundingClientRect();
+  ndc.set((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1);
+  ray.setFromCamera(ndc, camera);
+  const hits = ray.intersectObjects(pick, false).filter(h => visibleDeep(h.object));
+  let shell = null;
+  for (const h of hits) {
+    const k = h.object.userData.part;
+    if ((k === 'cabinet' && cabMat.opacity < .6) || k === 'tub') { shell ||= k; continue; }
+    if (k === 'dirt' && h.object.count === 0) continue;
+    return k;
+  }
+  return shell;
+}
+
+/* ================= модель состояния ================= */
+const T_IN = 15;
+const S = {
+  water: 0, temp: 18, waterDirt: 0, foam: 0, detergent: 1, soft: 1,
+  rpm: 0, washClock: 0, angle: 0,
+  dirt: .12, scale: .08, lint: .1,
+  clothesDirt: 1, wet: 0, clothesOn: true, imbalance: .6,
+  doorOpen: false, doorK: 0, locked: false,
+  out: { valve: false, via: 'main', heater: false, pump: false, motor: 'off', spinRpm: 0, target: 0 },
+  man: { valve: false, heater: false, pump: false, wash: false, spin: false },
+  run: false, paused: false, prog: null, steps: [], idx: 0, stepT: 0, stepV0: 0, stepT0: 0,
+  speed: 1, hint: '', hintWarn: false, ex: 0, exTarget: 0,
+};
+
+const PROGS = [
+  { id: 'c40', name: 'Хлопок 40°', temp: 40, spin: 1200, level: 14, rinseLevel: 14, rinses: 2, washDur: 16, washReal: 45 },
+  { id: 'c60', name: 'Хлопок 60°', temp: 60, spin: 1400, level: 14, rinseLevel: 14, rinses: 2, washDur: 16, washReal: 55 },
+  { id: 'cold', name: 'Холодная 20°', temp: 20, spin: 1000, level: 13, rinseLevel: 13, rinses: 2, washDur: 14, washReal: 35 },
+  { id: 'quick', name: 'Быстрая 15′', temp: 20, spin: 800, level: 11, rinseLevel: 11, rinses: 1, washDur: 8, washReal: 5 },
+  { id: 'clean', name: 'Чистка барабана', temp: 70, spin: 400, level: 26, rinseLevel: 20, rinses: 1, washDur: 22, washReal: 60, clean: true },
+];
+let progSel = PROGS[0];
+
+const TXT = {
+  idle: ['Готова к работе', 'Выберите программу и нажмите «Старт» — или включайте узлы вручную. Нажимайте на детали и подписи, чтобы узнать, как они работают. Сейчас в машине налёт за барабаном ' ],
+  lock: ['Блокировка люка', 'Замок (УБЛ) запирает дверцу. Плата проверяет, что люк закрыт, и опрашивает датчики: уровень воды (прессостат) и температуру (NTC).'],
+  fill: ['Набор воды', 'Заливной клапан открыт. Вода из водопровода идёт по трубке в лоток, смывает порошок из отсека основной стирки, проходит через генератор пузырей (вода + воздух + порошок = пена) и стекает в бак — по зазору между баком и барабаном. Прессостат следит за уровнем: набрали нужное — клапан закрывается. Барабан иногда поворачивается, чтобы бельё намокло.'],
+  fillRinse: ['Набор чистой воды', 'Клапан снова открыт: для полоскания набирается чистая вода. Порошка в отсеке уже нет, поэтому вода идёт без пены.'],
+  fillSoft: ['Вода + кондиционер', 'На последнем полоскании вода направляется в отсек кондиционера и забирает его через сифон в бак.'],
+  heat: ['Нагрев', 'ТЭН в приямке на дне бака греет воду — видно, как он раскаляется и от него поднимаются пузырьки. Датчик NTC сообщает температуру плате. Барабан медленно переворачивает бельё, чтобы вода прогревалась равномерно.'],
+  wash: ['Стирка', 'Мотор вращает барабан ~50 об/мин то в одну, то в другую сторону. Рёбра поднимают бельё и бросают его в воду — грязь выбивается механически, а порошок растворяет жир. Грязь переходит в воду (она мутнеет), а мутная вода проходит сквозь отверстия барабана в зазор за ним. ТЭН подогревает воду, если она остыла.'],
+  clean: ['Очистка барабана', 'Горячая вода (70 °C) с большим уровнем омывает зазор между баком и барабаном и крестовину: биоплёнка и налёт размокают и смываются — смотрите, как исчезают пятна и мутнеет вода. Белья в барабане нет.'],
+  rinse: ['Полоскание', 'Барабан крутит бельё в чистой воде, вымывая остатки порошка и грязи. Вода снова мутнеет — но уже меньше.'],
+  drain: ['Слив', 'Включён сливной насос. Вода уходит из нижней точки бака через фильтр — ворс и мусор остаются в нём — и по шлангу с петлёй в канализацию. Часть грязи оседает на обратной стороне барабана и стенках бака, особенно после холодной стирки.'],
+  spinMid: ['Подотжим', 'Короткий отжим между полосканиями: из белья выжимается грязная мыльная вода, чтобы следующее полоскание было эффективнее.'],
+  spin: ['Отжим', 'Сначала барабан на ~90 об/мин раскладывает бельё по стенкам (выше ~64 об/мин оно уже не падает), затем разгоняется. Центробежная сила выдавливает воду через отверстия — она летит на стенки бака и уходит в насос. Бак трясёт сильнее всего при прохождении резонанса (200–400 об/мин) — пружины и амортизаторы гасят вибрацию. На экране обороты реальные, анимация барабана замедлена.'],
+  done: ['Готово', 'Стирка закончена. Через минуту замок разблокирует дверцу. Совет: оставьте люк и лоток приоткрытыми, чтобы зазор за барабаном просох.'],
+  stop: ['Остановка', 'Программа прервана: насос сначала сливает воду, только потом откроется люк.'],
+  manual: ['Ручной режим', ''],
+};
+
+function buildSteps(p) {
+  const st = [];
+  st.push({ t: 'lock', label: 'Замок', dur: 1.2, real: .5 });
+  st.push({ t: 'fill', label: 'Набор воды', via: 'main', level: p.level, real: 3, txt: 'fill' });
+  if (p.temp > 25) st.push({ t: 'heat', label: `Нагрев ${p.temp}°`, target: p.temp, real: (p.temp - T_IN) * .6 });
+  st.push({ t: 'wash', label: p.clean ? 'Очистка' : 'Стирка', dur: p.washDur, real: p.washReal, target: p.temp, txt: p.clean ? 'clean' : 'wash' });
+  st.push({ t: 'drain', label: 'Слив', real: 1.5 });
+  for (let i = 0; i < p.rinses; i++) {
+    const last = i === p.rinses - 1, soft = last && !p.clean;
+    st.push({ t: 'fill', label: soft ? 'Кондиционер' : 'Вода', via: soft ? 'soft' : 'main', level: p.rinseLevel, real: 2.5, txt: soft ? 'fillSoft' : 'fillRinse' });
+    st.push({ t: 'wash', label: 'Полоскание', dur: 8, real: 6, rinse: true, txt: 'rinse' });
+    st.push({ t: 'drain', label: 'Слив', real: 1.5 });
+    if (!last) st.push({ t: 'spin', label: 'Подотжим', rpm: 600, dur: 6, real: 3, txt: 'spinMid' });
+  }
+  st.push({ t: 'spin', label: `Отжим ${p.spin}`, rpm: p.spin, dur: 13, real: 10, txt: 'spin' });
+  st.push({ t: 'done', label: 'Готово', dur: 2.5, real: .5 });
+  return st;
+}
+
+/* ---------- UI: программы ---------- */
+const progBox = $('progs');
+PROGS.forEach(p => {
+  const b = document.createElement('button'); b.className = 'btn'; b.textContent = p.name; b.dataset.id = p.id;
+  b.setAttribute('aria-pressed', p === progSel); b.onclick = () => { if (S.run) return; progSel = p; syncUI(); renderSteps(); };
+  progBox.appendChild(b);
+});
+$('btnStart').onclick = () => {
+  if (!S.run) startProgram(progSel);
+  else S.paused = !S.paused;
+  syncUI();
+};
+$('btnStop').onclick = () => {
+  if (S.run) {
+    S.steps = [{ t: 'drain', label: 'Слив', real: 1.5, txt: 'stop' }, { t: 'done', label: 'Стоп', dur: 1.5, real: .5 }];
+    S.idx = 0; S.stepT = 0; S.stepV0 = S.water; S.paused = false; S.prog = { name: 'Остановка', temp: 0 };
+  } else {
+    Object.keys(S.man).forEach(k => S.man[k] = false);
+    if (S.water > .1) S.man.pump = true;
+  }
+  renderSteps(); syncUI();
+};
+$('speed').querySelectorAll('button').forEach(b => b.onclick = () => {
+  S.speed = +b.dataset.s; $('speed').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b));
+});
+function startProgram(p) {
+  Object.keys(S.man).forEach(k => S.man[k] = false);
+  S.doorOpen = false;
+  S.prog = p; S.steps = buildSteps(p); S.idx = 0; S.stepT = 0; S.run = true; S.paused = false;
+  S.detergent = 1; S.soft = 1; S.imbalance = rnd(.4, 1); S.exTarget = 0;
+  S.clothesOn = !p.clean;
+  if (S.clothesOn) { S.clothesDirt = 1; }
+  beginStep();
+  renderSteps();
+}
+function beginStep() { S.stepT = 0; S.stepV0 = S.water; S.stepT0 = S.temp; S.washClock = 0; renderSteps(); }
+function nextStep() {
+  S.idx++;
+  if (S.idx >= S.steps.length) { S.run = false; S.prog = null; S.steps = []; S.locked = false; renderSteps(); syncUI(); return; }
+  beginStep();
+}
+
+/* ---------- UI: ручное управление ---------- */
+function hint(t, warn = false) { S.hint = t; S.hintWarn = warn; const h = $('manualHint'); h.textContent = t; h.classList.toggle('warn', warn); }
+$('manual').querySelectorAll('button').forEach(b => b.onclick = () => {
+  const k = b.dataset.m;
+  if (k === 'door') {
+    if (S.doorOpen) { S.doorOpen = false; hint('Дверца закрыта.'); }
+    else if (S.locked) hint('Замок заблокирован: в баке вода или барабан вращается. Слейте воду и остановите барабан.', true);
+    else { S.doorOpen = true; hint('Дверца открыта. Видно стеклянную «чашу», которая заходит в барабан.'); }
+    syncUI(); return;
+  }
+  if (S.run) { hint('Идёт программа. Нажмите «Стоп», чтобы управлять вручную.', true); return; }
+  const on = !S.man[k];
+  if (on && (k === 'valve' || k === 'wash' || k === 'spin') && S.doorOpen) { S.doorOpen = false; }
+  if (k === 'heater' && on && S.water < 3) { hint('ТЭН не включится: прессостат не видит воды. Без воды нагреватель перегорит — это защита.', true); return; }
+  if (k === 'spin' && on && S.water > 2) { hint('Сначала слейте воду: плата не начнёт отжим, пока бак полон (слишком тяжело и опасно для подшипников).', true); return; }
+  if (k === 'wash' && on) S.man.spin = false;
+  if (k === 'spin' && on) { S.man.wash = false; S.man.pump = true; }
+  if (k === 'valve' && on) S.man.pump = false;
+  if (k === 'pump' && on) S.man.valve = false;
+  S.man[k] = on;
+  if (k === 'valve') hint(on ? 'Клапан открыт: вода идёт через лоток в бак.' : 'Клапан закрыт.');
+  if (k === 'heater') hint(on ? 'ТЭН греет воду. Следите за температурой.' : 'ТЭН выключен.');
+  if (k === 'pump') hint(on ? 'Насос откачивает воду через фильтр.' : 'Насос выключен.');
+  if (k === 'wash') hint(on ? 'Барабан качает бельё: ~50 об/мин, смена направления.' : 'Барабан остановлен.');
+  if (k === 'spin') hint(on ? 'Отжим: разгон до 1200 об/мин.' : 'Отжим остановлен.');
+  syncUI();
+});
+
+/* ---------- UI: грязь, вид ---------- */
+$('btnAge').onclick = () => {
+  S.dirt = clamp(S.dirt + .35, 0, 1); S.scale = clamp(S.scale + .25, 0, 1); S.lint = clamp(S.lint + .4, 0, 1);
+  hint('Прошло 30 стирок на 40 °C с жёсткой водой: за барабаном налёт, на ТЭНе накипь, фильтр забивается. Запустите «Чистку барабана».');
+  if (sel.key) select(sel.key);
+};
+$('btnFilter').onclick = () => {
+  if (S.water > 1) { hint('Сначала слейте воду — иначе она выльется на пол через лючок фильтра.', true); return; }
+  S.lint = 0; hint('Фильтр очищен: ворс, волосы и пара монет вынуты. Слив снова быстрый.');
+  if (sel.key) select(sel.key);
+};
+const opIn = $('op');
+function applyOpacity() {
+  const v = 1 - opIn.value / 100; // 0..1 непрозрачность
+  cabMat.opacity = .03 + v * .97; cabMat.depthWrite = v > .95;
+  edgeMat.opacity = .25 + .45 * (1 - v);
+  ctrlMat.opacity = .12 + v * .88; drawerFrontMat.opacity = .12 + v * .88;
+  $('vOp').textContent = opIn.value + '%';
+}
+opIn.oninput = applyOpacity; applyOpacity();
+function toggleBtn(id, fn) { const b = $(id); b.onclick = () => { const on = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', on); fn(on); }; }
+toggleBtn('tCab', on => { cabGroup.visible = on; });
+toggleBtn('tTub', on => { tubShell.visible = on; });
+toggleBtn('tLbl', on => { labelsOn = on; applyLabels(); });
+toggleBtn('tRot', on => { controls.autoRotate = on; controls.autoRotateSpeed = 1.2; });
+const CAMS = {
+  iso: [[11, 8.5, 14], [0, 4.2, 0]], front: [[0, 4.8, 15], [0, 4.2, 0]], side: [[19, 5, -.3], [0, 4.2, -.3]],
+  back: [[-7, 7, -13], [0, 4.2, -1]], low: [[7, .6, 9], [0, 2.4, 0]], motor: [[-4.5, 6.2, -9.5], [0, 4.2, -2.4]],
+  exploded: [[17, 11, 20], [0, 4.2, .5]],
+};
+function goCam(k) { focusSet = null; applyLabels(); const [p, t] = CAMS[k]; const m = innerWidth < 760 ? 1.3 : 1; flyTo(v3(...t).lerp(v3(...p), m), v3(...t)); }
+$('cams').querySelectorAll('button').forEach(b => b.onclick = () => goCam(b.dataset.c));
+const panelEl = $('panel');
+function setPanel(open) { panelEl.classList.toggle('closed', !open); document.body.classList.toggle('nopanel', !open); $('panelToggle').setAttribute('aria-pressed', open); }
+setPanel(innerWidth >= 760);
+$('panelToggle').onclick = () => { document.body.classList.remove('clean'); $('cleanToggle').setAttribute('aria-pressed', false); setPanel(panelEl.classList.contains('closed')); };
+$('panelHide').onclick = () => setPanel(false);
+function toggleClean() { const c = document.body.classList.toggle('clean'); $('cleanToggle').setAttribute('aria-pressed', c); }
+$('cleanToggle').onclick = toggleClean;
+addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  if (e.code === 'KeyH') toggleClean();
+  if (e.key === 'Escape') { setIso(null); }
+});
+document.querySelectorAll('.tab').forEach(t => t.onclick = () => {
+  document.querySelectorAll('.tab').forEach(x => x.setAttribute('aria-selected', x === t));
+  document.querySelectorAll('.pane').forEach(p => p.classList.toggle('hidden', p.dataset.pane !== t.dataset.tab));
+});
+$('ex').oninput = () => { if (S.run) return; S.exTarget = $('ex').value / 100; };
+$('btnEx').onclick = () => { if (S.run) { hint('Во время программы машину не разобрать — нажмите «Стоп».', true); return; } S.exTarget = 1; goCam('exploded'); };
+$('btnAsm').onclick = () => { S.exTarget = 0; };
+
+function syncUI() {
+  progBox.querySelectorAll('button').forEach(b => { b.setAttribute('aria-pressed', b.dataset.id === progSel.id); b.disabled = S.run; });
+  $('btnStart').textContent = !S.run ? '▶ Старт' : S.paused ? '▶ Продолжить' : '⏸ Пауза';
+  $('ex').disabled = S.run; $('btnEx').disabled = S.run;
+  $('manual').querySelectorAll('button').forEach(b => {
+    const k = b.dataset.m;
+    b.setAttribute('aria-pressed', k === 'door' ? S.doorOpen : (S.run ? false : S.man[k]));
+    if (k !== 'door') b.disabled = S.run;
+  });
+}
+function renderSteps() {
+  const box = $('steps'); box.innerHTML = '';
+  const steps = S.run ? S.steps : buildSteps(progSel);
+  steps.forEach((s, i) => {
+    const e = document.createElement('span'); e.className = 'st'; e.textContent = s.label;
+    if (S.run) { if (i < S.idx) e.classList.add('done'); if (i === S.idx) e.classList.add('cur'); }
+    box.appendChild(e);
+  });
+  const cur = box.querySelector('.cur'); if (cur) cur.scrollIntoView({ block: 'nearest', inline: 'center' });
+}
+
+/* ================= логика программы ================= */
+function washPattern(dt, rpm = 50) {
+  S.washClock += dt;
+  const ph = S.washClock % 8;
+  return ph < 3.4 ? rpm : ph < 4 ? 0 : ph < 7.4 ? -rpm : 0;
+}
+function programTick(dt) {
+  const o = S.out; o.valve = false; o.heater = false; o.pump = false; o.motor = 'off'; o.target = 0;
+  if (!S.run) {
+    // ручной режим
+    const m = S.man;
+    if (m.valve) { o.valve = true; o.via = S.detergent > .05 ? 'main' : 'main'; if (S.water >= 28) { m.valve = false; hint('Прессостат: максимальный уровень — клапан закрыт автоматически.'); syncUI(); } }
+    if (m.heater) { if (S.water < 3) { m.heater = false; hint('Воды мало — плата отключила ТЭН (защита).', true); syncUI(); } else o.heater = S.temp < 90; }
+    if (m.pump) o.pump = true;
+    if (m.wash) { o.motor = 'wash'; o.target = washPattern(dt); }
+    if (m.spin) { o.motor = 'spin'; o.target = S.water > 2 ? 0 : 1200; o.pump = true; }
+    S.locked = Math.abs(S.rpm) > 1 || S.water > 6 || m.spin || m.wash;
+    return;
+  }
+  S.locked = true;
+  if (S.paused) return;
+  const s = S.steps[S.idx]; S.stepT += dt;
+  switch (s.t) {
+    case 'lock':
+      S.doorOpen = false;
+      if (S.stepT >= s.dur) nextStep(); break;
+    case 'fill':
+      o.valve = true; o.via = s.via;
+      if (S.clothesOn && S.stepT % 6 < 2) { o.motor = 'wash'; o.target = 25 * (S.stepT % 12 < 6 ? 1 : -1); }
+      if (S.water >= s.level) nextStep(); break;
+    case 'heat':
+      o.heater = true; o.motor = 'wash'; o.target = washPattern(dt, 35);
+      if (S.temp >= s.target) nextStep(); break;
+    case 'wash':
+      o.motor = 'wash'; o.target = washPattern(dt, s.rinse ? 45 : 52);
+      if (!s.rinse && s.target > 25 && S.temp < s.target - 1.5) o.heater = true;
+      if (S.stepT >= s.dur) nextStep(); break;
+    case 'drain':
+      o.pump = true;
+      if (S.water <= .02) { if (!s.hold) s.hold = S.stepT; if (S.stepT - s.hold > .8) nextStep(); }
+      break;
+    case 'spin': {
+      o.pump = true; o.motor = 'spin';
+      const k = S.stepT / s.dur;
+      o.target = k < .18 ? 90 : k < .85 ? s.rpm : 0;
+      if (S.stepT >= s.dur && Math.abs(S.rpm) < 3) nextStep();
+      break;
+    }
+    case 'done':
+      if (S.stepT > s.dur * .6) S.locked = false;
+      if (S.stepT >= s.dur) { S.locked = false; nextStep(); }
+      break;
+  }
+}
+
+function physicsTick(dt) {
+  const o = S.out;
+  // залив
+  if (o.valve) {
+    const dV = 2.4 * dt;
+    S.temp = (S.temp * S.water + T_IN * dV) / (S.water + dV);
+    S.waterDirt *= S.water / (S.water + dV);
+    S.water += dV;
+    if (o.via === 'main' && S.detergent > 0) { const d = Math.min(S.detergent, .22 * dt); S.detergent -= d; S.foam = Math.min(1.2, S.foam + d * 1.4); }
+    if (o.via === 'soft' && S.soft > 0) S.soft = Math.max(0, S.soft - .3 * dt);
+  }
+  // слив
+  S.drainRate = 0;
+  if (o.pump && S.water > 0) {
+    const rate = 3.2 * (1 - .8 * S.lint * S.lint);
+    const dV = Math.min(S.water, rate * dt); S.drainRate = rate;
+    const tf = S.temp < 40 ? 1.8 : S.temp < 60 ? 1 : .35;
+    S.dirt = clamp(S.dirt + dV * S.waterDirt * .0011 * tf, 0, 1);
+    S.lint = clamp(S.lint + dV * S.waterDirt * .0016, 0, 1);
+    S.water -= dV;
+    if (S.water < 1) S.foam *= Math.pow(.2, dt);
+  }
+  if (S.water <= 0.001) { S.water = 0; S.waterDirt = Math.max(0, S.waterDirt - dt * .5); S.foam = Math.max(0, S.foam - dt * .5); }
+  // нагрев
+  if (o.heater && S.water >= 3) {
+    S.temp += 42 / S.water * (1 - .45 * S.scale) * dt;
+    S.scale = clamp(S.scale + dt * .0007, 0, 1);
+  }
+  S.temp += ((S.water > .5 ? 18 : 20) - S.temp) * (S.water > .5 ? .004 : .05) * dt;
+  // мотор
+  const acc = o.motor === 'spin' ? 260 : 70;
+  S.rpm += clamp(o.target - S.rpm, -acc * dt, acc * dt);
+  // стирка: грязь из белья в воду
+  const turning = Math.abs(S.rpm) > 10 && Math.abs(S.rpm) < 100;
+  if (turning && S.water > 3) {
+    if (S.clothesOn) {
+      const k = .028 * (1 + S.temp / 40) * (S.foam > .1 ? 1.5 : 1);
+      const d = S.clothesDirt * k * dt; S.clothesDirt -= d; S.waterDirt = clamp(S.waterDirt + d * .75 * 14 / Math.max(S.water, 6), 0, 1);
+    }
+    if (S.temp >= 50) { // горячая вода смывает налёт за барабаном
+      const d = Math.min(S.dirt, dt * .016 * (S.temp / 70)); S.dirt -= d; S.waterDirt = clamp(S.waterDirt + d * 1.6, 0, 1);
+      if (S.prog && S.prog.clean) S.scale = Math.max(0, S.scale - dt * .006);
+    }
+    S.foam = Math.max(0, S.foam - dt * .01);
+  }
+  if (S.water > 2 && S.clothesOn) S.wet = 1;
+  if (Math.abs(S.rpm) > 300 && S.wet > 0) S.wet = Math.max(.08, S.wet - dt * .11 * Math.abs(S.rpm) / 1200);
+}
+
+/* ================= анимация ================= */
+const G = 98; // дм/с²
+function visOmega(rpm) { const a = Math.abs(rpm); const rps = a <= 60 ? a / 60 : 1 + (a - 60) / 1340 * 2.2; return Math.sign(rpm) * rps * Math.PI * 2; }
+const tmpC = new THREE.Color(), dObj = new THREE.Object3D();
+const WATER_CLEAN = new THREE.Color(0x4aa8ff), WATER_DIRTY = new THREE.Color(0x8c7a55);
+let time = 0;
+
+function animate(dtReal) {
+  time += dtReal;
+  const w = visOmega(S.rpm), wReal = S.rpm / 60 * Math.PI * 2;
+  S.angle += w * dtReal; drum.rotation.z = S.angle; rotor.rotation.z = S.angle;
+  S.ex += (S.exTarget - S.ex) * Math.min(1, dtReal * 3); if (Math.abs(S.exTarget - S.ex) < .001) S.ex = S.exTarget;
+  for (const e of EXP) e.o.position.copy(e.base).addScaledVector(e.off, S.ex);
+  const flowOK = S.ex < .03;
+
+  // вибрация бака
+  const a = Math.abs(S.rpm);
+  const amp = (a > 120 ? .012 * a / 1000 + .09 * Math.exp(-Math.pow((a - 300) / 90, 2)) : a > 5 ? .008 : 0) * S.imbalance;
+  tub.position.set(tubBase.x + Math.sin(time * 37) * amp, tubBase.y + Math.cos(time * 37) * amp * .7 - S.water * .004, tubBase.z + Math.sin(time * 23) * amp * .3);
+  tub.updateMatrixWorld();
+  for (const s of springs) {
+    const b = s.local.clone().applyMatrix4(tub.matrixWorld);
+    const d = b.clone().sub(s.top); const L = d.length();
+    s.m.position.copy(s.top); s.m.quaternion.setFromUnitVectors(v3(0, -1, 0), d.normalize()); s.m.scale.set(1, L, 1);
+  }
+
+  // вода
+  const h = levelFromLiters(S.water);
+  const surfY = -TUB_R + h;
+  clipPlane.constant = tub.position.y + surfY + .001;
+  const hasW = S.water > .02;
+  waterMat.visible = hasW;
+  tmpC.copy(WATER_CLEAN).lerp(WATER_DIRTY, clamp(S.waterDirt * .8, 0, .8));
+  waterMat.color.copy(tmpC); surfMat.color.copy(tmpC).offsetHSL(0, 0, .12);
+  waterMat.opacity = .36 + S.waterDirt * .14;
+  surf.visible = hasW && h > .03;
+  if (surf.visible) {
+    const chord = 2 * Math.sqrt(Math.max(0, WR * WR - (WR - h) * (WR - h)));
+    surf.scale.x = Math.max(.01, chord * .995); surf.position.y = surfY;
+    const pa = surfGeo.attributes.position; const wav = .02 + Math.min(.08, Math.abs(S.rpm) / 600) + (S.out.valve ? .03 : 0);
+    for (let i = 0; i < pa.count; i++) {
+      const x = surfBase[i * 3], z = surfBase[i * 3 + 2];
+      pa.setY(i, Math.sin(x * 9 + time * 3.1) * wav * .5 + Math.cos(z * 2.4 - time * 2.2) * wav * .4 + x * Math.sin(time * 1.3) * wav * Math.sign(S.rpm || 0) * 1.5);
+    }
+    pa.needsUpdate = true;
+  }
+
+  // ТЭН
+  const heat = S.out.heater && S.water >= 3;
+  const hot = clamp((S.temp - 20) / 60, 0, 1);
+  heaterMat.emissiveIntensity += ((heat ? .9 + Math.sin(time * 6) * .1 : hot * .12) - heaterMat.emissiveIntensity) * Math.min(1, dtReal * 3);
+  heaterMat.color.setHex(0xb87333).lerp(tmpC.setHex(0xd6cfbf), S.scale * .85);
+  scaleMesh.count = Math.floor(S.scale * 220);
+  // пузырьки нагрева
+  hBub.visible = heat;
+  if (heat) {
+    for (let i = 0; i < HB_N; i++) {
+      const p = hbP[i]; const u = (p.ph + time * .8) % 1;
+      const y = HY + u * (surfY - HY);
+      const s = y < surfY - .02 ? p.s : 0;
+      _m.makeScale(s, s, s).setPosition(p.x + Math.sin(time * 5 + i) * .03, y, p.z); hBub.setMatrixAt(i, _m);
+    }
+    hBub.instanceMatrix.needsUpdate = true;
+  }
+
+  // пена
+  const foamN = hasW && h > .25 ? Math.floor(clamp(S.foam, 0, 1) * FOAM_N) : 0;
+  foam.count = foamN;
+  if (foamN) {
+    const chord = 2 * Math.sqrt(Math.max(0, WR * WR - (WR - h) * (WR - h)));
+    for (let i = 0; i < foamN; i++) {
+      const p = foamP[i];
+      _m.makeScale(p.s, p.s * .7, p.s).setPosition((p.u - .5) * chord * .9, surfY + .03 + Math.sin(time * 2 + p.ph) * .02, TUB_ZC + (p.v - .5) * (WL - .2));
+      foam.setMatrixAt(i, _m);
+    }
+    foam.instanceMatrix.needsUpdate = true;
+  }
+  // взвесь грязи
+  const speckN = hasW ? Math.floor(clamp(S.waterDirt, 0, 1) * SPECK_N) : 0;
+  specks.count = speckN;
+  if (speckN) {
+    for (let i = 0; i < speckN; i++) {
+      const p = speckP[i]; p.a += (w * .25 + .1) * dtReal * p.w;
+      const x = Math.cos(p.a) * p.r, y = Math.sin(p.a) * p.r;
+      const s = y < surfY - .03 ? p.s : 0;
+      _m.makeScale(s, s, s).setPosition(x, y, p.z); specks.setMatrixAt(i, _m);
+    }
+    specks.instanceMatrix.needsUpdate = true;
+  }
+  // брызги отжима
+  if (Math.abs(S.rpm) > 250 && S.wet > .1 && S.clothesOn) {
+    const n = Math.floor(dtReal * 260 * S.wet);
+    for (let k = 0, j = 0; k < n && j < SPRAY_N; j++) if (sprayP[j].life <= 0) { sprayP[j].life = 1; sprayP[j].a = rnd(0, 6.28); sprayP[j].z = rnd(DR_Z0 + .2, DR_Z1 - .2); k++; }
+  }
+  for (let i = 0; i < SPRAY_N; i++) {
+    const p = sprayP[i];
+    if (p.life > 0) {
+      p.life -= dtReal * 4; p.a += w * dtReal * .5;
+      const r = DR_R + (1 - p.life) * .27, s = Math.max(0, p.life) * .045 + .01;
+      _m.makeScale(s, s, s).setPosition(Math.cos(p.a) * r, Math.sin(p.a) * r, p.z);
+    } else _m.makeScale(0, 0, 0);
+    spray.setMatrixAt(i, _m);
+  }
+  spray.instanceMatrix.needsUpdate = true;
+
+  // грязь за барабаном
+  dirtDrum.count = Math.floor(S.dirt * SPOTS);
+  dirtTub.count = Math.floor(S.dirt * SPOTS * .8);
+  lintMesh.visible = S.lint > .02; lintMesh.scale.set(.4 + S.lint * .6, Math.max(.02, S.lint), .4 + S.lint * .6);
+
+  // бельё
+  clothGroup.visible = S.clothesOn;
+  if (S.clothesOn) {
+    const sub = 3, dt = dtReal / sub;
+    for (let it = 0; it < sub; it++) for (const c of clothes) {
+      if (c.st === 'wall') {
+        if (Math.abs(wReal) < .4) { c.a += (c.rest - c.a) * Math.min(1, dt * 2.5); }
+        else c.a += w * dt;
+        c.a = Math.atan2(Math.sin(c.a), Math.cos(c.a));
+        const need = -(wReal * wReal * c.Rw) / G + c.th;
+        if (Math.cos(c.a) < need && (Math.abs(wReal) > .4 || Math.cos(c.a) < -.05)) {
+          c.st = 'fly'; c.x = Math.sin(c.a) * c.Rw; c.y = -Math.cos(c.a) * c.Rw;
+          c.vx = w * c.Rw * Math.cos(c.a); c.vy = w * c.Rw * Math.sin(c.a); c.th = rnd(-.25, .2);
+        }
+      } else {
+        c.vy -= G * dt * .35;
+        if (c.y < surfY) { c.vx *= 1 - 3 * dt; c.vy *= 1 - 3 * dt; }
+        c.x += c.vx * dt; c.y += c.vy * dt;
+        c.m.rotation.z += c.spin * dt;
+        if (Math.hypot(c.x, c.y) >= c.Rw) { c.st = 'wall'; c.a = Math.atan2(c.x, -c.y); }
+      }
+    }
+    for (const c of clothes) {
+      if (c.st === 'wall') { c.m.position.set(Math.sin(c.a) * c.Rw, -Math.cos(c.a) * c.Rw, c.z); c.m.rotation.set(0, 0, c.a + Math.sin(c.rot0) * .2); }
+      else c.m.position.set(c.x, c.y, c.z);
+      c.mat.color.copy(c.base).lerp(DIRTY, .55 * S.clothesDirt);
+    }
+  }
+
+  // мотор: вращающееся поле в статоре
+  const motorOn = Math.abs(S.out.target) > 0 || Math.abs(S.rpm) > 2;
+  for (let i = 0; i < coilMats.length; i++) {
+    const ph = i / coilMats.length * Math.PI * 2 * 4 - S.angle * 8;
+    coilMats[i].emissiveIntensity = motorOn ? Math.max(0, Math.cos(ph)) * 1.2 : 0;
+  }
+  impeller.rotation.z += (S.out.pump ? 30 : 0) * dtReal;
+
+  // потоки
+  const viaMain = S.out.valve && S.out.via === 'main', viaSoft = S.out.valve && S.out.via === 'soft';
+  fInlet.update(dtReal, flowOK && S.out.valve);
+  fMain.update(dtReal, flowOK && viaMain); fSoft.update(dtReal, flowOK && viaSoft);
+  fFill.update(dtReal, flowOK && S.out.valve); fFoam.update(dtReal, flowOK && viaMain && S.detergent > .05);
+  fPour.update(dtReal, flowOK && S.out.valve);
+  const draining = flowOK && S.out.pump && (S.water > .02 || (Math.abs(S.rpm) > 250 && S.wet > .1 && S.clothesOn));
+  const dc = tmpC.copy(WATER_CLEAN).lerp(WATER_DIRTY, clamp(S.waterDirt, 0, .9));
+  fDrain1.mat.color.copy(dc); fDrain2.mat.color.copy(dc);
+  const slow = 1 - .8 * S.lint * S.lint;
+  fDrain1.update(dtReal, draining, slow); fDrain2.update(dtReal, draining, slow);
+
+  // лоток
+  powder.scale.y = Math.max(.01, S.detergent); powder.visible = S.detergent > .02;
+  softener.scale.y = Math.max(.01, S.soft); softener.visible = S.soft > .02;
+
+  // дверца и индикаторы
+  S.doorK += ((S.doorOpen ? 1 : 0) - S.doorK) * Math.min(1, dtReal * 4);
+  doorPivot.rotation.y = -1.75 * S.doorK;
+  lockLed.emissiveIntensity = S.locked ? 1.6 : 0;
+  valveLed.emissiveIntensity = S.out.valve ? 2 : 0;
+  pressLed.emissiveIntensity = clamp(S.water / 14, 0, 1) * 1.6;
+  knob.rotation.y = S.run ? (PROGS.indexOf(S.prog) + 1) * .6 : PROGS.indexOf(progSel) * .6;
+
+  // выделение
+  applyIso();
+  if (sel.key && sel.key !== 'dirt' && sel.key !== 'cabinet' && !iso) {
+    sel.box.makeEmpty();
+    for (const kk of keysOf(sel.key)) for (const m of partMeshes[kk] || []) if (!m.isInstancedMesh && visibleDeep(m)) sel.box.expandByObject(m);
+    sel.helper.visible = !sel.box.isEmpty();
+  } else sel.helper.visible = false;
+}
+
+/* ================= HUD ================= */
+let hudT = 0;
+function remainingMin() {
+  if (!S.run) return null;
+  let t = 0;
+  S.steps.forEach((s, i) => {
+    if (i < S.idx) return;
+    if (i > S.idx) { t += s.real; return; }
+    let p = 0;
+    if (s.t === 'fill') p = S.water / s.level;
+    else if (s.t === 'heat') p = (S.temp - S.stepT0) / Math.max(1, s.target - S.stepT0);
+    else if (s.t === 'drain') p = S.stepV0 > 0 ? 1 - S.water / S.stepV0 : 1;
+    else p = S.stepT / (s.dur || 1);
+    t += s.real * (1 - clamp(p, 0, 1));
+  });
+  return Math.max(1, Math.round(t));
+}
+function power() {
+  let p = 2;
+  if (S.out.valve) p += 8;
+  if (S.out.heater && S.water >= 3) p += 2000;
+  if (Math.abs(S.rpm) > 2) p += Math.abs(S.rpm) > 120 ? 120 + Math.abs(S.rpm) * .3 : 110;
+  if (S.out.pump) p += 30;
+  return p;
+}
+function phaseText() {
+  if (S.run) {
+    const s = S.steps[S.idx];
+    const k = s.txt || s.t;
+    return { title: (S.paused ? 'Пауза · ' : '') + (TXT[k] || TXT.wash)[0], text: (TXT[k] || TXT.wash)[1], short: s.label };
+  }
+  const m = S.man, on = [];
+  if (m.valve) on.push(TXT.fill[1]);
+  if (m.heater) on.push(TXT.heat[1]);
+  if (m.wash) on.push(TXT.wash[1]);
+  if (m.spin) on.push(TXT.spin[1]);
+  if (m.pump && !m.spin) on.push(TXT.drain[1]);
+  if (on.length) return { title: 'Ручной режим', text: on.join(' '), short: 'Ручной режим' };
+  return { title: TXT.idle[0], text: TXT.idle[1] + `${Math.round(S.dirt * 100)}%, накипь на ТЭНе ${Math.round(S.scale * 100)}%.` + (S.dirt > .4 ? ' Пора запустить «Чистку барабана».' : ''), short: 'Ожидание' };
+}
+function drawDisplay(rem) {
+  const g = dispCanvas.getContext('2d'); const Wd = dispCanvas.width, Hd = dispCanvas.height;
+  g.fillStyle = '#05080c'; g.fillRect(0, 0, Wd, Hd);
+  g.fillStyle = '#5ee0ff'; g.font = '600 46px ui-monospace,Menlo,monospace'; g.textBaseline = 'middle';
+  const tt = rem == null ? '-:--' : `${Math.floor(rem / 60)}:${String(rem % 60).padStart(2, '0')}`;
+  g.fillText(tt, 14, 42);
+  g.font = '600 26px ui-monospace,Menlo,monospace'; g.fillStyle = '#ffb347';
+  g.fillText(`${Math.round(S.temp)}°`, 200, 30);
+  g.fillStyle = '#9fe870'; g.fillText(`${Math.round(Math.abs(S.rpm))}`, 200, 70);
+  g.font = '500 16px system-ui'; g.fillStyle = '#7f8ea3';
+  g.fillText(S.locked ? '🔒' : '', 280, 30);
+  g.fillText(S.out.heater ? 'нагрев' : S.out.valve ? 'вода' : '', 14, 92);
+  dispTex.needsUpdate = true;
+}
+let lastPhase = '';
+function hud(dt) {
+  hudT += dt; if (hudT < .15) return; hudT = 0;
+  const ph = phaseText();
+  $('rPhase').textContent = ph.short;
+  $('rWater').textContent = `${S.water.toFixed(1)} л`;
+  $('rTemp').textContent = `${Math.round(S.temp)} °C`;
+  $('rRpm').textContent = `${Math.round(Math.abs(S.rpm))}`;
+  $('rPow').textContent = `${Math.round(power())} Вт`;
+  const rem = remainingMin();
+  $('rTime').textContent = rem == null ? '—' : `${Math.floor(rem / 60)}:${String(rem % 60).padStart(2, '0')}`;
+  $('rCloth').textContent = !S.clothesOn ? 'нет' : S.clothesDirt > .6 ? 'грязное' : S.clothesDirt > .2 ? 'отстирывается' : (S.wet > .5 ? 'чистое, мокрое' : 'чистое');
+  const leds = { valve: S.out.valve, heater: S.out.heater && S.water >= 3, motor: Math.abs(S.rpm) > 2, pump: S.out.pump, lock: S.locked };
+  document.querySelectorAll('.led').forEach(l => l.classList.toggle('on', !!leds[l.dataset.k]));
+  if (ph.title + ph.text !== lastPhase) { lastPhase = ph.title + ph.text; $('stepTitle').textContent = ph.title; $('stepText').textContent = ph.text; }
+  const pct = (id, v) => { $('v' + id).textContent = Math.round(v * 100) + '%'; $('f' + id).style.width = (v * 100).toFixed(1) + '%'; };
+  pct('Dirt', S.dirt); pct('Scale', S.scale); pct('Lint', S.lint);
+  $('vEx').textContent = Math.round(S.exTarget * 100) + '%'; if (document.activeElement !== $('ex')) $('ex').value = Math.round(S.exTarget * 100);
+  drawDisplay(rem);
+  syncUI();
+}
+
+/* ================= цикл ================= */
+const clock = new THREE.Clock();
+function frame() {
+  const dt = Math.min(.05, clock.getDelta());
+  const sdt = dt * S.speed;
+  programTick(sdt);
+  if (!S.paused) physicsTick(sdt); else { S.out.valve = S.out.heater = S.out.pump = false; S.out.target = 0; physicsTick(sdt); }
+  animate(dt);
+  if (camAnim) {
+    camAnim.k = Math.min(1, camAnim.k + dt * 1.6); const e = 1 - Math.pow(1 - camAnim.k, 3);
+    camera.position.lerpVectors(camAnim.p0, camAnim.p1, e); controls.target.lerpVectors(camAnim.t0, camAnim.t1, e);
+    if (camAnim.k >= 1) camAnim = null;
+  }
+  controls.update();
+  hud(dt);
+  renderer.render(scene, camera);
+  labelRenderer.render(scene, camera);
+  requestAnimationFrame(frame);
+}
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight); labelRenderer.setSize(innerWidth, innerHeight);
+  fitCamera();
+});
+function fitCamera() {
+  if (innerWidth < 760) { camera.fov = 52; camera.updateProjectionMatrix(); }
+  else { camera.fov = 38; camera.updateProjectionMatrix(); }
+}
+fitCamera();
+if (innerWidth < 760) { labelsOn = false; applyLabels(); $('tLbl').setAttribute('aria-pressed', 'false'); }
+syncUI(); renderSteps();
+$('loading').remove();
+frame();
+window.__S = S;
+</script>
+</body>
+</html>
