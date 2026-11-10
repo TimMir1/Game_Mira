@@ -102,7 +102,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 #info .acts .btn{flex:1}
 
 #fab{position:fixed;top:16px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:6}
-.fabb{position:static;padding:8px 13px;border-radius:12px;cursor:pointer;font-size:13px;font-weight:600;white-space:nowrap}
+.fabb{position:static;text-decoration:none;color:inherit;padding:8px 13px;border-radius:12px;cursor:pointer;font-size:13px;font-weight:600;white-space:nowrap}
 .fabb[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
 #panel.closed{display:none}
 body.nopanel #explain{right:16px}
@@ -287,7 +287,7 @@ body.iso #explain{display:none}
   <p id="infoText"></p>
   <div class="acts"><button class="btn" id="btnFocus">🔍 Приблизить</button><button class="btn" id="btnIso">◎ Только эта деталь</button></div>
 </div>
-<div id="fab"><button id="panelToggle" class="card fabb" aria-pressed="true" title="Панель управления">⚙<span class="t"> Панель</span></button><button id="cleanToggle" class="card fabb" aria-pressed="false" title="Скрыть все панели (клавиша H)">👁<span class="t"> Только модель</span></button></div>
+<div id="fab"><a href="../index.html" class="card fabb" title="На главную">🏠<span class="t"> Главная</span></a><a href="../washer/index.html" class="card fabb" title="Стиральная машина">🧺<span class="t"> Стиральная машина</span></a><button id="panelToggle" class="card fabb" aria-pressed="true" title="Панель управления">⚙<span class="t"> Панель</span></button><button id="cleanToggle" class="card fabb" aria-pressed="false" title="Скрыть все панели (клавиша H)">👁<span class="t"> Только модель</span></button></div>
 
 <script type="importmap">
 {"imports":{
