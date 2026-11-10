@@ -1,0 +1,990 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Говорилка</title>
+<meta name="theme-color" content="#fff4e6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Говорилка">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" href="icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg1:#fff4e6;--bg2:#e8f4ff;--ink:#3b3550;--soft:#7a7290;
+  --card:#ffffff;--shadow:0 10px 30px rgba(80,60,120,.15);
+  --pink:#ff8fb1;--orange:#ffb35c;--green:#7fd38a;--blue:#7cc4ff;--violet:#b49cff;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;background:linear-gradient(160deg,var(--bg1),var(--bg2));background-color:var(--bg1);
+  color:var(--ink);font-family:Nunito,"Arial Rounded MT Bold",system-ui,sans-serif;
+  user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;padding:0}
+.screen{position:fixed;inset:0;display:none;flex-direction:column;
+  padding:calc(12px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom))}
+.screen.on{display:flex}
+.emoji{font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;line-height:1}
+
+/* ---------- home ---------- */
+#home header{display:flex;justify-content:space-between;align-items:center}
+#home h1{margin:6px 0 0;font-size:34px;font-weight:900;letter-spacing:-.5px;text-align:center}
+#home h1 span{display:inline-block;animation:bob 2.4s ease-in-out infinite}
+#home h1 span:nth-child(2n){animation-delay:.3s}
+.pill{display:flex;align-items:center;gap:6px;background:var(--card);border-radius:999px;padding:8px 14px;font-weight:900;font-size:20px;box-shadow:var(--shadow)}
+.gear{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.6);display:grid;place-items:center;font-size:22px;position:relative}
+.gear svg{position:absolute;inset:0;transform:rotate(-90deg)}
+.gear circle{fill:none;stroke:var(--violet);stroke-width:4;stroke-dasharray:126;stroke-dashoffset:126}
+.tiles{flex:1;display:grid;gap:12px;grid-template-columns:1fr 1fr;grid-template-rows:repeat(3,1fr);margin-top:12px;min-height:0}
+.tile{border-radius:28px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:6px;padding:8px;text-align:center;box-shadow:var(--shadow);position:relative;overflow:hidden;
+  transition:transform .15s}
+.tile:active{transform:scale(.96)}
+.tile .emoji{font-size:clamp(48px,9vh,84px);filter:drop-shadow(0 6px 6px rgba(0,0,0,.12))}
+.tile b{font-size:clamp(16px,2.5vh,22px);font-weight:900;text-align:center;line-height:1.1}
+.tile small{display:block;font-size:12px;font-weight:700;opacity:.75;margin-top:4px}
+.t1{background:linear-gradient(135deg,#ffd9a8,#ffb35c)}
+.t2{background:linear-gradient(135deg,#c8f2cf,#7fd38a)}
+.t3{background:linear-gradient(135deg,#d3ebff,#7cc4ff)}
+.t4{background:linear-gradient(135deg,#ffd6e7,#ff8fb1)}
+.t5{background:linear-gradient(135deg,#e7deff,#b49cff)}
+.t6{background:linear-gradient(135deg,#d6f7ef,#5fd3b8)}
+@media (min-width:700px) and (min-aspect-ratio:1/1){.tiles{grid-template-rows:repeat(2,1fr);grid-template-columns:repeat(3,1fr)}}
+
+/* ---------- game ---------- */
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;z-index:3}
+.round{width:58px;height:58px;border-radius:50%;background:var(--card);box-shadow:var(--shadow);display:grid;place-items:center;font-size:28px}
+.round:active{transform:scale(.92)}
+.stage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;min-height:0}
+.hero{position:relative;width:min(70vw,44vh,340px);aspect-ratio:1;border-radius:50%;display:grid;place-items:center;
+  background:radial-gradient(circle at 50% 40%,#fff,#fff8ef);box-shadow:var(--shadow)}
+.hero .emoji{font-size:min(40vw,25vh,190px);transition:transform .2s}
+.hero .ring{position:absolute;inset:-14px;border-radius:50%;border:10px solid var(--green);opacity:0;transform:scale(1);transition:opacity .2s}
+.hero.listen .ring{opacity:.8}
+.bubble{margin-top:22px;background:var(--card);border-radius:24px;padding:10px 22px;font-size:clamp(26px,min(7vh,10vw),58px);font-weight:900;box-shadow:var(--shadow);
+  letter-spacing:1px;min-height:1.4em;display:flex;gap:4px;align-items:center}
+.bubble .syl{padding:0 4px;border-radius:12px;transition:all .2s}
+.bubble .syl.hl{background:var(--orange);color:#fff;transform:scale(1.15)}
+.name{font-size:22px;font-weight:800;color:var(--soft);margin-top:12px;min-height:1.3em}
+.bottom{display:flex;justify-content:center;align-items:center;gap:18px;z-index:3}
+.mic{display:flex;align-items:center;gap:8px;font-weight:800;color:var(--soft);font-size:15px}
+.mic i{width:12px;height:12px;border-radius:50%;background:#ccc}
+.mic.on i{background:#4cc35a;box-shadow:0 0 0 4px rgba(76,195,90,.25)}
+.ok{width:76px;height:76px;font-size:36px;background:var(--green)}
+.choices{display:grid;gap:14px;width:100%;max-width:520px;grid-template-columns:repeat(2,1fr)}
+.choices.n3{grid-template-columns:repeat(3,1fr)}
+.choice{aspect-ratio:1;border-radius:28px;background:var(--card);box-shadow:var(--shadow);display:grid;place-items:center;transition:transform .2s,opacity .3s}
+.choice .emoji{font-size:min(17vw,12vh,110px)}
+.choice:active{transform:scale(.94)}
+.choice.no{animation:shake .5s}
+.choice.fade{opacity:.15}
+
+/* blow */
+.scene{position:relative;width:min(88vw,420px);height:min(52vh,420px);display:grid;place-items:center}
+.cake{position:absolute;bottom:6%;left:50%;transform:translateX(-50%);width:min(64vw,260px);height:min(30vw,19vh,130px);border-radius:26px 26px 18px 18px;
+  background:linear-gradient(#fff3f7 0 22%,#ff9cbc 22% 34%,#ffe0b8 34% 64%,#ff9cbc 64% 76%,#ffe0b8 76%);box-shadow:0 14px 0 -4px #d9cfe8,var(--shadow)}
+.cake::before{content:'';position:absolute;left:-6%;right:-6%;bottom:-16px;height:18px;border-radius:50%;background:#e6e1f2}
+.candles{position:absolute;bottom:calc(6% + min(30vw,19vh,130px));left:50%;transform:translateX(-50%);display:flex;gap:min(9vw,40px)}
+.candle{width:16px;height:min(14vw,9vh,64px);background:repeating-linear-gradient(45deg,#ff8fb1 0 8px,#fff 8px 16px);border-radius:4px;position:relative}
+.flame{position:absolute;left:50%;bottom:100%;width:22px;height:34px;margin-left:-11px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;
+  background:radial-gradient(circle at 50% 70%,#fff6b0,#ffb300 55%,#ff6a00);animation:flick .15s infinite alternate;transform-origin:50% 100%}
+.flame.out{animation:none;opacity:0;transition:opacity .4s}
+.smoke{position:absolute;left:50%;bottom:100%;font-size:26px;opacity:0;transform:translate(-50%,0)}
+.smoke.go{animation:smoke 1.4s forwards}
+.sea{position:absolute;left:0;right:0;bottom:0;height:36%;border-radius:30px;background:linear-gradient(#9fd8ff,#4aa6e8)}
+.boat{position:absolute;bottom:26%;left:2%;font-size:min(24vw,15vh,110px);transition:left .15s linear;animation:rock 2s ease-in-out infinite}
+.flag{position:absolute;right:2%;bottom:30%;font-size:44px}
+.dande{position:absolute;inset:0}
+.stem{position:absolute;left:50%;bottom:0;width:8px;height:45%;margin-left:-4px;background:#6cbf5a;border-radius:4px}
+.seed{position:absolute;width:14px;height:14px;margin:-7px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px #e6e1f2;transition:transform 2.2s ease-out,opacity 2.2s}
+.meter{width:min(80vw,380px);height:20px;border-radius:12px;background:rgba(255,255,255,.7);overflow:hidden;margin-top:14px;box-shadow:inset 0 2px 4px rgba(0,0,0,.08)}
+.meter i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--violet));border-radius:12px;transition:width .1s}
+.blowbtn{font-size:30px;padding:14px 24px;border-radius:999px;background:var(--card);box-shadow:var(--shadow);font-weight:900}
+
+/* fx */
+.fx{position:fixed;pointer-events:none;font-size:36px;z-index:20;animation:fly 1.4s ease-out forwards}
+.jump{animation:jump .7s}
+.bigstar{position:fixed;inset:0;display:grid;place-items:center;pointer-events:none;z-index:15}
+.bigstar span{font-size:min(50vw,280px);animation:pop 1.2s ease-out forwards}
+
+/* book / rest / parent */
+.sheet{flex:1;overflow:auto;background:rgba(255,255,255,.75);border-radius:28px;padding:16px;margin-top:12px;box-shadow:var(--shadow)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:10px}
+.st{aspect-ratio:1;border-radius:20px;background:#fff;display:grid;place-items:center;font-size:44px;position:relative;box-shadow:0 3px 8px rgba(0,0,0,.06)}
+.st.lock{background:#f1eef7;filter:grayscale(1);opacity:.35}
+.st em{position:absolute;right:4px;bottom:2px;font-style:normal;font-size:13px;font-weight:900;color:var(--soft)}
+h2{margin:6px 0;font-size:26px;font-weight:900}
+#rest{align-items:center;justify-content:center;text-align:center;gap:16px}
+#rest .emoji{font-size:140px;animation:bob 3s ease-in-out infinite}
+#rest p{font-size:24px;font-weight:800;max-width:420px;margin:0}
+.hold{position:relative;overflow:hidden;padding:16px 26px;border-radius:999px;background:var(--card);box-shadow:var(--shadow);font-weight:800;font-size:17px}
+.hold i{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(180,156,255,.35)}
+#parent .sheet{font-size:16px;font-weight:700;line-height:1.5}
+#parent label{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #eee}
+#parent input[type=text],#parent select{font:inherit;padding:8px 10px;border-radius:12px;border:2px solid #e6e1f2;min-width:0;max-width:55%}
+#parent input[type=checkbox]{width:26px;height:26px}
+#parent ul{padding-left:20px;margin:8px 0}
+#parent li{margin:6px 0}
+.btn{padding:12px 18px;border-radius:16px;background:var(--violet);color:#fff;font-weight:900}
+
+
+/* куколка, палитра, мини-кнопки */
+.dollwrap{position:relative;height:clamp(170px,calc(100dvh - 430px),46vh);aspect-ratio:220/400;display:grid;place-items:center}
+.dollwrap #dollBox,.dollwrap svg.doll{height:100%;width:100%;display:block;overflow:visible}
+.dollwrap .ring{position:absolute;inset:-10px -30px;border-radius:40px;border:8px solid var(--green);opacity:0;transition:opacity .2s}
+.dollwrap.listen .ring{opacity:.7}
+.grow{animation:grow .6s cubic-bezier(.3,1.5,.5,1);transform-box:fill-box;transform-origin:50% 0}
+.pop{animation:popin .5s cubic-bezier(.3,1.6,.5,1);transform-box:fill-box;transform-origin:50% 50%}
+.rowbtns{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,52px);gap:6px;justify-content:center;margin-top:10px;width:100%}
+.rowbtns .mini{width:auto;aspect-ratio:1;height:auto;min-width:0}
+.mini{width:52px;height:52px;border-radius:16px;background:var(--card);box-shadow:0 4px 12px rgba(80,60,120,.12);display:grid;place-items:center;padding:5px;transition:transform .15s}
+.mini svg{width:100%;height:100%;overflow:hidden}
+.mini .emoji{font-size:30px}
+.mini:active{transform:scale(.9)}
+.mini.sel{outline:4px solid var(--orange)}
+.palette{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-top:12px;width:min(100%,420px)}
+.dot{aspect-ratio:1;border-radius:50%;box-shadow:0 4px 10px rgba(0,0,0,.15),inset 0 -5px 0 rgba(0,0,0,.12);border:4px solid #fff;transition:transform .15s}
+.dot:active{transform:scale(.88)}
+.dot.rainbow{background:conic-gradient(#ef4444,#fb923c,#facc15,#22c55e,#3b82f6,#a855f7,#ef4444)}
+.clothes{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;margin-top:12px;width:min(100%,460px)}
+.clothes .mini{width:auto;height:auto;aspect-ratio:1;min-width:0;padding:4px}
+.talk{animation:talk .18s infinite alternate}
+@keyframes grow{from{transform:scaleY(.15);opacity:0}to{transform:scaleY(1);opacity:1}}
+@keyframes popin{from{transform:scale(.2);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes talk{from{transform:scale(1) rotate(-4deg)}to{transform:scale(1.12) rotate(4deg)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-10px)}40%,80%{transform:translateX(10px)}}
+@keyframes jump{0%{transform:scale(1)}30%{transform:scale(1.25) translateY(-20px) rotate(-6deg)}60%{transform:scale(.95)}100%{transform:scale(1)}}
+@keyframes fly{0%{transform:translate(0,0) scale(.6);opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(1.3) rotate(var(--r));opacity:0}}
+@keyframes pop{0%{transform:scale(0) rotate(-30deg);opacity:0}40%{transform:scale(1.1) rotate(8deg);opacity:1}70%{transform:scale(1)}100%{transform:scale(1.4);opacity:0}}
+@keyframes flick{from{transform:scaleY(1) rotate(-3deg)}to{transform:scaleY(1.12) rotate(3deg)}}
+@keyframes smoke{0%{opacity:.8;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,-60px) scale(1.6)}}
+@keyframes rock{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="rainbow" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ef4444"/><stop offset=".2" stop-color="#fb923c"/><stop offset=".4" stop-color="#facc15"/><stop offset=".6" stop-color="#22c55e"/><stop offset=".8" stop-color="#3b82f6"/><stop offset="1" stop-color="#a855f7"/></linearGradient></defs></svg>
+
+<!-- ГЛАВНАЯ -->
+<section id="home" class="screen on">
+  <header>
+    <button class="pill" id="bookBtn" aria-label="Наклейки"><span class="emoji">⭐</span><span id="starCount">0</span></button>
+    <button class="gear" id="gear" aria-label="Для родителей (удерживайте)"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="20"/></svg><span class="emoji">⚙️</span></button>
+  </header>
+  <h1><span>Го</span><span>во</span><span>рил</span><span>ка</span></h1>
+  <div class="tiles">
+    <button class="tile t1" data-mode="animals"><span class="emoji">🐮</span><b>Кто как говорит?<small>Му! Гав! Би-би!</small></b></button>
+    <button class="tile t2" data-mode="words"><span class="emoji">🍎</span><b>Покажи и скажи<small>Первые слова</small></b></button>
+    <button class="tile t3" data-mode="blow"><span class="emoji">🌬️</span><b>Подуй!<small>Свечки, кораблик</small></b></button>
+    <button class="tile t4" data-mode="hair"><span class="emoji">💇‍♀️</span><b>Причёски<small>Учим цвета</small></b></button>
+    <button class="tile t5" data-mode="dress"><span class="emoji">👗</span><b>Одень куклу<small>Шапка, куртка, сапоги</small></b></button>
+    <button class="tile t6" data-mode="echo"><span class="emoji">🦜</span><b>Повторюшка<small>Скажи — и я повторю</small></b></button>
+  </div>
+</section>
+
+<!-- ИГРА -->
+<section id="game" class="screen">
+  <div class="top">
+    <button class="round" id="homeBtn" aria-label="Домой"><span class="emoji">🏠</span></button>
+    <div class="mic" id="micState"><i></i><span class="emoji">🎤</span></div>
+    <div class="pill"><span class="emoji">⭐</span><span id="starCount2">0</span></div>
+  </div>
+  <div class="stage" id="stage"></div>
+  <div class="bottom">
+    <button class="round" id="againBtn" aria-label="Повторить"><span class="emoji">🔊</span></button>
+    <button class="round ok" id="okBtn" aria-label="Сказала!"><span class="emoji">👍</span></button>
+    <button class="round" id="nextBtn" aria-label="Дальше"><span class="emoji">➡️</span></button>
+  </div>
+</section>
+
+<!-- НАКЛЕЙКИ -->
+<section id="book" class="screen">
+  <div class="top">
+    <button class="round" data-home aria-label="Домой"><span class="emoji">🏠</span></button>
+    <h2>Мои наклейки</h2>
+    <div style="width:58px"></div>
+  </div>
+  <div class="sheet"><div class="grid" id="bookGrid"></div></div>
+</section>
+
+<!-- ОТДЫХ -->
+<section id="rest" class="screen">
+  <span class="emoji">🦉</span>
+  <p id="restText">Глазки устали! Пора отдохнуть и поиграть с мамой и папой.</p>
+  <button class="hold" id="restHold"><i></i>Взрослым: удерживайте, чтобы продолжить</button>
+</section>
+
+<!-- ДЛЯ РОДИТЕЛЕЙ -->
+<section id="parent" class="screen">
+  <div class="top">
+    <button class="round" data-home aria-label="Назад"><span class="emoji">⬅️</span></button>
+    <h2>Для родителей</h2>
+    <div style="width:58px"></div>
+  </div>
+  <div class="sheet">
+    <label>Имя ребёнка <input type="text" id="setName" placeholder="например, Мира" maxlength="20"></label>
+    <label>Девочка / мальчик
+      <select id="setGender"><option value="f">девочка</option><option value="m">мальчик</option></select></label>
+    <label>Слушать голос через микрофон <input type="checkbox" id="setMic" checked></label>
+    <label>Время игры за раз
+      <select id="setLimit"><option value="10">10 минут</option><option value="15">15 минут</option><option value="20">20 минут</option><option value="0">без лимита</option></select></label>
+    <label>Скорость голоса
+      <select id="setRate"><option value="0.75">медленно</option><option value="0.88">средне</option><option value="1">обычно</option></select></label>
+    <p style="margin:14px 0 4px"><b>Как играть с пользой</b></p>
+    <ul>
+      <li>Играйте <b>вместе</b>: сядьте рядом, повторяйте звуки сами, преувеличенно и весело. Ребёнок лучше всего учится, подражая вам.</li>
+      <li>Хвалите за <b>любую попытку</b> сказать — даже «м» вместо «му» уже успех. Не исправляйте и не требуйте повторить «правильно».</li>
+      <li>В «Причёсках» и «Одень куклу» кнопка <b>➡️</b> даёт задание: «Сделай кукле розовые волосы!», «Надень кукле шапку!» — так ребёнок учится понимать речь.</li>
+      <li>Кнопка <b>👍</b> — для вас: нажмите, если ребёнок сказал, а микрофон не услышал.</li>
+      <li>После игры переносите в жизнь: увидели собаку — «гав-гав!», машину — «би-би!».</li>
+      <li>Коротко и часто лучше, чем долго: 10–15 минут. Таймер поможет.</li>
+      <li>Игра — помощник, но не замена занятиям. Если в 4 года речь сильно отстаёт, стоит показаться <b>логопеду</b> и <b>неврологу</b>.</li>
+    </ul>
+    <p style="font-size:13px;color:var(--soft)">Звук идёт через встроенный голос телефона. Если голоса не слышно — проверьте громкость и что в настройках телефона установлен русский синтез речи. Микрофон работает только на этом устройстве и никуда ничего не отправляет. В «Повторюшке» фраза ребёнка держится в памяти пару секунд, чтобы проиграть её смешным голосом, и сразу забывается.</p>
+    <button class="btn" id="resetBtn">Сбросить наклейки</button>
+  </div>
+</section>
+
+<script>
+'use strict';
+/* ===================== ДАННЫЕ ===================== */
+// e — картинка, n — кто это, g — род (для «говорит»), show — что на экране, say — как произносит голос, rep — что просим повторить
+const ANIMALS = [
+  {e:'🐮',n:'корова',show:'МУ-У!',say:'мууу',rep:'мууу'},
+  {e:'🐶',n:'собачка',show:'ГАВ-ГАВ!',say:'гав-гав',rep:'гав'},
+  {e:'🐱',n:'кошка',show:'МЯУ!',say:'мяу',rep:'мяу'},
+  {e:'🦆',n:'уточка',show:'КРЯ-КРЯ!',say:'кря-кря',rep:'кря'},
+  {e:'🐸',n:'лягушка',show:'КВА-КВА!',say:'ква-ква',rep:'ква'},
+  {e:'🐷',n:'свинка',show:'ХРЮ-ХРЮ!',say:'хрю-хрю',rep:'хрю'},
+  {e:'🐑',n:'овечка',show:'БЕ-Е!',say:'бээээ',rep:'бээ'},
+  {e:'🐐',n:'козочка',show:'МЕ-Е!',say:'мээээ',rep:'мээ'},
+  {e:'🐴',n:'лошадка',show:'И-ГО-ГО!',say:'иго-го',rep:'иго-го'},
+  {e:'🐤',n:'цыплёнок',show:'ПИ-ПИ!',say:'пи-пи-пи',rep:'пи-пи'},
+  {e:'🐓',n:'петушок',show:'КУ-КА-РЕ-КУ!',say:'кукареку',rep:'ку-ку'},
+  {e:'🦉',n:'сова',show:'У-ХУ!',say:'уху',rep:'уху'},
+  {e:'🐝',n:'пчёлка',show:'Ж-Ж-Ж!',say:'жжжжж',rep:'жжж'},
+  {e:'🐍',n:'змейка',show:'Ш-Ш-Ш!',say:'шшшшш',rep:'шшш'},
+  {e:'🐺',n:'волк',show:'У-У-У!',say:'уууу',rep:'ууу'},
+  {e:'🚗',n:'машинка',show:'БИ-БИ!',say:'би-би',rep:'би-би'},
+  {e:'🚂',n:'паровоз',show:'ТУ-ТУ!',say:'ту-ту',rep:'ту-ту'},
+  {e:'✈️',n:'самолёт',show:'У-У-У!',say:'уууу',rep:'ууу'},
+  {e:'⏰',n:'часики',show:'ТИК-ТАК!',say:'тик-так',rep:'тик-так'},
+  {e:'🥁',n:'барабан',show:'БУМ-БУМ!',say:'бум-бум',rep:'бум'},
+  {e:'👶',n:'малыш',show:'А-А-А!',say:'а-а-а',rep:'а-а'},
+];
+// [картинка, слово, слоги]
+const WORDS = [
+  ['👩','мама','ма-ма'],['👨','папа','па-па'],['👵','баба','ба-ба'],['⚽','мяч','мяч'],['🏠','дом','дом'],
+  ['🐱','кот','кот'],['🧃','сок','сок'],['👃','нос','нос'],['🐟','рыба','ры-ба'],['🍌','банан','ба-нан'],
+  ['🦆','утка','ут-ка'],['🌙','луна','лу-на'],['🧸','мишка','миш-ка'],['💧','вода','во-да'],['🐰','зайка','зай-ка'],
+  ['🦔','ёжик','ё-жик'],['🐘','слон','слон'],['🧀','сыр','сыр'],['🍞','хлеб','хлеб'],['🥛','молоко','мо-ло-ко'],
+  ['🥄','ложка','лож-ка'],['🎈','шарик','ша-рик'],['⭐','звезда','звез-да'],['☀️','солнце','солн-це'],['🌸','цветок','цве-ток'],
+  ['📖','книга','кни-га'],['🍎','яблоко','яб-ло-ко'],['🚗','машина','ма-ши-на'],['🐶','собака','со-ба-ка'],['🎂','торт','торт'],
+  ['🐮','корова','ко-ро-ва'],['🍓','ягодка','я-год-ка'],['👟','кеды','ке-ды'],['🐔','курица','ку-ри-ца'],['🚌','автобус','ав-то-бус'],
+];
+
+/* ===================== ХРАНЕНИЕ ===================== */
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem('govor_'+k); return v===null ? d : JSON.parse(v); }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem('govor_'+k, JSON.stringify(v)); }catch(e){} }
+};
+const S = {
+  name: store.get('name',''), gender: store.get('gender','f'), mic: store.get('mic',true),
+  limit: store.get('limit',15), rate: store.get('rate',0.88),
+  stickers: store.get('stickers',{}), stars: store.get('stars',0),
+};
+const save = () => { for (const k of ['name','gender','mic','limit','rate','stickers','stars']) store.set(k, S[k]); };
+
+/* ===================== УТИЛИТЫ ===================== */
+const $ = s => document.querySelector(s);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const pick = a => a[Math.floor(Math.random()*a.length)];
+const shuffle = a => { a = a.slice(); for (let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+const cap = s => s[0].toUpperCase()+s.slice(1);
+let token = 0;                    // смена раунда отменяет старые цепочки
+const alive = t => t === token;
+
+/* ===================== ГОЛОС (TTS) ===================== */
+let voice = null;
+function chooseVoice(){
+  const vs = (speechSynthesis.getVoices()||[]).filter(v => /^ru/i.test(v.lang));
+  const pref = ['Milena','Google','Yandex','Alyona','Katya','Irina','Daria','Svetlana'];
+  voice = vs.sort((a,b)=>{
+    const sa = pref.findIndex(p=>a.name.includes(p)), sb = pref.findIndex(p=>b.name.includes(p));
+    return (sa<0?99:sa)-(sb<0?99:sb);
+  })[0] || null;
+}
+if ('speechSynthesis' in window){ chooseVoice(); speechSynthesis.onvoiceschanged = chooseVoice; }
+let speaking = false;
+function say(text, {rate=1, pitch=1.15}={}){
+  return new Promise(res=>{
+    if (!('speechSynthesis' in window)) return res();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'ru-RU'; if (voice) u.voice = voice;
+    u.rate = S.rate*rate; u.pitch = pitch;
+    let done = false; const fin = () => { if(done) return; done = true; speaking = false; res(); };
+    u.onend = fin; u.onerror = fin;
+    setTimeout(fin, 1500 + text.length*140/(S.rate*rate));   // страховка (iOS иногда не шлёт onend)
+    speaking = true; speechSynthesis.speak(u);
+  });
+}
+const hush = () => { try{ speechSynthesis.cancel(); }catch(e){} speaking = false; };
+const kid = () => S.name ? S.name : '';
+const praise = () => {
+  const f = S.gender === 'f';
+  const p = pick(['Молодец!','Ура!','Здорово!','Отлично!', f?'Умница!':'Умник!', f?'Какая ты молодец!':'Какой ты молодец!','Супер!']);
+  return kid() && Math.random()<.5 ? `${kid()}, ${p.toLowerCase()}` : p;
+};
+
+/* ===================== ЗВУКИ (WebAudio) ===================== */
+let ac = null;
+function audio(){ if(!ac){ try{ ac = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } if(ac && ac.state==='suspended') ac.resume(); return ac; }
+function tone(f, t0, dur, type='sine', vol=.18){
+  const a = audio(); if(!a) return;
+  const o = a.createOscillator(), g = a.createGain();
+  o.type = type; o.frequency.setValueAtTime(f, a.currentTime+t0);
+  g.gain.setValueAtTime(0, a.currentTime+t0); g.gain.linearRampToValueAtTime(vol, a.currentTime+t0+.02);
+  g.gain.exponentialRampToValueAtTime(.001, a.currentTime+t0+dur);
+  o.connect(g).connect(a.destination); o.start(a.currentTime+t0); o.stop(a.currentTime+t0+dur+.05);
+}
+const sfx = {
+  pop(){ tone(660,0,.12,'triangle'); tone(990,.06,.12,'triangle'); },
+  win(){ [523,659,784,1047].forEach((f,i)=>tone(f,i*.1,.3,'triangle',.16)); },
+  no(){ tone(300,0,.18,'sine',.12); tone(240,.12,.22,'sine',.12); },
+  puff(){ tone(180,0,.3,'sawtooth',.03); },
+};
+
+/* ===================== МИКРОФОН ===================== */
+const mic = { stream:null, an:null, buf:null, kind:null, level:0, denied:false };
+async function micOn(kind){       // kind: 'voice' | 'blow'
+  if (!S.mic || mic.denied) return false;
+  if (mic.stream && mic.kind === kind) return true;
+  micOff();
+  try{
+    const voiceMode = kind === 'voice';
+    mic.stream = await navigator.mediaDevices.getUserMedia({ audio:{
+      echoCancellation: voiceMode, noiseSuppression: voiceMode, autoGainControl: voiceMode } });
+    const a = audio(); const src = a.createMediaStreamSource(mic.stream);
+    mic.an = a.createAnalyser(); mic.an.fftSize = 1024; mic.buf = new Float32Array(mic.an.fftSize);
+    src.connect(mic.an); mic.kind = kind;
+    $('#micState').classList.add('on'); $('#micState').style.visibility = 'visible';
+    return true;
+  }catch(e){ mic.denied = true; $('#micState').style.visibility = 'hidden'; return false; }
+}
+function micOff(){ if (mic.stream){ mic.stream.getTracks().forEach(t=>t.stop()); } mic.stream = null; mic.an = null; mic.kind = null; $('#micState').classList.remove('on'); }
+function rms(){
+  if (!mic.an) return 0;
+  mic.an.getFloatTimeDomainData(mic.buf); let s = 0;
+  for (let i=0;i<mic.buf.length;i++) s += mic.buf[i]*mic.buf[i];
+  return Math.sqrt(s/mic.buf.length);
+}
+/** Ждём голос ребёнка. Резолвится true при голосе, false по таймауту/отмене. */
+function listen(t, ring, {timeout=9000, need=260}={}){
+  return new Promise(async res=>{
+    if (!mic.an){ return res(false); }
+    await sleep(350);                                  // хвост голоса телефона
+    let floor = 0, n = 0, voiced = 0, last = performance.now(); const start = last;
+    ring && ring.parentElement.classList.add('listen');
+    const finish = v => { ring && (ring.parentElement.classList.remove('listen'), ring.style.transform=''); listenDone = null; res(v); };
+    listenDone = finish;
+    (function loop(now){
+      if (!alive(t) || listenDone !== finish) return finish(false);
+      const dt = now - last; last = now;
+      const r = speaking ? 0 : rms();
+      if (now - start < 500){ floor += r; n++; }
+      else {
+        const base = n ? floor/n : 0.005, th = Math.max(0.018, base*3.2);
+        if (r > th) voiced += dt; else voiced = Math.max(0, voiced - dt*0.3);
+        if (ring) ring.style.transform = `scale(${1 + Math.min(.25, r/th*.08)})`;
+        if (voiced > need) return finish(true);
+        if (now - start > timeout) return finish(false);
+      }
+      requestAnimationFrame(loop);
+    })(performance.now());
+  });
+}
+let listenDone = null;   // ручное подтверждение 👍 завершает ожидание
+
+/* ===================== НАГРАДЫ ===================== */
+function burst(x, y, items = ['⭐','🌟','✨','🎉','💖','🎈']){
+  for (let i=0;i<14;i++){
+    const s = document.createElement('span'); s.className = 'fx emoji'; s.textContent = pick(items);
+    s.style.left = x+'px'; s.style.top = y+'px';
+    const a = Math.random()*Math.PI*2, d = 120 + Math.random()*160;
+    s.style.setProperty('--dx', Math.cos(a)*d+'px'); s.style.setProperty('--dy', Math.sin(a)*d-60+'px');
+    s.style.setProperty('--r', (Math.random()*360-180)+'deg');
+    document.body.appendChild(s); setTimeout(()=>s.remove(), 1500);
+  }
+}
+function reward(emoji, el){
+  S.stars++; S.stickers[emoji] = (S.stickers[emoji]||0)+1; save(); updateStars();
+  sfx.win();
+  const r = (el||document.body).getBoundingClientRect();
+  burst(r.left + r.width/2, r.top + r.height/2);
+  if (el){ el.classList.remove('jump'); void el.offsetWidth; el.classList.add('jump'); }
+  if (navigator.vibrate) try{ navigator.vibrate([30,40,30]); }catch(e){}
+}
+function updateStars(){ $('#starCount').textContent = S.stars; $('#starCount2').textContent = S.stars; }
+
+/* ===================== ЭКРАНЫ ===================== */
+let mode = null, playMs = 0, lastTick = performance.now();
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on', s.id===id));
+}
+function goHome(){ token++; hush(); micOff(); mode = null; show('home'); updateStars(); }
+document.querySelectorAll('[data-home]').forEach(b=>b.onclick = goHome);
+$('#homeBtn').onclick = () => { sfx.pop(); goHome(); };
+document.querySelectorAll('.tile').forEach(b => b.onclick = () => { sfx.pop(); start(b.dataset.mode); });
+$('#bookBtn').onclick = () => { sfx.pop(); renderBook(); show('book'); };
+
+function start(m){
+  audio();                                           // разблокировка звука на iOS
+  if ('speechSynthesis' in window){ const u = new SpeechSynthesisUtterance(''); speechSynthesis.speak(u); }
+  mode = m; $('#stage').dataset.mode = ''; show('game'); $('#micState').style.visibility = 'hidden';
+  next();
+}
+function next(){
+  token++; hush(); if (listenDone) listenDone(false);
+  if (S.limit && playMs > S.limit*60000){ return restScreen(); }
+  ({animals:roundAnimal, words:roundWord, blow:roundBlow, hair:roundHair, dress:roundDress, echo:roundEcho})[mode](token);
+}
+$('#nextBtn').onclick = () => { sfx.pop(); next(); };
+let again = null;
+$('#againBtn').onclick = () => { sfx.pop(); again && again(); };
+$('#okBtn').onclick = () => { if (listenDone) listenDone(true); else if (okAction) okAction(); };
+let okAction = null;
+
+// учёт времени игры
+setInterval(()=>{ const now = performance.now(); if ($('#game').classList.contains('on') && !document.hidden) playMs += now - lastTick; lastTick = now; }, 1000);
+
+/* ---------- 1. Кто как говорит ---------- */
+let animalBag = [];
+async function roundAnimal(t){
+  if (!animalBag.length) animalBag = shuffle(ANIMALS);
+  const a = animalBag.pop();
+  const st = $('#stage');
+  st.innerHTML = `<div class="hero" id="hero"><span class="emoji" id="heroE">${a.e}</span><div class="ring"></div></div>
+    <div class="bubble">${a.show}</div><div class="name">${cap(a.n)}</div>`;
+  const hero = $('#hero'), heroE = $('#heroE'), ring = hero.querySelector('.ring');
+  const sound = () => { heroE.classList.remove('jump'); void heroE.offsetWidth; heroE.classList.add('jump'); return say(a.say, {rate:.9, pitch:1.3}); };
+  hero.onclick = () => { hush(); sound(); };
+  okAction = null;
+  again = async () => { hush(); await say(`${cap(a.n)} говорит:`); await sound(); await say(`Скажи: ${a.rep}!`); };
+
+  await sleep(300); if(!alive(t)) return;
+  await say(pick([`Кто это? Это ${a.n}!`, `Смотри! ${cap(a.n)}!`, `А это ${a.n}.`])); if(!alive(t)) return;
+  await say(`${cap(a.n)} говорит:`); if(!alive(t)) return;
+  await sound(); if(!alive(t)) return;
+  await say(pick([`А ты скажи: ${a.rep}!`, `Скажи и ты: ${a.rep}!`, `Повтори: ${a.rep}!`])); if(!alive(t)) return;
+
+  await micOn('voice'); if(!alive(t)) return;
+  let ok = await listen(t, ring);
+  if (!ok && alive(t) && mic.an){
+    await say(pick(['Ну-ка, громче!','Давай вместе!','Попробуй!'])); if(!alive(t)) return;
+    await sound(); if(!alive(t)) return;
+    ok = await listen(t, ring);
+  }
+  if (!alive(t)) return;
+  if (ok){
+    reward(a.e, heroE);
+    await say(praise()); if(!alive(t)) return;
+    await sound(); if(!alive(t)) return;
+    await sleep(700); if(alive(t)) next();
+  } else {
+    // без микрофона ждём родительского 👍 или «дальше»
+    okAction = async () => { okAction = null; reward(a.e, heroE); await say(praise()); if(alive(t)){ await sleep(600); alive(t) && next(); } };
+  }
+}
+
+/* ---------- 2. Покажи и скажи ---------- */
+let wordBag = [], wordWins = 0;
+async function roundWord(t){
+  if (!wordBag.length) wordBag = shuffle(WORDS);
+  const w = wordBag.pop();
+  const n = wordWins >= 6 ? 3 : 2;
+  const others = shuffle(WORDS.filter(x => x[0] !== w[0] && x[1] !== w[1])).slice(0, n-1);
+  const opts = shuffle([w, ...others]);
+  const st = $('#stage');
+  st.innerHTML = `<div class="choices ${n===3?'n3':''}">${opts.map((o,i)=>`<button class="choice" data-i="${i}"><span class="emoji">${o[0]}</span></button>`).join('')}</div>
+    <div class="name" id="wHint">Где ${w[1]}?</div>`;
+  okAction = null;
+  const ask = () => say(pick([`Где ${w[1]}?`, `Покажи, где ${w[1]}!`, `А где ${w[1]}?`]));
+  again = async () => { hush(); await ask(); };
+  let answered = false;
+  st.querySelectorAll('.choice').forEach(b => b.onclick = async () => {
+    if (answered) return;
+    const o = opts[+b.dataset.i];
+    if (o !== w){
+      sfx.no(); b.classList.remove('no'); void b.offsetWidth; b.classList.add('no');
+      hush(); await say(`Это ${o[1]}.`); if(alive(t)) await say(`А где ${w[1]}?`);
+      return;
+    }
+    answered = true; sfx.pop(); hush();
+    st.querySelectorAll('.choice').forEach(x => x !== b && x.classList.add('fade'));
+    await sleep(350); if(!alive(t)) return;
+    speakPhase(t, w);
+  });
+  await sleep(300); if(alive(t)) await ask();
+}
+async function speakPhase(t, w){
+  const st = $('#stage'), syl = w[2].split('-');
+  st.innerHTML = `<div class="hero" id="hero"><span class="emoji" id="heroE">${w[0]}</span><div class="ring"></div></div>
+    <div class="bubble" id="bub">${syl.map(s=>`<span class="syl">${s.toUpperCase()}</span>`).join('<span>-</span>')}</div>`;
+  const heroE = $('#heroE'), ring = $('#hero .ring'), parts = [...document.querySelectorAll('#bub .syl')];
+  const bySyl = async () => {
+    if (syl.length > 1){
+      for (let i=0;i<syl.length;i++){ parts.forEach((p,j)=>p.classList.toggle('hl', j===i)); await say(syl[i], {rate:.8}); if(!alive(t)) return; await sleep(120); }
+      parts.forEach(p=>p.classList.remove('hl'));
+    }
+    parts.forEach(p=>p.classList.add('hl')); await say(w[1], {rate:.85}); parts.forEach(p=>p.classList.remove('hl'));
+  };
+  $('#hero').onclick = () => { hush(); bySyl(); };
+  again = async () => { hush(); await say('Скажи:'); await bySyl(); };
+  okAction = null;
+  await say(pick(['Да! Это', 'Правильно! Это', 'Верно! Это'])+' '+w[1]+'!'); if(!alive(t)) return;
+  reward(w[0], heroE); wordWins++;
+  await say('Скажи:'); if(!alive(t)) return;
+  await bySyl(); if(!alive(t)) return;
+  await micOn('voice'); if(!alive(t)) return;
+  let ok = await listen(t, ring, {need: 220});
+  if (!alive(t)) return;
+  if (ok){
+    burst(innerWidth/2, innerHeight/2, ['⭐','🌟','✨']); sfx.win();
+    S.stars++; save(); updateStars();
+    await say(praise()); if(!alive(t)) return;
+    await sleep(500); alive(t) && next();
+  } else if (mic.an){
+    await say('Ничего, в следующий раз!'); await sleep(400); alive(t) && next();
+  } else {
+    okAction = async () => { okAction = null; sfx.win(); S.stars++; save(); updateStars(); await say(praise()); if(alive(t)){ await sleep(500); alive(t) && next(); } };
+  }
+}
+
+/* ---------- 3. Подуй ---------- */
+let blowIdx = 0;
+async function roundBlow(t){
+  const kind = ['candles','boat','dande'][blowIdx++ % 3];
+  const st = $('#stage'); okAction = null;
+  let html = '';
+  if (kind === 'candles') html = `<div class="scene"><div class="cake"></div><div class="candles">${[0,1,2].map(()=>`<div class="candle"><div class="flame"></div><div class="smoke emoji">💨</div></div>`).join('')}</div></div>`;
+  if (kind === 'boat') html = `<div class="scene"><div class="sea"></div><span class="flag emoji">🏝️</span><span class="boat emoji" id="boat">⛵</span></div>`;
+  if (kind === 'dande') html = `<div class="scene"><div class="dande" id="dande"><div class="stem"></div></div></div>`;
+  st.innerHTML = html + `<div class="meter"><i id="meter"></i></div><div style="height:12px"></div><button class="blowbtn" id="blowBtn">💨 Ф-ф-ф!</button>`;
+
+  let seeds = [];
+  if (kind === 'dande'){
+    const d = $('#dande'), box = d.getBoundingClientRect(), cx = box.width/2, cy = box.height*0.4, R = Math.min(box.width, box.height)*0.26;
+    for (let i=0;i<36;i++){
+      const a = i/36*Math.PI*2, r = R*(i%2 ? 1 : .72);
+      const s = document.createElement('i'); s.className = 'seed';
+      s.style.left = cx + Math.cos(a)*r + 'px'; s.style.top = cy + Math.sin(a)*r + 'px';
+      d.appendChild(s); seeds.push(s);
+    }
+    const c = document.createElement('i'); c.className = 'seed'; c.style.cssText += `left:${cx}px;top:${cy}px;width:30px;height:30px;margin:-15px;background:#e9d27a`; d.appendChild(c);
+  }
+  const intro = {candles:'Подуй на свечки! Фу-у-у!', boat:'Подуй на парус! Пусть кораблик плывёт к острову!', dande:'Подуй на одуванчик! Фу-у-у!'}[kind];
+  again = () => { hush(); say(intro); };
+
+  let prog = 0, finished = false;
+  const total = kind === 'boat' ? 6 : 3.2;        // секунд «дутья»
+  const apply = () => {
+    const p = Math.min(1, prog/total);
+    $('#meter').style.width = p*100+'%';
+    if (kind === 'candles') document.querySelectorAll('.flame').forEach((f,i)=>{ if (p >= (i+1)/3 && !f.classList.contains('out')){ f.classList.add('out'); f.nextElementSibling.classList.add('go'); sfx.puff(); } });
+    if (kind === 'boat') $('#boat').style.left = (2 + p*68)+'%';
+    if (kind === 'dande') seeds.forEach((s,i)=>{ if (p >= (i+1)/seeds.length && !s.dataset.f){ s.dataset.f = 1;
+      s.style.transform = `translate(${80+Math.random()*260}px,${-140-Math.random()*200}px) rotate(${Math.random()*400}deg)`; s.style.opacity = 0; } });
+    if (p >= 1 && !finished){ finished = true; win(); }
+  };
+  const win = async () => {
+    reward(kind==='candles'?'🎂':kind==='boat'?'⛵':'🌼', st.querySelector('.scene'));
+    hush(); await say(kind==='candles' ? 'Ура! Все свечки погасли!' : kind==='boat' ? 'Ура! Кораблик приплыл!' : 'Ура! Полетели пушинки!');
+    if (!alive(t)) return; await say(praise()); await sleep(900); alive(t) && next();
+  };
+  $('#blowBtn').onclick = () => { if (finished) return; prog += total/7; sfx.puff(); apply(); };
+  okAction = () => $('#blowBtn').click();     // 👍 работает как «дуть» без микрофона
+
+  await sleep(250); if(!alive(t)) return;
+  await say(intro); if(!alive(t)) return;
+  const hasMic = await micOn('blow'); if(!alive(t)) return;
+  if (!hasMic) return;
+  let floor = 0, n = 0, last = performance.now(); const t0 = last;
+  (function loop(now){
+    if (!alive(t) || finished) return;
+    const dt = (now-last)/1000; last = now;
+    const r = rms();
+    if (now - t0 < 500){ floor += r; n++; }
+    else {
+      const th = Math.max(0.05, (n?floor/n:0.01)*4);
+      if (r > th && !speaking){ prog += dt * Math.min(2, r/th); apply(); }
+    }
+    requestAnimationFrame(loop);
+  })(performance.now());
+}
+
+/* ===================== ЦВЕТА ===================== */
+const COLORS = [
+  {id:'red',    m:'красный',    f:'красная',    n:'красное',    pl:'красные',    hex:'#ef4444', st:'🔴'},
+  {id:'orange', m:'оранжевый',  f:'оранжевая',  n:'оранжевое',  pl:'оранжевые',  hex:'#fb923c', st:'🟠'},
+  {id:'yellow', m:'жёлтый',     f:'жёлтая',     n:'жёлтое',     pl:'жёлтые',     hex:'#facc15', st:'🟡'},
+  {id:'green',  m:'зелёный',    f:'зелёная',    n:'зелёное',    pl:'зелёные',    hex:'#22c55e', st:'🟢'},
+  {id:'sky',    m:'голубой',    f:'голубая',    n:'голубое',    pl:'голубые',    hex:'#7dd3fc', st:'🩵'},
+  {id:'blue',   m:'синий',      f:'синяя',      n:'синее',      pl:'синие',      hex:'#2563eb', st:'🔵'},
+  {id:'violet', m:'фиолетовый', f:'фиолетовая', n:'фиолетовое', pl:'фиолетовые', hex:'#a855f7', st:'🟣'},
+  {id:'pink',   m:'розовый',    f:'розовая',    n:'розовое',    pl:'розовые',    hex:'#f472b6', st:'🩷'},
+  {id:'brown',  m:'коричневый', f:'коричневая', n:'коричневое', pl:'коричневые', hex:'#8b5a2b', st:'🟤'},
+  {id:'black',  m:'чёрный',     f:'чёрная',     n:'чёрное',     pl:'чёрные',     hex:'#2a2a33', st:'⚫'},
+  {id:'white',  m:'белый',      f:'белая',      n:'белое',      pl:'белые',      hex:'#f8f7f4', st:'⚪'},
+  {id:'rainbow',m:'радужный',   f:'радужная',   n:'радужное',   pl:'радужные',   hex:'url(#rainbow)', st:'🌈', rep:'радуга'},
+];
+const colorById = id => COLORS.find(c => c.id === id) || COLORS[0];
+const adj = (c, g) => c[g] || c.m;
+function darker(hex, k = .28){
+  if (!hex.startsWith('#')) return '#6d28d9';
+  const n = parseInt(hex.slice(1), 16);
+  let r = n >> 16, g = n >> 8 & 255, b = n & 255;
+  if (r + g + b > 700) k = .18;
+  return `rgb(${Math.round(r*(1-k))},${Math.round(g*(1-k))},${Math.round(b*(1-k))})`;
+}
+
+/* ===================== КУКЛА (SVG) ===================== */
+const SKIN = '#ffd9b8', SKIN_S = '#e8b48f';
+const P = (d, f, s, w = 3) => `<path d="${d}" fill="${f}" stroke="${s}" stroke-width="${w}" stroke-linejoin="round" stroke-linecap="round"/>`;
+const C = (x, y, r, f, s, w = 3) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${f}" stroke="${s}" stroke-width="${w}"/>`;
+const CAP = 'M80 122 C76 60 112 38 150 38 C188 38 224 60 220 122 C210 96 196 84 176 80 C160 92 128 96 104 88 C94 98 86 108 80 122 Z';
+
+const HAIR = [
+  {id:'bald', n:'лысая', say:'Ой! Лысая!', icon:'✂️'},
+  {id:'long', n:'длинные', say:'Длинные волосы!',
+    back:(f,s)=>P('M72 118 C68 46 110 28 150 28 C190 28 232 46 228 118 L240 300 C215 316 185 300 175 290 L125 290 C115 300 85 316 60 300 Z',f,s),
+    front:(f,s)=>P(CAP,f,s)},
+  {id:'tails', n:'хвостики', say:'Хвостики!',
+    back:(f,s)=>`<g transform="rotate(-18 62 150)"><ellipse cx="62" cy="150" rx="24" ry="48" fill="${f}" stroke="${s}" stroke-width="3"/></g><g transform="rotate(18 238 150)"><ellipse cx="238" cy="150" rx="24" ry="48" fill="${f}" stroke="${s}" stroke-width="3"/></g>`,
+    front:(f,s)=>P(CAP,f,s)+C(80,104,9,'#ff8fb1','#e2557f')+C(220,104,9,'#ff8fb1','#e2557f')},
+  {id:'bun', n:'пучок', say:'Пучок!',
+    back:(f,s)=>C(150,34,30,f,s),
+    front:(f,s)=>P(CAP,f,s)},
+  {id:'curly', n:'кудряшки', say:'Кудряшки!',
+    back:(f,s)=>{ let o=''; for (let a=-205;a<=25;a+=18){ const r=a*Math.PI/180; o+=C(150+Math.cos(r)*80,118+Math.sin(r)*80,26,f,s); } return o; },
+    front:(f,s)=>{ let o=''; for (let a=-165;a<=-15;a+=21){ const r=a*Math.PI/180; o+=C(150+Math.cos(r)*58,112+Math.sin(r)*58,21,f,s); } return o; }},
+  {id:'bob', n:'каре', say:'Короткая стрижка!',
+    back:(f,s)=>P('M74 120 C70 50 110 30 150 30 C190 30 230 50 226 120 L230 180 C220 192 200 190 196 178 L104 178 C100 190 80 192 70 180 Z',f,s),
+    front:(f,s)=>P(CAP,f,s)},
+  {id:'mohawk', n:'ирокез', say:'Ирокез! Ха-ха!',
+    front:(f,s)=>P('M116 74 L106 18 L130 50 L138 4 L152 48 L166 6 L172 50 L194 18 L184 76 C168 66 132 66 116 74 Z',f,s)},
+];
+
+// Одежда: n — как называем, acc — «надень (что)», g — род для цвета, slot — куда надевается, st — наклейка
+const CLOTHES = [
+  {id:'beanie', n:'шапка',   acc:'шапку',   g:'f',  slot:'head',  st:'🧢', vb:'60 6 180 124',
+    draw:(c,s)=>P('M78 112 C76 50 112 32 150 32 C188 32 224 50 222 112 Z',c,s)+`<rect x="72" y="94" width="156" height="28" rx="14" fill="${s}" stroke="${s}"/>`+C(150,28,18,'#ffffff',s)},
+  {id:'hat',    n:'шляпа',   acc:'шляпу',   g:'f',  slot:'head',  st:'👒', vb:'40 16 220 96',
+    draw:(c,s)=>`<ellipse cx="150" cy="84" rx="104" ry="20" fill="${c}" stroke="${s}" stroke-width="3"/>`+P('M98 84 C96 30 204 30 202 84 Z',c,s)+`<rect x="98" y="66" width="104" height="13" fill="${s}"/>`+C(196,64,8,'#ff8fb1','#e2557f')},
+  {id:'crown',  n:'корона',  acc:'корону',  g:'f',  slot:'head',  st:'👑', vb:'90 0 120 86',
+    draw:(c,s)=>P('M100 76 L102 22 L126 50 L150 10 L174 50 L198 22 L200 76 Z',c,s)+C(150,12,6,'#ef4444','#b91c1c',2)+C(102,22,5,'#38bdf8','#0369a1',2)+C(198,22,5,'#38bdf8','#0369a1',2)},
+  {id:'bow',    n:'бантик',  acc:'бантик',  g:'m',  slot:'head',  st:'🎀', vb:'160 26 92 72',
+    draw:(c,s)=>P('M206 62 L170 36 L172 88 Z',c,s)+P('M206 62 L242 36 L240 88 Z',c,s)+C(206,62,10,c,s)},
+  {id:'glasses',n:'очки',    acc:'очки',    g:'pl', slot:'eyes',  st:'🕶️', vb:'80 94 140 48',
+    draw:(c,s)=>`<g fill="rgba(255,255,255,.25)" stroke="${c==='url(#rainbow)'?'#7c3aed':c}" stroke-width="6"><circle cx="126" cy="118" r="19"/><circle cx="174" cy="118" r="19"/><path d="M145 116 L155 116 M107 114 L86 108 M193 114 L214 108" fill="none"/></g>`},
+  {id:'scarf',  n:'шарф',    acc:'шарф',    g:'m',  slot:'neck',  st:'🧣', vb:'104 168 92 104',
+    draw:(c,s)=>`<rect x="110" y="174" width="80" height="26" rx="13" fill="${c}" stroke="${s}" stroke-width="3"/>`+P('M160 190 L184 190 L188 262 L162 262 Z',c,s)+`<path d="M166 262 L166 270 M174 262 L174 270 M182 262 L182 270" stroke="${s}" stroke-width="3"/>`},
+  {id:'tshirt', n:'футболка',acc:'футболку',g:'f',  slot:'top',   st:'👕', vb:'66 180 168 116',
+    draw:(c,s)=>P('M100 194 L72 206 L74 240 L100 236 Z',c,s)+P('M200 194 L228 206 L226 240 L200 236 Z',c,s)+P('M100 194 Q150 182 200 194 L194 290 L106 290 Z',c,s)+`<path d="M134 190 Q150 206 166 190" fill="none" stroke="${s}" stroke-width="3"/>`+C(150,240,12,'#ffffff',s,2)},
+  {id:'jacket', n:'куртка',  acc:'куртку',  g:'f',  slot:'outer', st:'🧥', vb:'62 176 176 130',
+    draw:(c,s)=>P('M98 194 L70 206 L72 290 L100 290 Z',c,s)+P('M202 194 L230 206 L228 290 L200 290 Z',c,s)+P('M96 192 Q150 180 204 192 L200 300 L100 300 Z',c,s)
+      +`<path d="M150 190 L150 300" stroke="${s}" stroke-width="4"/><path d="M128 186 L150 208 L172 186" fill="none" stroke="${s}" stroke-width="4"/><rect x="70" y="280" width="30" height="10" rx="4" fill="${s}"/><rect x="200" y="280" width="30" height="10" rx="4" fill="${s}"/><rect x="112" y="250" width="26" height="20" rx="4" fill="none" stroke="${s}" stroke-width="3"/><rect x="162" y="250" width="26" height="20" rx="4" fill="none" stroke="${s}" stroke-width="3"/>`},
+  {id:'dress',  n:'платье',  acc:'платье',  g:'n',  slot:'dress', st:'👗', vb:'66 180 168 166',
+    draw:(c,s)=>C(92,204,16,c,s)+C(208,204,16,c,s)+P('M104 192 Q150 182 196 192 L198 240 L228 340 L72 340 L102 240 Z',c,s)+`<rect x="102" y="234" width="96" height="10" rx="5" fill="${s}"/>`
+      +[[120,280],[170,300],[140,318],[200,326],[100,322],[160,266]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="5" fill="#ffffff" opacity=".85"/>`).join('')},
+  {id:'pants',  n:'штаны',   acc:'штаны',   g:'pl', slot:'legs',  st:'👖', vb:'96 274 108 104',
+    draw:(c,s)=>P('M106 280 L194 280 L198 370 L158 370 L150 316 L142 370 L102 370 Z',c,s)+`<path d="M106 290 L194 290" stroke="${s}" stroke-width="3"/>`},
+  {id:'boots',  n:'сапоги',  acc:'сапоги',  g:'pl', slot:'feet',  st:'👢', vb:'100 322 100 70',
+    draw:(c,s)=>`<rect x="112" y="330" width="34" height="52" rx="8" fill="${c}" stroke="${s}" stroke-width="3"/><rect x="154" y="330" width="34" height="52" rx="8" fill="${c}" stroke="${s}" stroke-width="3"/><rect x="104" y="374" width="46" height="12" rx="6" fill="${s}"/><rect x="150" y="374" width="46" height="12" rx="6" fill="${s}"/>`},
+  {id:'mittens',n:'варежки', acc:'варежки', g:'pl', slot:'hands', st:'🧤', vb:'64 262 50 50',
+    draw:(c,s)=>C(87,294,17,c,s)+C(213,294,17,c,s)+C(100,284,7,c,s)+C(200,284,7,c,s)+`<rect x="74" y="276" width="26" height="8" rx="4" fill="${s}"/><rect x="200" y="276" width="26" height="8" rx="4" fill="${s}"/>`},
+];
+const SLOT_ORDER = ['legs','feet','top','dress','outer','hands','neck','eyes','head'];
+
+const doll = Object.assign({style:'bald', color:null, wear:{}}, store.get('doll', {}));
+const saveDoll = () => store.set('doll', doll);
+
+function dollSVG(anim){   // anim: 'hair' | slot — что анимировать
+  const hc = doll.color ? colorById(doll.color) : null, hf = hc ? hc.hex : '#000', hs = hc ? darker(hc.hex) : '#000';
+  const style = HAIR.find(h => h.id === doll.style) || HAIR[0];
+  const ga = cls => anim === cls ? ` class="${cls === 'hair' ? 'grow' : 'pop'}"` : '';
+  let o = `<svg viewBox="40 0 220 400" class="doll" aria-label="Кукла">`;
+  if (hc && style.back) o += `<g${ga('hair')}>${style.back(hf, hs)}</g>`;
+  // тело
+  o += `<rect x="74" y="198" width="26" height="90" rx="13" fill="${SKIN}" stroke="${SKIN_S}" stroke-width="3"/><rect x="200" y="198" width="26" height="90" rx="13" fill="${SKIN}" stroke="${SKIN_S}" stroke-width="3"/>`;
+  o += C(87,292,14,SKIN,SKIN_S) + C(213,292,14,SKIN,SKIN_S);
+  o += `<rect x="116" y="298" width="28" height="76" rx="13" fill="${SKIN}" stroke="${SKIN_S}" stroke-width="3"/><rect x="156" y="298" width="28" height="76" rx="13" fill="${SKIN}" stroke="${SKIN_S}" stroke-width="3"/>`;
+  o += `<ellipse cx="130" cy="378" rx="20" ry="11" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="3"/><ellipse cx="170" cy="378" rx="20" ry="11" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="3"/>`;
+  o += `<rect x="138" y="168" width="24" height="34" rx="8" fill="${SKIN}" stroke="${SKIN_S}" stroke-width="3"/>`;
+  o += P('M106 196 Q150 186 194 196 L190 288 L110 288 Z', '#ffffff', '#e2e8f0');               // майка
+  o += P('M108 282 L192 282 L196 318 L156 318 L150 302 L144 318 L104 318 Z', '#a5d8ff', '#7cb8e4'); // шортики
+  // голова
+  o += C(82,124,13,SKIN,SKIN_S) + C(218,124,13,SKIN,SKIN_S) + C(150,115,68,SKIN,SKIN_S);
+  o += `<ellipse cx="126" cy="120" rx="9" ry="12" fill="#2b2340"/><ellipse cx="174" cy="120" rx="9" ry="12" fill="#2b2340"/>`;
+  o += `<circle cx="129" cy="115" r="3.5" fill="#fff"/><circle cx="177" cy="115" r="3.5" fill="#fff"/>`;
+  o += `<ellipse cx="106" cy="142" rx="12" ry="7" fill="#ffb3c1" opacity=".8"/><ellipse cx="194" cy="142" rx="12" ry="7" fill="#ffb3c1" opacity=".8"/>`;
+  o += `<path d="M134 148 Q150 164 166 148" fill="none" stroke="#d1495b" stroke-width="4" stroke-linecap="round"/>`;
+  if (hc && style.front) o += `<g${ga('hair')}>${style.front(hf, hs)}</g>`;
+  // одежда
+  for (const slot of SLOT_ORDER){
+    const w = doll.wear[slot]; if (!w) continue;
+    const it = CLOTHES.find(x => x.id === w.id), c = colorById(w.color);
+    o += `<g${ga(slot)}>${it.draw(c.hex, darker(c.hex))}</g>`;
+  }
+  return o + '</svg>';
+}
+function itemThumb(it, c){ return `<svg viewBox="${it.vb}">${it.draw(c.hex, darker(c.hex))}</svg>`; }
+function hairThumb(h){
+  const c = doll.color ? colorById(doll.color) : colorById('brown'), f = c.hex, s = darker(c.hex);
+  if (h.id === 'bald') return `<span class="emoji">✂️</span>`;
+  return `<svg viewBox="50 -10 200 230">${h.back ? h.back(f, s) : ''}${C(150,115,68,SKIN,SKIN_S)}${h.front ? h.front(f, s) : ''}</svg>`;
+}
+function dollStage(extra){
+  return `<div class="dollwrap" id="dollwrap"><div class="ring"></div><div id="dollBox">${dollSVG()}</div></div>${extra}`;
+}
+function redraw(anim){
+  $('#dollBox').innerHTML = dollSVG(anim);
+  const w = $('#dollwrap'); w.classList.remove('jump'); void w.offsetWidth;
+}
+
+/* ---------- 4. Причёски ---------- */
+let hairTask = null;
+async function roundHair(t){
+  const st = $('#stage');
+  if (st.dataset.mode !== 'hair'){
+    st.dataset.mode = 'hair'; hairTask = null;
+    st.innerHTML = dollStage(`
+      <div class="rowbtns" id="styleRow">${HAIR.map((h,i)=>`<button class="mini" data-i="${i}" aria-label="${h.n}">${hairThumb(h)}</button>`).join('')}</div>
+      <div class="palette">${COLORS.map((c,i)=>`<button class="dot ${c.id}" data-i="${i}" style="background:${c.id==='rainbow'?'':c.hex}" aria-label="${c.m}"></button>`).join('')}</div>`);
+    st.querySelectorAll('.palette .dot').forEach(b => b.onclick = () => hairPick(COLORS[+b.dataset.i]));
+    st.querySelectorAll('#styleRow .mini').forEach(b => b.onclick = () => stylePick(HAIR[+b.dataset.i]));
+    okAction = null;
+    again = async () => { hush(); await say(hairTask ? `Сделай кукле ${hairTask.pl} волосы!` : 'Выбери цвет волос!'); };
+    await sleep(250); if (!alive(t)) return;
+    await say(doll.color ? 'Какие волосы сделаем кукле? Нажимай на цвет!' : 'Ой, кукла лысая! Давай сделаем ей волосы! Нажимай на цвет!');
+    return;
+  }
+  // кнопка ➡️ — задание
+  hairTask = pick(COLORS.filter(c => c.id !== doll.color));
+  await say(pick([`Сделай кукле ${hairTask.pl} волосы!`, `А где ${hairTask.m} цвет? Нажми!`, `Найди ${hairTask.m}!`]));
+}
+async function hairPick(c){
+  const t = ++token; hush(); if (listenDone) listenDone(false); okAction = null;
+  if (hairTask && c.id !== hairTask.id){
+    sfx.no(); await say(`Это ${c.m}.`); if (alive(t)) await say(`А где ${hairTask.m}?`); return;
+  }
+  const wasTask = !!hairTask; hairTask = null;
+  if (doll.style === 'bald') doll.style = pick(['long','tails','curly','bun','bob']);
+  doll.color = c.id; saveDoll(); sfx.pop(); redraw('hair');
+  document.querySelectorAll('#styleRow .mini').forEach((b,i) => b.innerHTML = hairThumb(HAIR[i]));
+  if (wasTask) await say(pick(['Правильно!','Да!','Верно!']));
+  if (!alive(t)) return;
+  await say(`${cap(c.pl)} волосы!`); if (!alive(t)) return;
+  await say(`Скажи: ${c.rep || c.m}!`); if (!alive(t)) return;
+  await micOn('voice'); if (!alive(t)) return;
+  const ok = await listen(t, $('#dollwrap .ring'), {need: 220});
+  if (!alive(t)) return;
+  const win = async () => { reward(c.st, $('#dollwrap')); await say(praise()); if (alive(t)) await say(`${cap(c.m)}!`); };
+  if (ok) win();
+  else if (!mic.an) okAction = () => { okAction = null; win(); };
+}
+async function stylePick(h){
+  const t = ++token; hush(); if (listenDone) listenDone(false);
+  doll.style = h.id;
+  if (h.id !== 'bald' && !doll.color) doll.color = pick(COLORS).id;
+  saveDoll(); sfx.pop(); redraw('hair');
+  await say(h.say);
+}
+
+/* ---------- 5. Одень куклу ---------- */
+let dressTask = null;
+async function roundDress(t){
+  const st = $('#stage');
+  if (st.dataset.mode !== 'dress'){
+    st.dataset.mode = 'dress'; dressTask = null;
+    st.innerHTML = dollStage(`
+      <div class="clothes">${CLOTHES.map((it,i)=>`<button class="mini" data-i="${i}" aria-label="${it.n}">${itemThumb(it, colorById(['red','blue','green','pink','violet','orange','yellow','sky'][i%8]))}</button>`).join('')}
+      <button class="mini" id="undress" aria-label="Снять всё"><span class="emoji">🧺</span></button></div>`);
+    st.querySelectorAll('.clothes .mini[data-i]').forEach(b => b.onclick = () => wearPick(CLOTHES[+b.dataset.i]));
+    $('#undress').onclick = async () => { ++token; hush(); doll.wear = {}; saveDoll(); sfx.pop(); redraw(); await say('Ой! Всё сняли!'); };
+    okAction = null;
+    again = async () => { hush(); await say(dressTask ? `Надень кукле ${dressTask.acc}!` : 'Нажимай на одежду!'); };
+    await sleep(250); if (!alive(t)) return;
+    await say('Давай оденем куклу! Нажимай на одежду!');
+    return;
+  }
+  const worn = Object.values(doll.wear).map(w => w.id);
+  dressTask = pick(CLOTHES.filter(it => !worn.includes(it.id)).length ? CLOTHES.filter(it => !worn.includes(it.id)) : CLOTHES);
+  await say(pick([`Надень кукле ${dressTask.acc}!`, `Где ${dressTask.n}? Нажми!`]));
+}
+async function wearPick(it){
+  const t = ++token; hush(); if (listenDone) listenDone(false); okAction = null;
+  if (dressTask && it.id !== dressTask.id){
+    sfx.no(); await say(`Это ${it.n}.`); if (alive(t)) await say(`А где ${dressTask.n}?`); return;
+  }
+  const wasTask = !!dressTask; dressTask = null;
+  const cur = doll.wear[it.slot];
+  let color;
+  if (cur && cur.id === it.id){                                   // повторное нажатие — новый цвет
+    const i = COLORS.findIndex(c => c.id === cur.color); color = COLORS[(i + 1) % COLORS.length];
+  } else color = pick(COLORS.filter(c => c.id !== 'white'));
+  doll.wear[it.slot] = {id: it.id, color: color.id};
+  if (it.slot === 'dress'){ delete doll.wear.top; delete doll.wear.legs; }
+  if (it.slot === 'top' || it.slot === 'legs') delete doll.wear.dress;
+  saveDoll(); sfx.pop(); redraw(it.slot);
+  if (wasTask) await say(pick(['Правильно!','Да!','Верно!']));
+  if (!alive(t)) return;
+  await say(`${cap(adj(color, it.g))} ${it.n}!`); if (!alive(t)) return;
+  await say(`Скажи: ${it.n}!`); if (!alive(t)) return;
+  await micOn('voice'); if (!alive(t)) return;
+  const ok = await listen(t, $('#dollwrap .ring'), {need: 220});
+  if (!alive(t)) return;
+  const win = async () => { reward(it.st, $('#dollwrap')); await say(praise()); };
+  if (ok) win();
+  else if (!mic.an) okAction = () => { okAction = null; win(); };
+}
+
+/* ---------- 6. Повторюшка ---------- */
+const ECHO = [
+  {e:'🦜', n:'попугай', rate:1.45, hi:'Привет! Я попугай-повторюшка!'},
+  {e:'🐭', n:'мышка',   rate:1.85, hi:'Пи-пи! Я мышка-повторюшка!'},
+  {e:'🐻', n:'мишка',   rate:0.72, hi:'Привет! Я мишка-повторюшка!'},
+  {e:'🐢', n:'черепаха',rate:0.58, hi:'При-вет! Я че-ре-па-ха!'},
+];
+let echoIdx = 0, echoCount = 0;
+function recordUtterance(t, ring){
+  return new Promise(res => {
+    const a = audio(); if (!a || !mic.stream) return res(null);
+    const src = a.createMediaStreamSource(mic.stream);
+    const proc = a.createScriptProcessor(2048, 1, 1), mute = a.createGain(); mute.gain.value = 0;
+    src.connect(proc); proc.connect(mute); mute.connect(a.destination);
+    const pre = [], chunks = []; let state = 'wait', floor = null, voiced = 0, silent = 0; const t0 = performance.now();
+    ring && ring.parentElement.classList.add('listen');
+    const done = v => {
+      proc.onaudioprocess = null; try{ src.disconnect(); proc.disconnect(); mute.disconnect(); }catch(e){}
+      ring && (ring.parentElement.classList.remove('listen'), ring.style.transform = ''); res(v);
+    };
+    proc.onaudioprocess = e => {
+      if (!alive(t)) return done(null);
+      const d = new Float32Array(e.inputBuffer.getChannelData(0));
+      let s = 0; for (let i = 0; i < d.length; i++) s += d[i]*d[i];
+      const r = Math.sqrt(s / d.length), ms = d.length / a.sampleRate * 1000;
+      if (performance.now() - t0 < 450 || floor === null){ floor = floor === null ? r : floor*.8 + r*.2; return; }
+      const th = Math.max(0.018, floor * 3.2);
+      if (ring) ring.style.transform = `scale(${1 + Math.min(.12, r/th*.04)})`;
+      if (state === 'wait'){
+        pre.push(d); if (pre.length > 6) pre.shift();
+        if (r > th && !speaking){ voiced += ms; if (voiced > 110){ state = 'rec'; chunks.push(...pre); } }
+        else { voiced = 0; floor = floor*.97 + r*.03; }
+      } else {
+        chunks.push(d);
+        silent = r < th*.7 ? silent + ms : 0;
+        if (silent > 650 || chunks.length*ms > 4500){
+          const keep = Math.max(1, chunks.length - Math.floor(Math.max(0, silent - 200) / ms));
+          const len = chunks.slice(0, keep).reduce((n, c) => n + c.length, 0);
+          const buf = a.createBuffer(1, len, a.sampleRate), ch = buf.getChannelData(0);
+          let off = 0; for (const c of chunks.slice(0, keep)){ ch.set(c, off); off += c.length; }
+          done(buf);
+        }
+      }
+    };
+  });
+}
+function playBack(buf, rate, el){
+  return new Promise(res => {
+    const a = audio(), s = a.createBufferSource(), g = a.createGain();
+    s.buffer = buf; s.playbackRate.value = rate; g.gain.value = 1.8;
+    s.connect(g).connect(a.destination);
+    el.classList.add('talk');
+    let fin = false; const end = () => { if (fin) return; fin = true; el.classList.remove('talk'); res(); };
+    s.onended = end; setTimeout(end, buf.duration / rate * 1000 + 600);
+    s.start();
+  });
+}
+async function roundEcho(t, greet){
+  const st = $('#stage'), ch = ECHO[echoIdx];
+  const w = pick(WORDS);
+  if (st.dataset.mode !== 'echo'){
+    st.dataset.mode = 'echo'; greet = true;
+    st.innerHTML = `<div class="hero" id="hero"><span class="emoji" id="heroE"></span><div class="ring"></div></div>
+      <div class="bubble" id="eHint"></div>
+      <div class="rowbtns" id="echoRow">${ECHO.map((c,i)=>`<button class="mini" data-i="${i}" aria-label="${c.n}"><span class="emoji">${c.e}</span></button>`).join('')}</div>`;
+    st.querySelectorAll('#echoRow .mini').forEach(b => b.onclick = () => { sfx.pop(); echoIdx = +b.dataset.i; roundEcho(++token, true); });
+  }
+  okAction = null;
+  $('#heroE').textContent = ch.e;
+  st.querySelectorAll('#echoRow .mini').forEach((b,i) => b.classList.toggle('sel', i === echoIdx));
+  $('#eHint').innerHTML = `<span class="emoji">${w[0]}</span>&nbsp;${w[1].toUpperCase()}`;
+  again = async () => { hush(); await say(`Скажи: ${w[1]}!`); };
+  $('#hero').onclick = () => { hush(); say(ch.hi, {pitch: ch.rate > 1 ? 1.6 : .7}); };
+  await sleep(250); if (!alive(t)) return;
+  if (greet){ await say(ch.hi, {pitch: ch.rate > 1 ? 1.6 : .7}); if (!alive(t)) return; await say('Скажи что-нибудь, а я повторю!'); }
+  else await say(`Скажи: ${w[1]}!`);
+  if (!alive(t)) return;
+  if (!await micOn('voice')){
+    $('#eHint').textContent = 'Нужен микрофон 🎤';
+    await say('Мне нужен микрофон. Попроси маму или папу разрешить.'); return;
+  }
+  while (alive(t)){
+    const buf = await recordUtterance(t, $('#hero .ring'));
+    if (!buf || !alive(t)) return;
+    await playBack(buf, ch.rate, $('#heroE'));
+    if (!alive(t)) return;
+    echoCount++;
+    if (echoCount % 3 === 0) reward(ch.e, $('#hero'));
+    else { const r = $('#hero').getBoundingClientRect(); burst(r.left + r.width/2, r.top + r.height/2, ['✨','⭐','💬']); }
+    await sleep(300);
+  }
+}
+
+/* ===================== НАКЛЕЙКИ ===================== */
+function renderBook(){
+  const all = [...new Set([...ANIMALS.map(a=>a.e), ...WORDS.map(w=>w[0]), '🎂','⛵','🌼', ...COLORS.map(c=>c.st), ...CLOTHES.map(c=>c.st), ...ECHO.map(c=>c.e)])];
+  $('#bookGrid').innerHTML = all.map(e => {
+    const c = S.stickers[e]||0;
+    return `<div class="st emoji ${c?'':'lock'}">${e}${c>1?`<em>×${c}</em>`:''}</div>`;
+  }).join('');
+}
+
+/* ===================== ОТДЫХ ===================== */
+function restScreen(){
+  token++; hush(); micOff(); show('rest');
+  const txt = `${kid() ? kid()+', ' : ''}глазки устали! Пора отдохнуть и поиграть с мамой и папой.`;
+  $('#restText').textContent = cap(txt);
+  say(cap(txt));
+}
+function holdButton(btn, ms, fn, fillEl){
+  let timer = null, t0 = 0, raf = 0;
+  const stop = () => { clearTimeout(timer); cancelAnimationFrame(raf); fillEl && (fillEl.style.width = 0, fillEl.style.strokeDashoffset = 126); };
+  const tick = () => { const p = Math.min(1,(performance.now()-t0)/ms); if (fillEl){ if (fillEl.tagName==='I') fillEl.style.width = p*100+'%'; else fillEl.style.strokeDashoffset = 126*(1-p); } raf = requestAnimationFrame(tick); };
+  btn.addEventListener('pointerdown', e => { e.preventDefault(); t0 = performance.now(); tick(); timer = setTimeout(()=>{ stop(); fn(); }, ms); });
+  ['pointerup','pointerleave','pointercancel'].forEach(ev => btn.addEventListener(ev, stop));
+  btn.addEventListener('contextmenu', e => e.preventDefault());
+}
+holdButton($('#restHold'), 2500, () => { playMs = 0; goHome(); }, $('#restHold i'));
+
+/* ===================== РОДИТЕЛИ ===================== */
+holdButton($('#gear'), 1200, () => {
+  $('#setName').value = S.name; $('#setGender').value = S.gender; $('#setMic').checked = S.mic;
+  $('#setLimit').value = String(S.limit); $('#setRate').value = String(S.rate);
+  show('parent');
+}, $('#gear circle'));
+$('#setName').oninput = e => { S.name = e.target.value.trim(); save(); };
+$('#setGender').onchange = e => { S.gender = e.target.value; save(); };
+$('#setMic').onchange = e => { S.mic = e.target.checked; mic.denied = false; save(); };
+$('#setLimit').onchange = e => { S.limit = +e.target.value; save(); };
+$('#setRate').onchange = e => { S.rate = +e.target.value; save(); say('Привет! Давай играть!'); };
+$('#resetBtn').onclick = () => { if (confirm('Сбросить все наклейки и звёздочки?')){ S.stickers = {}; S.stars = 0; save(); updateStars(); } };
+
+document.addEventListener('visibilitychange', () => { if (document.hidden){ hush(); } });
+document.addEventListener('contextmenu', e => e.preventDefault());
+updateStars();
+</script>
+</body>
+</html>
