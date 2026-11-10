@@ -2,6 +2,8 @@
 // Этот файл можно заменить файлом, скачанным в режиме продавца
 // (кнопка «Скачать data.js»). Фото хранятся прямо здесь в виде data:-ссылок
 // или как пути к файлам в папке market/images/.
+window.SELLER = { name: "Продавец", telegram: "", whatsapp: "", phone: "", channel: "ubitsaavito" };
+
 window.LISTINGS = [
   {
     id: "seed-silver",
