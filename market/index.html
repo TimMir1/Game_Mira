@@ -164,7 +164,8 @@
   <div class="wrap">
     <b>Режим продавца.</b>
     <span id="draftInfo"></span>
-    <button class="btn" id="exportBtn">⬇ Скачать data.js</button>
+    <button class="btn" id="publishBtn" style="background:#ff4d2e;color:#fff">🚀 Опубликовать</button>
+    <button class="btn" id="exportBtn">⬇ data.js</button>
     <button class="btn" id="resetBtn">Сбросить черновики</button>
     <button class="btn" id="settingsBtn">⚙ Контакты</button>
     <button class="btn" id="logoutBtn">Выйти</button>
@@ -243,6 +244,9 @@
       <input class="field" id="sPhone" placeholder="+7 999 123-45-67">
       <label class="lbl" for="sCh">Telegram-канал с объявлениями (без @)</label>
       <input class="field" id="sCh" placeholder="my_shop_channel">
+      <label class="lbl" for="sGh">GitHub-токен для кнопки «Опубликовать»</label>
+      <input class="field" id="sGh" type="password" autocomplete="off" placeholder="github_pat_…">
+      <p class="muted" style="font-size:13px;margin:6px 0 0">Хранится только в этом браузере и на сайт не попадает.</p>
     </div>
     <div class="modal-foot">
       <button class="btn ghost" value="cancel" formnovalidate>Отмена</button>
@@ -253,7 +257,10 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="data.js"></script>
+<script>
+  // Свежая версия объявлений, без старого кэша браузера.
+  document.write('<script src="data.js?v=' + Math.floor(Date.now() / 30000) + '"><\/script>');
+</script>
 <script>
 // ===== Настройки сайта =====
 const SITE_NAME = "Убийца Авито";
@@ -273,10 +280,20 @@ const store = {
   get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { toast("Не хватает места в браузере: уменьшите число фото"); return false; } }
 };
-const K = { admin: "uk.admin", drafts: "uk.drafts", favs: "uk.favs", seller: "uk.seller" };
+const K = { admin: "uk.admin", drafts: "uk.drafts", favs: "uk.favs", seller: "uk.seller", gh: "uk.gh", pending: "uk.pending" };
+// Куда кнопка «Опубликовать» сохраняет объявления.
+const GH = { owner: "TimMir1", repo: "Game_Mira", branch: "main", dir: "market/" };
 
 const published = Array.isArray(window.LISTINGS) ? window.LISTINGS : [];
 const publishedSeller = window.SELLER || DEFAULT_SELLER;
+// Если опубликованная версия уже доехала до сайта, черновики больше не нужны.
+(() => {
+  const pending = store.get(K.pending, 0);
+  if (pending && (window.DATA_VERSION || 0) >= pending) {
+    if (!store.get(K.drafts, {}).dirty) store.set(K.drafts, { upserts: {}, deleted: [] });
+    try { localStorage.removeItem(K.pending); } catch {}
+  }
+})();
 let isAdmin = store.get(K.admin, false);
 let favs = new Set(store.get(K.favs, []));
 let state = { cat: "all", q: "", min: "", max: "", sort: "new", onlyFavs: false };
@@ -467,7 +484,9 @@ function setAdmin(on) {
 }
 function updateDraftInfo() {
   const d = drafts(), n = Object.keys(d.upserts).length + d.deleted.length;
-  $("#draftInfo").textContent = n ? `Неопубликованных изменений: ${n}. Скачайте data.js и загрузите его в папку market/.` : "Все изменения опубликованы.";
+  const pending = store.get(K.pending, 0) && !drafts().dirty;
+  $("#draftInfo").textContent = pending ? "Опубликовано, сайт и канал обновятся через 1–2 минуты." :
+    n ? `Неопубликованных изменений: ${n}. Нажмите «Опубликовать».` : "Все изменения опубликованы.";
 }
 $("#loginLink").onclick = e => { e.preventDefault(); setAdmin(!isAdmin); toast(isAdmin ? "Режим продавца включён" : "Режим продавца выключен"); };
 $("#logoutBtn").onclick = () => setAdmin(false);
@@ -476,11 +495,69 @@ $("#resetBtn").onclick = () => {
   if (!confirm("Удалить все неопубликованные изменения в этом браузере?")) return;
   store.set(K.drafts, { upserts: {}, deleted: [] }); updateDraftInfo(); route();
 };
+function dataJs(list, version) {
+  return "// Сгенерировано сайтом " + SITE_NAME + " " + new Date().toLocaleString("ru-RU") + "\n" +
+    (version ? "window.DATA_VERSION = " + version + ";\n" : "") +
+    "window.SELLER = " + JSON.stringify(seller(), null, 2) + ";\n" +
+    "window.LISTINGS = " + JSON.stringify(list, null, 2) + ";\n";
+}
+
+// ===== Публикация на GitHub одним коммитом =====
+async function gh(token, method, path, body) {
+  const r = await fetch(`https://api.github.com/repos/${GH.owner}/${GH.repo}${path}`, {
+    method, body: body ? JSON.stringify(body) : undefined,
+    headers: { Authorization: "Bearer " + token, Accept: "application/vnd.github+json", ...(body ? { "Content-Type": "application/json" } : {}) }
+  });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) { const e = new Error(j.message || "HTTP " + r.status); e.status = r.status; throw e; }
+  return j;
+}
+async function publish() {
+  const token = store.get(K.gh, "");
+  if (!token) { toast("Сначала вставьте GitHub-токен в «⚙ Контакты»"); $("#settingsBtn").click(); return; }
+  const btn = $("#publishBtn"); btn.disabled = true; btn.textContent = "⏳ Публикую…";
+  try {
+    const version = Date.now(), files = [];
+    // Фото из черновиков становятся отдельными файлами в market/images/.
+    const list = allListings().map(x => ({ ...x, photos: (x.photos || []).map((p, i) => {
+      const m = /^data:image\/(\w+);base64,(.+)$/.exec(p);
+      if (!m) return p;
+      const name = `images/${String(x.id).replace(/[^\w-]/g, "")}-${version.toString(36)}-${i}.${m[1] === "jpeg" ? "jpg" : m[1]}`;
+      files.push({ path: GH.dir + name, b64: m[2] });
+      return name;
+    }) }));
+    const tree = [];
+    for (let i = 0; i < files.length; i++) {
+      btn.textContent = `⏳ Фото ${i + 1}/${files.length}…`;
+      const b = await gh(token, "POST", "/git/blobs", { content: files[i].b64, encoding: "base64" });
+      tree.push({ path: files[i].path, mode: "100644", type: "blob", sha: b.sha });
+    }
+    tree.push({ path: GH.dir + "data.js", mode: "100644", type: "blob", content: dataJs(list, version) });
+    btn.textContent = "⏳ Сохраняю…";
+    for (let attempt = 0; ; attempt++) {
+      try {
+        const head = (await gh(token, "GET", `/git/ref/heads/${GH.branch}`)).object.sha;
+        const base = (await gh(token, "GET", `/git/commits/${head}`)).tree.sha;
+        const t = await gh(token, "POST", "/git/trees", { base_tree: base, tree });
+        const c = await gh(token, "POST", "/git/commits", { message: "Объявления: обновление с сайта", tree: t.sha, parents: [head] });
+        await gh(token, "PATCH", `/git/refs/heads/${GH.branch}`, { sha: c.sha });
+        break;
+      } catch (e) { if (e.status !== 422 || attempt >= 2) throw e; }
+    }
+    store.set(K.pending, version);
+    const d = drafts(); d.dirty = false; store.set(K.drafts, d);
+    toast("Опубликовано! Сайт и канал обновятся через 1–2 минуты");
+  } catch (e) {
+    const why = e.status === 401 ? "токен неверный или просрочен" :
+      e.status === 403 || e.status === 404 ? "у токена нет доступа к репозиторию (нужно Contents: Read and write)" :
+      e.message === "Failed to fetch" ? "нет связи с GitHub" : e.message;
+    alert("Не удалось опубликовать: " + why);
+  } finally { btn.disabled = false; btn.textContent = "🚀 Опубликовать"; updateDraftInfo(); }
+}
+$("#publishBtn").onclick = publish;
+
 $("#exportBtn").onclick = () => {
-  const s = seller();
-  const body = "// Сгенерировано сайтом " + SITE_NAME + " " + new Date().toLocaleString("ru-RU") + "\n" +
-    "window.SELLER = " + JSON.stringify(s, null, 2) + ";\n" +
-    "window.LISTINGS = " + JSON.stringify(allListings(), null, 2) + ";\n";
+  const body = dataJs(allListings());
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([body], { type: "text/javascript" }));
   a.download = "data.js"; a.click(); URL.revokeObjectURL(a.href);
@@ -488,12 +565,13 @@ $("#exportBtn").onclick = () => {
 };
 $("#settingsBtn").onclick = () => {
   const s = seller();
-  $("#sName").value = s.name || ""; $("#sTg").value = s.telegram || ""; $("#sWa").value = s.whatsapp || ""; $("#sPhone").value = s.phone || ""; $("#sCh").value = s.channel || "";
+  $("#sName").value = s.name || ""; $("#sTg").value = s.telegram || ""; $("#sWa").value = s.whatsapp || ""; $("#sPhone").value = s.phone || ""; $("#sCh").value = s.channel || ""; $("#sGh").value = store.get(K.gh, "");
   $("#settings").showModal();
 };
 $("#settings").addEventListener("close", () => {
   if ($("#settings").returnValue !== "save") return;
   store.set(K.seller, { name: $("#sName").value.trim(), telegram: $("#sTg").value.trim().replace(/^@/, ""), whatsapp: $("#sWa").value.trim(), phone: $("#sPhone").value.trim(), channel: $("#sCh").value.trim().replace(/^@/, "") });
+  store.set(K.gh, $("#sGh").value.trim());
   toast("Контакты сохранены"); route();
 });
 
@@ -549,12 +627,12 @@ $("#editor").addEventListener("close", () => {
     photos: editPhotos, placeholder: prev?.placeholder,
     specs, description: $("#fDesc").value.trim()
   };
-  const d = drafts(); d.upserts[item.id] = item; d.deleted = d.deleted.filter(x => x !== item.id);
+  const d = drafts(); d.dirty = true; d.upserts[item.id] = item; d.deleted = d.deleted.filter(x => x !== item.id);
   if (store.set(K.drafts, d)) { toast("Сохранено"); updateDraftInfo(); location.hash = "#/item/" + encodeURIComponent(item.id); route(); }
 });
 $("#deleteBtn").onclick = () => {
   if (!editing || !confirm("Удалить объявление?")) return;
-  const d = drafts(); delete d.upserts[editing];
+  const d = drafts(); d.dirty = true; delete d.upserts[editing];
   if (published.some(x => x.id === editing) && !d.deleted.includes(editing)) d.deleted.push(editing);
   store.set(K.drafts, d); $("#editor").close("cancel"); updateDraftInfo(); location.hash = "#/";
 };
