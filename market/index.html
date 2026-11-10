@@ -188,6 +188,7 @@
 <footer>
   <div class="wrap">
     <span><span id="footName">Убийца Авито</span> · без комиссий и платных размещений</span>
+    <a href="#" id="channelLink" target="_blank" rel="noopener" hidden>📣 Наш Telegram-канал</a>
     <a href="#" id="loginLink">Вход для продавца</a>
   </div>
 </footer>
@@ -240,6 +241,8 @@
       <input class="field" id="sWa" placeholder="79991234567">
       <label class="lbl" for="sPhone">Телефон для звонков</label>
       <input class="field" id="sPhone" placeholder="+7 999 123-45-67">
+      <label class="lbl" for="sCh">Telegram-канал с объявлениями (без @)</label>
+      <input class="field" id="sCh" placeholder="my_shop_channel">
     </div>
     <div class="modal-foot">
       <button class="btn ghost" value="cancel" formnovalidate>Отмена</button>
@@ -423,7 +426,12 @@ function renderItem(id) {
 }
 
 // ===== Роутер =====
+function updateChannel() {
+  const ch = (seller().channel || "").replace(/^@/, "");
+  $("#channelLink").hidden = !ch; if (ch) $("#channelLink").href = "https://t.me/" + encodeURIComponent(ch);
+}
 function route() {
+  updateChannel();
   const m = location.hash.match(/^#\/item\/(.+)$/);
   if (m) renderItem(decodeURIComponent(m[1]));
   else { document.title = `${SITE_NAME} — объявления`; renderList(); }
@@ -480,12 +488,12 @@ $("#exportBtn").onclick = () => {
 };
 $("#settingsBtn").onclick = () => {
   const s = seller();
-  $("#sName").value = s.name || ""; $("#sTg").value = s.telegram || ""; $("#sWa").value = s.whatsapp || ""; $("#sPhone").value = s.phone || "";
+  $("#sName").value = s.name || ""; $("#sTg").value = s.telegram || ""; $("#sWa").value = s.whatsapp || ""; $("#sPhone").value = s.phone || ""; $("#sCh").value = s.channel || "";
   $("#settings").showModal();
 };
 $("#settings").addEventListener("close", () => {
   if ($("#settings").returnValue !== "save") return;
-  store.set(K.seller, { name: $("#sName").value.trim(), telegram: $("#sTg").value.trim().replace(/^@/, ""), whatsapp: $("#sWa").value.trim(), phone: $("#sPhone").value.trim() });
+  store.set(K.seller, { name: $("#sName").value.trim(), telegram: $("#sTg").value.trim().replace(/^@/, ""), whatsapp: $("#sWa").value.trim(), phone: $("#sPhone").value.trim(), channel: $("#sCh").value.trim().replace(/^@/, "") });
   toast("Контакты сохранены"); route();
 });
 

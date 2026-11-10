@@ -1,0 +1,27 @@
+name: Telegram — новые объявления
+
+on:
+  push:
+    branches: [main]
+    paths: [market/data.js]
+  workflow_dispatch:
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Прошлая версия data.js
+        run: git show HEAD^:market/data.js > "$RUNNER_TEMP/old-data.js" 2>/dev/null || true
+      - name: Публикация в канал
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          SITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/market/
+          OLD_DATA: ${{ runner.temp }}/old-data.js
+        run: node market/tools/telegram-post.mjs
