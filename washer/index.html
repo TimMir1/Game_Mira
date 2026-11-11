@@ -1166,7 +1166,7 @@ function programTick(dt) {
     if (m.heater) { if (S.water < 3) { m.heater = false; hint('Воды мало — плата отключила ТЭН (защита).', true); syncUI(); } else o.heater = S.temp < 90; }
     if (m.pump) o.pump = true;
     if (m.wash) { o.motor = 'wash'; o.target = washPattern(dt); }
-    if (m.spin) { o.motor = 'spin'; o.target = S.water > 2 ? 0 : 1200; o.pump = true; }
+    if (m.spin) { o.motor = 'spin'; o.target = S.water > 2 ? 0 : (S.spinRpm || 1200); o.pump = true; }
     S.locked = Math.abs(S.rpm) > 1 || S.water > 6 || m.spin || m.wash;
     return;
   }
@@ -1543,8 +1543,11 @@ fitCamera();
 if (innerWidth < 760) { labelsOn = false; applyLabels(); $('tLbl').setAttribute('aria-pressed', 'false'); }
 syncUI(); renderSteps();
 $('loading').remove();
-frame();
 window.__S = S;
+if (new URLSearchParams(location.search).has('reel')) {
+  // режим записи видео: кадры рендерятся по команде снаружи
+  window.__W = { THREE, scene, camera, renderer, labelRenderer, S, tub, drum, cabMat, edgeMat, ctrlMat, drawerFrontMat, tubShell, labels, programTick, physicsTick, animate, applyIso, controls, hud, heaterMat };
+} else frame();
 </script>
 </body>
 </html>

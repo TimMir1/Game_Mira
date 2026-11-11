@@ -1,0 +1,1170 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>iPhone в разрезе</title>
+<style>
+:root{
+  --bg1:#eef1f6;--bg2:#d6dce6;--panel:rgba(255,255,255,.9);--text:#141a24;--muted:#5d6878;
+  --accent:#2f6bff;--accent-ink:#fff;--border:rgba(15,23,42,.1);--shadow:0 8px 30px rgba(15,23,42,.14);
+  --label:rgba(255,255,255,.94);--chip:rgba(127,127,127,.12);--warn:#c2410c;--ok:#16a34a;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg1:#1a1f29;--bg2:#0a0c11;--panel:rgba(22,26,34,.9);--text:#eef2f7;--muted:#98a3b3;
+    --accent:#6f9bff;--accent-ink:#06101f;--border:rgba(255,255,255,.1);--shadow:0 8px 30px rgba(0,0,0,.5);
+    --label:rgba(26,30,40,.94);--chip:rgba(255,255,255,.08);--warn:#fb923c;--ok:#4ade80;
+  }
+}
+:root[data-theme="dark"]{
+  --bg1:#1a1f29;--bg2:#0a0c11;--panel:rgba(22,26,34,.9);--text:#eef2f7;--muted:#98a3b3;
+  --accent:#6f9bff;--accent-ink:#06101f;--border:rgba(255,255,255,.1);--shadow:0 8px 30px rgba(0,0,0,.5);
+  --label:rgba(26,30,40,.94);--chip:rgba(255,255,255,.08);--warn:#fb923c;--ok:#4ade80;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;color:var(--text);
+  font-family:Inter,"SF Pro Text","Segoe UI",Roboto,system-ui,sans-serif;
+  background:radial-gradient(120% 90% at 40% 20%,var(--bg1),var(--bg2));background-color:var(--bg2)}
+#app{position:fixed;inset:0}
+#app canvas{display:block;touch-action:none}
+button{font:inherit;color:inherit}
+.card{position:fixed;background:var(--panel);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);z-index:5}
+.hidden{display:none!important}
+
+#hud{top:16px;left:16px;width:300px;padding:13px 15px}
+#hud h1{margin:0 0 3px;font-size:16.5px;font-weight:680;letter-spacing:-.01em}
+#hud .sub{margin:0 0 10px;font-size:12px;color:var(--muted);line-height:1.45}
+.read{display:grid;grid-template-columns:repeat(3,1fr);gap:8px 10px}
+.read span{display:block;font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.read b{display:block;font-size:15px;font-weight:650;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.read .wide{grid-column:span 3}
+
+#panel{top:16px;right:16px;width:300px;max-height:calc(100% - 32px);overflow:auto;padding:6px 12px 12px}
+#panel section{padding:8px 0;border-bottom:1px solid var(--border)}
+#panel section:last-child{border-bottom:0}
+#panel h2{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:4px 2px 8px;font-weight:650}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.btn{all:unset;box-sizing:border-box;cursor:pointer;padding:7px 11px;border-radius:10px;font-size:12.5px;font-weight:560;
+  background:var(--chip);text-align:center;transition:background .15s}
+.btn:hover{background:rgba(127,127,127,.2)}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.btn[aria-pressed="true"],.btn.primary{background:var(--accent);color:var(--accent-ink)}
+.row{display:flex;gap:6px;margin-top:8px;align-items:center}
+.row .btn{flex:1}
+.scgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.scgrid .btn{text-align:left;padding:9px 10px;line-height:1.25}
+.scgrid .btn small{display:block;font-size:10.5px;opacity:.7;font-weight:500;margin-top:2px}
+.hint{font-size:11.5px;color:var(--muted);margin:8px 2px 0;line-height:1.4}
+.seg{display:flex;background:var(--chip);border-radius:10px;padding:2px;flex:1}
+.seg .btn{background:transparent;padding:5px 0;flex:1;border-radius:8px;font-size:12px}
+.seg .btn[aria-pressed="true"]{background:var(--accent)}
+.lblsmall{font-size:12px;color:var(--muted);white-space:nowrap}
+.bar{margin:6px 2px 8px}
+.bar .t{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px}
+.bar .t b{font-variant-numeric:tabular-nums;font-weight:600}
+input[type=range]{width:100%;accent-color:var(--accent)}
+
+#explain{left:332px;right:332px;bottom:calc(16px + env(safe-area-inset-bottom));padding:10px 14px 12px}
+#steps{display:flex;gap:4px;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin;align-items:center}
+.st{all:unset;flex:none;font-size:11px;padding:3px 8px;border-radius:99px;background:var(--chip);color:var(--muted);white-space:nowrap;cursor:pointer}
+.st.done{opacity:.55}
+.st.cur{background:var(--accent);color:var(--accent-ink);font-weight:650}
+#stepTitle{font-size:15px;font-weight:680;margin:4px 0 3px;display:flex;align-items:center;gap:8px}
+#stepTitle .num{font-size:11px;font-weight:700;color:var(--accent-ink);background:var(--accent);border-radius:99px;padding:2px 7px}
+#stepText{margin:0;font-size:13px;line-height:1.5;opacity:.9}
+#prog{height:3px;border-radius:3px;background:var(--chip);margin-top:9px;overflow:hidden}
+#prog i{display:block;height:100%;width:0;background:var(--accent)}
+.ctl{display:flex;gap:4px;margin-left:auto}
+.ctl .btn{padding:3px 9px;font-size:12px}
+
+#info{left:16px;bottom:calc(16px + env(safe-area-inset-bottom));width:300px;padding:12px 14px;max-height:45%;overflow:auto}
+#info h3{margin:0 26px 6px 0;font-size:14.5px}
+#info p{margin:0;font-size:12.5px;line-height:1.5}
+#info .x{position:absolute;top:6px;right:6px;padding:4px 9px}
+#info .acts{display:flex;gap:6px;margin-top:10px}
+#info .acts .btn{flex:1}
+
+#fab{position:fixed;top:16px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:6}
+.fabb{position:static;padding:8px 13px;border-radius:12px;cursor:pointer;font-size:13px;font-weight:600;white-space:nowrap}
+.fabb[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+#panel.closed{display:none}
+body.nopanel #explain{right:16px}
+body.clean #hud,body.clean #panel,body.clean #explain,body.clean #info{display:none!important}
+body.idle #explain{display:none}
+.phead{display:flex;align-items:center;gap:6px;position:sticky;top:-6px;margin:0 -12px;padding:8px 12px;background:var(--panel);z-index:2;border-bottom:1px solid var(--border)}
+.tabs{display:flex;flex:1;background:var(--chip);border-radius:10px;padding:2px}
+.tab{all:unset;flex:1;text-align:center;padding:6px 0;border-radius:8px;font-size:12.5px;font-weight:600;cursor:pointer;color:var(--muted)}
+.tab[aria-selected="true"]{background:var(--bg1);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.btn.icon{padding:6px 10px}
+.plist h3{font-size:11.5px;margin:10px 2px 6px;color:var(--muted);font-weight:650}
+.plist .chips .btn{font-size:12px;padding:6px 9px}
+.plist .btn.sel{background:var(--accent);color:var(--accent-ink)}
+
+.lbl{background:var(--label);color:var(--text);border:1px solid var(--border);
+  border-radius:8px;padding:3px 7px;font-size:11px;font-weight:600;white-space:nowrap;cursor:pointer;
+  box-shadow:0 2px 8px rgba(0,0,0,.12);pointer-events:auto;user-select:none}
+.lbl:hover{background:var(--accent);color:var(--accent-ink)}
+.lbl.hot{background:var(--accent);color:var(--accent-ink);font-size:12px}
+.lbl.big{font-size:13px;font-weight:700;padding:4px 9px}
+#loading{position:fixed;inset:0;display:grid;place-items:center;color:var(--muted);font-size:14px}
+
+@media (max-width:1180px){
+  #explain{left:16px;right:332px}
+  #info{left:16px;bottom:auto;top:230px}
+}
+@media (max-width:760px){
+  #hud{right:16px;width:auto;padding:9px 12px;top:calc(8px + env(safe-area-inset-top))}
+  #hud .sub,#hud h1{display:none}
+  .read{gap:4px 8px}.read b{font-size:13px}.read span{font-size:9.5px}
+  #fab{top:auto;left:auto;right:16px;transform:none;bottom:calc(16px + env(safe-area-inset-bottom));flex-direction:column}
+  .fabb{padding:9px 11px;font-size:16px}.fabb .t{display:none}
+  #panel{top:auto;left:16px;right:70px;width:auto;bottom:calc(16px + env(safe-area-inset-bottom));max-height:58%}
+  #explain,body.nopanel #explain{left:16px;right:70px;padding:8px 10px 9px}
+  body:not(.nopanel) #explain{display:none}
+  #stepText{font-size:12px;max-height:6.2em;overflow:auto}
+  #stepTitle{font-size:13.5px}
+  #info{left:16px;right:16px;width:auto;top:auto;bottom:calc(150px + env(safe-area-inset-bottom));max-height:35%}
+  .lbl{font-size:9.5px;padding:2px 5px}.lbl.hot{font-size:10.5px}
+}
+</style>
+</head>
+<body class="idle">
+<div id="app"></div>
+<div id="loading">Загрузка 3D…</div>
+
+<div id="hud" class="card">
+  <h1>iPhone 18 Pro в разрезе</h1>
+  <p class="sub">Полупрозрачная модель по данным разборок 2026 года. Выберите сценарий справа — и смотрите, что происходит внутри. Нажимайте на детали и подписи.</p>
+  <div class="read">
+    <div class="wide"><span>Сейчас</span><b id="rNow">Выберите сценарий</b></div>
+    <div><span>Заряд</span><b id="rBat">—</b></div>
+    <div><span>Чип</span><b id="rT">—</b></div>
+    <div><span>Экран</span><b id="rHz">—</b></div>
+  </div>
+</div>
+
+<div id="panel" class="card" aria-label="Управление">
+  <div class="phead">
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" data-tab="run" aria-selected="true">Как работает</button>
+      <button class="tab" role="tab" data-tab="parts" aria-selected="false">Детали</button>
+      <button class="tab" role="tab" data-tab="view" aria-selected="false">Вид</button>
+    </div>
+    <button class="btn icon" id="panelHide" aria-label="Свернуть панель" title="Свернуть панель">✕</button>
+  </div>
+  <div class="pane" data-pane="run">
+  <section>
+    <h2>Сценарии</h2>
+    <div class="scgrid" id="scs"></div>
+    <div class="row"><span class="lblsmall">Скорость</span>
+      <div class="seg" id="speed">
+        <button class="btn" data-s="0.5" aria-pressed="false">×0,5</button>
+        <button class="btn" data-s="1" aria-pressed="true">×1</button>
+        <button class="btn" data-s="2" aria-pressed="false">×2</button>
+      </div>
+    </div>
+    <p class="hint">Каждый сценарий идёт по шагам: внизу появляется объяснение, нужные детали подсвечиваются, а сигналы, свет, тепло и энергия бегут по телефону цветными точками.</p>
+  </section>
+  </div>
+  <div class="pane hidden" data-pane="parts">
+  <section>
+    <h2>Разборка</h2>
+    <div class="bar"><div class="t"><span>Разложить по слоям</span><b id="vEx">0%</b></div>
+      <input type="range" id="ex" min="0" max="100" value="0" aria-label="Степень разборки"></div>
+    <div class="row"><button class="btn" id="btnEx">⇔ Разобрать</button><button class="btn" id="btnAsm">Собрать</button></div>
+    <p class="hint">Телефон раскладывается как бутерброд: стекло и экран — вперёд, плата и камеры — назад, кнопки — в стороны.</p>
+  </section>
+  <section class="plist">
+    <h2>Все детали</h2>
+    <div id="partList"></div>
+    <p class="hint">Нажмите на деталь — камера подлетит к ней. В карточке есть «Только эта деталь».</p>
+  </section>
+  </div>
+  <div class="pane hidden" data-pane="view">
+  <section>
+    <h2>Вид</h2>
+    <div class="bar"><div class="t"><span>Рентген (прозрачность)</span><b id="vX"></b></div>
+      <input type="range" id="xr" min="0" max="100" value="72" aria-label="Прозрачность корпуса"></div>
+    <div class="chips">
+      <button class="btn" id="tLbl" aria-pressed="true">Подписи</button>
+      <button class="btn" id="tRot" aria-pressed="false">Автоповорот</button>
+    </div>
+    <div class="chips" style="margin-top:8px" id="cams">
+      <button class="btn" data-c="iso">Общий</button>
+      <button class="btn" data-c="front">Спереди</button>
+      <button class="btn" data-c="back">Сзади</button>
+      <button class="btn" data-c="side">Сбоку</button>
+      <button class="btn" data-c="bottom">Снизу</button>
+      <button class="btn" data-c="cams">Камеры</button>
+      <button class="btn" data-c="board">Плата</button>
+    </div>
+  </section>
+  </div>
+</div>
+
+<div id="explain" class="card">
+  <div id="steps"></div>
+  <div id="stepTitle"><span class="num" id="stepNum">1</span><span id="stepName"></span>
+    <span class="ctl"><button class="btn" id="bPrev" aria-label="Предыдущий шаг">◀</button><button class="btn" id="bPlay" aria-label="Пауза">❚❚</button><button class="btn" id="bNext" aria-label="Следующий шаг">▶</button><button class="btn" id="bStop" aria-label="Закрыть сценарий">✕</button></span></div>
+  <p id="stepText"></p>
+  <div id="prog"><i></i></div>
+</div>
+
+<div id="info" class="card hidden" role="dialog" aria-live="polite">
+  <button class="btn x" id="infoClose" aria-label="Закрыть">✕</button>
+  <h3 id="infoTitle"></h3>
+  <p id="infoText"></p>
+  <div class="acts"><button class="btn" id="infoIso">Только эта деталь</button></div>
+</div>
+
+<div id="fab">
+  <button class="card fabb" id="panelToggle" aria-pressed="true" title="Панель управления">☰ <span class="t">Панель</span></button>
+  <button class="card fabb" id="cleanToggle" aria-pressed="false" title="Скрыть всё, кроме модели">👁 <span class="t">Только модель</span></button>
+</div>
+
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+"three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const V = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, t) => a + (b - a) * t;
+const ease = t => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+const $ = id => document.getElementById(id);
+
+/* ---------- сцена ---------- */
+const app = $('app');
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+app.appendChild(renderer.domElement);
+const labelRenderer = new CSS2DRenderer();
+labelRenderer.setSize(innerWidth, innerHeight);
+Object.assign(labelRenderer.domElement.style, { position: 'absolute', top: '0', left: '0', pointerEvents: 'none' });
+app.appendChild(labelRenderer.domElement);
+
+const scene = new THREE.Scene();
+scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(renderer), .04).texture;
+const camera = new THREE.PerspectiveCamera(32, innerWidth / innerHeight, 1, 6000);
+camera.position.set(-170, 70, 250);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; controls.target.set(0, 0, 0);
+controls.minDistance = 30; controls.maxDistance = 1400;
+scene.add(new THREE.HemisphereLight(0xffffff, 0x8899aa, .9));
+const dl = new THREE.DirectionalLight(0xffffff, 1.6); dl.position.set(-120, 200, 260); scene.add(dl);
+const dl2 = new THREE.DirectionalLight(0xbcd2ff, .8); dl2.position.set(200, -60, -220); scene.add(dl2);
+
+const phone = new THREE.Group(); scene.add(phone);
+
+/* ---------- геометрия ---------- */
+function rrTo(p, w, h, r, cx = 0, cy = 0) {
+  const x = cx - w / 2, y = cy - h / 2;
+  p.moveTo(x + r, y); p.lineTo(x + w - r, y); p.absarc(x + w - r, y + r, r, -Math.PI / 2, 0);
+  p.lineTo(x + w, y + h - r); p.absarc(x + w - r, y + h - r, r, 0, Math.PI / 2);
+  p.lineTo(x + r, y + h); p.absarc(x + r, y + h - r, r, Math.PI / 2, Math.PI);
+  p.lineTo(x, y + r); p.absarc(x + r, y + r, r, Math.PI, Math.PI * 1.5);
+  return p;
+}
+const rr = (w, h, r, cx, cy) => rrTo(new THREE.Shape(), w, h, r, cx, cy);
+function ext(shape, z0, z1, seg = 24) {
+  const g = new THREE.ExtrudeGeometry(shape, { depth: z1 - z0, bevelEnabled: false, curveSegments: seg });
+  g.translate(0, 0, z0); return g;
+}
+function box(w, h, d, x, y, z) { const g = new THREE.BoxGeometry(w, h, d); g.translate(x, y, z); return g; }
+function cylZ(r, z0, z1, x, y, seg = 32, r2 = r, open = false) { const g = new THREE.CylinderGeometry(r2, r, z1 - z0, seg, 1, open); g.rotateX(Math.PI / 2); g.translate(x, y, (z0 + z1) / 2); return g; }
+
+/* ---------- материалы ---------- */
+const shellMats = [];
+function shell(m) { m.transparent = true; m.depthWrite = false; shellMats.push(m); m.userData.op = m.opacity; return m; }
+const M = {
+  glass: shell(new THREE.MeshPhysicalMaterial({ color: 0xd6ecff, roughness: .04, metalness: 0, opacity: .14, clearcoat: 1, side: THREE.DoubleSide })),
+  frame: shell(new THREE.MeshStandardMaterial({ color: 0xaab2bd, metalness: .85, roughness: .3, opacity: .5, side: THREE.DoubleSide })),
+  back: shell(new THREE.MeshPhysicalMaterial({ color: 0x8d99a8, metalness: .5, roughness: .4, opacity: .3, side: THREE.DoubleSide })),
+  plateau: shell(new THREE.MeshStandardMaterial({ color: 0x9aa3ae, metalness: .85, roughness: .28, opacity: .4, side: THREE.DoubleSide })),
+  oled: shell(new THREE.MeshStandardMaterial({ color: 0x0b0e14, roughness: .35, opacity: .5 })),
+  pcb: new THREE.MeshStandardMaterial({ color: 0x1b6a54, roughness: .55, metalness: .1 }),
+  pcb2: new THREE.MeshStandardMaterial({ color: 0x175a48, roughness: .55, metalness: .1 }),
+  inter: new THREE.MeshStandardMaterial({ color: 0x2f3a3a, roughness: .5 }),
+  chip: new THREE.MeshStandardMaterial({ color: 0x23262d, roughness: .45, metalness: .3 }),
+  steel: new THREE.MeshStandardMaterial({ color: 0xbfc5cc, metalness: .9, roughness: .3 }),
+  dark: new THREE.MeshStandardMaterial({ color: 0x2a2e36, metalness: .6, roughness: .4 }),
+  black: new THREE.MeshStandardMaterial({ color: 0x0d0f13, metalness: .3, roughness: .35 }),
+  copper: new THREE.MeshStandardMaterial({ color: 0xc8793c, metalness: .9, roughness: .3 }),
+  magnet: new THREE.MeshStandardMaterial({ color: 0x8b919b, metalness: .8, roughness: .35 }),
+  lens: new THREE.MeshPhysicalMaterial({ color: 0x1a3550, metalness: .2, roughness: .05, clearcoat: 1, transparent: true, opacity: .45, depthWrite: false }),
+  sensor: new THREE.MeshStandardMaterial({ color: 0x3b2f66, metalness: .5, roughness: .25, emissive: 0x7a5cff, emissiveIntensity: 0 }),
+  prism: new THREE.MeshPhysicalMaterial({ color: 0xbfe3ff, roughness: .05, transmission: 0, transparent: true, opacity: .45 }),
+  batShell: shell(new THREE.MeshStandardMaterial({ color: 0x39404c, metalness: .5, roughness: .4, opacity: .45 })),
+  batFill: new THREE.MeshStandardMaterial({ color: 0x22c55e, emissive: 0x16a34a, emissiveIntensity: .35, transparent: true, opacity: .85 }),
+  flex: new THREE.MeshStandardMaterial({ color: 0xd08a2a, roughness: .5, metalness: .2 }),
+  sapph: new THREE.MeshPhysicalMaterial({ color: 0x9fb8d6, roughness: .05, metalness: .3, clearcoat: 1 }),
+  btn: new THREE.MeshStandardMaterial({ color: 0x8e96a2, metalness: .9, roughness: .3 }),
+  action: new THREE.MeshStandardMaterial({ color: 0xff8a3d, metalness: .6, roughness: .35 }),
+  membrane: new THREE.MeshStandardMaterial({ color: 0x5b6472, roughness: .7 }),
+  white: new THREE.MeshStandardMaterial({ color: 0xf2f2f0, roughness: .4, emissive: 0xffffff, emissiveIntensity: 0 }),
+  ant: new THREE.MeshBasicMaterial({ color: 0x22d3ee, transparent: true, opacity: .0, depthWrite: false }),
+  band: new THREE.MeshStandardMaterial({ color: 0x3a3f47, roughness: .8 }),
+  barrel: new THREE.MeshStandardMaterial({ color: 0x2a2e36, metalness: .7, roughness: .35, side: THREE.DoubleSide }),
+};
+M.module = shell(new THREE.MeshStandardMaterial({ color: 0x3a404a, metalness: .6, roughness: .4, opacity: .35 }));
+const edgeMat = new THREE.LineBasicMaterial({ color: 0x9fb3c8, transparent: true, opacity: .35, depthWrite: false });
+
+function textTex(lines, o = {}) {
+  const c = document.createElement('canvas'); c.width = o.w || 256; c.height = o.h || 256;
+  const g = c.getContext('2d');
+  g.fillStyle = o.bg || '#202329'; g.fillRect(0, 0, c.width, c.height);
+  if (o.border) { g.strokeStyle = o.border; g.lineWidth = 6; g.strokeRect(8, 8, c.width - 16, c.height - 16); }
+  g.fillStyle = o.fg || '#d7dbe2'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  lines.forEach((l, i) => {
+    g.font = `${i ? 500 : 700} ${i ? (o.s2 || 30) : (o.s1 || 46)}px Inter, Arial, sans-serif`;
+    g.fillText(l, c.width / 2, c.height / 2 + (i - (lines.length - 1) / 2) * (o.lh || 52));
+  });
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t;
+}
+function chipMats(tex, side = 1, base = M.chip) {
+  const top = new THREE.MeshStandardMaterial({ map: tex, roughness: .4, metalness: .2 });
+  const a = [base, base, base, base, base, base]; a[side > 0 ? 4 : 5] = top; return a;
+}
+
+/* ---------- реестр деталей ---------- */
+const PARTS = {}, G = {}, pickables = [], labels = [];
+function grp(gk, off) { const g = new THREE.Group(); phone.add(g); G[gk] = { g, off: V(...off) }; return g; }
+function part(key, gk, name, text, lbl, main = false) { PARTS[key] = { key, gk, name, text, meshes: [], lbl: V(...lbl), main }; }
+function add(key, geo, mat, edges = false) {
+  const m = new THREE.Mesh(geo, mat); m.userData.key = key;
+  PARTS[key].meshes.push(m); G[PARTS[key].gk].g.add(m); pickables.push(m);
+  if (edges) { const e = new THREE.LineSegments(new THREE.EdgesGeometry(geo, 25), edgeMat); e.raycast = () => {}; PARTS[key].meshes.push(e); G[PARTS[key].gk].g.add(e); }
+  return m;
+}
+
+const W = 71.9, H = 150, TH = 8.75, R = 11;
+
+/* группы разборки: смещения (мм) */
+grp('glass', [0, 0, 62]); grp('touch', [0, 0, 50]); grp('oled', [0, 0, 40]);
+grp('front', [0, 8, 28]); grp('vapor', [0, 0, 18]); grp('board', [6, 4, 8]); grp('board2', [6, 4, -4]);
+grp('frame', [0, 0, 0]); grp('btnL', [-26, 0, 0]); grp('btnR', [26, 0, 0]);
+grp('battery', [0, -8, -16]); grp('bottom', [0, -26, -6]); grp('cams', [0, 6, -34]);
+grp('magsafe', [0, -8, -48]); grp('back', [0, 0, -62]);
+
+/* --- стекло --- */
+part('glass', 'glass', 'Защитное стекло Ceramic Shield', 'Верхний слой экрана. Стекло с керамическими нанокристаллами внутри — заметно прочнее обычного и лучше держит царапины. Сквозь него проходит свет экрана и «чувствуется» ваш палец.', [-30, 62, 4.4], true);
+add('glass', ext(rr(W - 1.2, H - 1.2, R - .6), 3.55, 4.35), M.glass, true);
+
+/* --- сенсорный слой --- */
+part('touch', 'touch', 'Сенсорный слой', 'Сетка прозрачных электродов прямо поверх OLED-матрицы. Палец проводит ток и меняет электрическую ёмкость в узлах сетки — по этим изменениям контроллер вычисляет точку касания. Опрос до 240 раз в секунду.', [30, 55, 3.5], true);
+const TG = { nx: 9, ny: 19, sx: 7.4, sy: 7.4 };
+const touchNodes = new THREE.InstancedMesh(new THREE.BoxGeometry(1.1, 1.1, .12), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: .9, depthWrite: false }), TG.nx * TG.ny);
+touchNodes.userData.key = 'touch'; PARTS.touch.meshes.push(touchNodes); G.touch.g.add(touchNodes);
+{
+  const pts = []; const x0 = -(TG.nx - 1) / 2 * TG.sx, y0 = -(TG.ny - 1) / 2 * TG.sy, z = 3.52;
+  for (let i = 0; i < TG.nx; i++) pts.push(V(x0 + i * TG.sx, y0, z), V(x0 + i * TG.sx, -y0, z));
+  for (let j = 0; j < TG.ny; j++) pts.push(V(x0, y0 + j * TG.sy, z), V(-x0, y0 + j * TG.sy, z));
+  const gl = new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: 0x6fd3ff, transparent: true, opacity: .18, depthWrite: false }));
+  gl.userData.key = 'touch'; PARTS.touch.meshes.push(gl); G.touch.g.add(gl); TG.lines = gl;
+  const dm = new THREE.Object3D(); let n = 0;
+  for (let i = 0; i < TG.nx; i++) for (let j = 0; j < TG.ny; j++) { dm.position.set(x0 + i * TG.sx, y0 + j * TG.sy, z); dm.updateMatrix(); touchNodes.setMatrixAt(n++, dm.matrix); }
+  TG.x0 = x0; TG.y0 = y0;
+}
+
+/* --- OLED + картинка экрана --- */
+part('oled', 'oled', 'OLED-экран ProMotion', 'Экран 6,3″ — около 3 миллионов пикселей. Каждый пиксель светится сам (органические светодиоды: красный, зелёный и синий субпиксели), поэтому чёрный — по-настоящему чёрный. Частота меняется от 1 до 120 Гц: прокрутка плавная, а заряд экономится.', [-30, -40, 3.4], true);
+add('oled', ext(rr(W - 3, H - 3, R - 1.4), 2.7, 3.45), M.oled, true);
+const SCR = { w: W - 3.4, h: H - 3.4 };
+const scrCanvas = document.createElement('canvas'); scrCanvas.width = 360; scrCanvas.height = Math.round(360 * SCR.h / SCR.w);
+const scrCtx = scrCanvas.getContext('2d');
+const scrTex = new THREE.CanvasTexture(scrCanvas); scrTex.colorSpace = THREE.SRGBColorSpace;
+scrTex.repeat.set(1 / SCR.w, 1 / SCR.h); scrTex.offset.set(.5, .5);
+const scrMat = new THREE.MeshBasicMaterial({ map: scrTex, transparent: true, opacity: .5, depthWrite: false, toneMapped: false });
+const screenMesh = add('oled', new THREE.ShapeGeometry(rr(SCR.w, SCR.h, R - 1.6), 20), scrMat);
+screenMesh.position.z = 3.47; screenMesh.renderOrder = 2;
+
+/* --- TrueDepth / фронтальная часть --- */
+part('truedepth', 'front', 'Модуль TrueDepth (Face ID)', 'Сидит в Dynamic Island: фронтальная камера 18 Мп, проектор 30 000 инфракрасных точек и ИК-подсветка. В iPhone 18 Pro инфракрасную камеру спрятали под экран, поэтому «островок» стал заметно меньше.', [0, 70, 2.6], true);
+add('truedepth', box(26, 7, 2, 0, 66, .9), M.dark, true);
+const frontCam = add('truedepth', cylZ(1.9, 1.9, 2.65, 0, 66, 24), M.lens);
+const dotProj = add('truedepth', box(4, 4, 1.4, 6.5, 66, 2.2), M.black);
+add('truedepth', cylZ(.9, 2.85, 2.95, 6.5, 66, 16), new THREE.MeshBasicMaterial({ color: 0x7a1020 }));
+const flood = add('truedepth', box(3, 3, 1.2, -5.5, 66, 2.1), M.black);
+const irCam = add('truedepth', box(4.5, 4.5, 1.4, -10.5, 66, 2.2), M.black);
+add('truedepth', cylZ(1.4, 2.85, 2.95, -10.5, 66, 16), new THREE.MeshBasicMaterial({ color: 0x1b1030 }));
+const P_DOT = V(6.5, 66, 3), P_FLOOD = V(-5.5, 66, 3), P_IR = V(-10.5, 66, 3);
+
+part('earpiece', 'front', 'Разговорный динамик', 'Над экраном. Во время звонка звучит в ухо, а при музыке работает вторым динамиком — получается стерео.', [16, 73, 2]);
+add('earpiece', box(13, 2.6, 1.5, 0, 71.6, 2.2), M.dark, true);
+const earMem = add('earpiece', box(10, 1.6, .3, 0, 71.6, 3.05), M.membrane);
+
+/* --- испарительная камера --- */
+part('vapor', 'vapor', 'Испарительная камера', 'Плоская герметичная пластина из стали с медной сеткой и каплей воды внутри. Вода испаряется над горячим чипом, пар мгновенно разносит тепло по всей пластине, остывает, снова становится водой и по сетке возвращается обратно. В iPhone 18 Pro камера стала в 3 раза больше по площади.', [-24, 8, 2.6], true);
+const heatCanvas = document.createElement('canvas'); heatCanvas.width = 64; heatCanvas.height = 96;
+const heatCtx = heatCanvas.getContext('2d');
+const heatTex = new THREE.CanvasTexture(heatCanvas);
+const VC = { w: 62, h: 82, cx: 0, cy: 20 };
+heatTex.repeat.set(1 / VC.w, 1 / VC.h); heatTex.offset.set(.5 - VC.cx / VC.w, .5 - VC.cy / VC.h);
+const vaporMat = new THREE.MeshStandardMaterial({ color: 0xb9c0c8, metalness: .85, roughness: .32, emissive: 0xffffff, emissiveMap: heatTex, emissiveIntensity: 1, transparent: true, opacity: .78 });
+add('vapor', ext(rr(VC.w, VC.h, 8, VC.cx, VC.cy), 2.05, 2.6), vaporMat, true);
+
+/* --- плата (сэндвич) --- */
+function boardShape() {
+  const s = new THREE.Shape();
+  s.moveTo(-31, 25); s.lineTo(31, 25); s.lineTo(31, 60); s.absarc(27, 60, 4, 0, Math.PI / 2); s.lineTo(6, 64); s.lineTo(2, 60); s.lineTo(2, 38); s.lineTo(-31, 38); s.lineTo(-31, 25);
+  return s;
+}
+part('board', 'board', 'Материнская плата (сэндвич)', 'Две платы, сложенные друг на друга через промежуточную рамку: так на маленькой площади помещается вдвое больше микросхем. Сверху — процессор, внутри «бутерброда» спрятаны память и контроллер питания.', [32, 30, 1.9], true);
+add('board', ext(boardShape(), 1.0, 1.75), M.pcb, true);
+add('board', ext(boardShape(), -1.0, 1.0), M.inter);
+part('board2', 'board2', 'Нижняя плата', 'Вторая половина «сэндвича». На ней модем, флеш-память, контроллер питания и аудиоусилитель.', [32, 26, -1.8]);
+add('board2', ext(boardShape(), -1.8, -1.0), M.pcb2, true);
+
+function chip(key, gk, name, text, w, h, x, y, side, tex, mat) {
+  part(key, gk, name, text, [x, y + h / 2 + 2, side > 0 ? 2.2 : -2.2]);
+  const z0 = side > 0 ? 1.75 : -2.45, z1 = side > 0 ? 2.05 : -1.8;
+  return add(key, box(w, h, z1 - z0, x, y, (z0 + z1) / 2), chipMats(tex, side, mat));
+}
+const socMesh = chip('soc', 'board', 'Процессор A20 Pro', 'Мозг телефона, техпроцесс 2 нм. В одном чипе: центральный процессор (CPU), графика (GPU), нейродвижок для ИИ, обработка фото (ISP) и Secure Enclave для Face ID. Оперативная память стоит прямо на чипе. Чип прижат прямо к испарительной камере — без термопасты.', 13, 13, 16.5, 47, 1,
+  textTex(['A20 Pro', '2 нм'], { bg: '#a9afb7', fg: '#15181d', s1: 54 }), M.steel);
+PARTS.soc.main = true;
+const socMat = socMesh.material[4];
+chip('n1', 'board', 'Беспроводной чип N1', 'Wi-Fi 7, Bluetooth 6 и Thread. Интернет дома, AirDrop, наушники и часы.', 7, 6, 8, 31, 1, textTex(['N1', 'Wi-Fi 7'], { s1: 70 }));
+chip('gyro', 'board', 'Гироскоп и акселерометр', 'Чувствуют наклон, поворот и тряску. Нужны для поворота экрана, игр, шагомера и стабилизации камеры.', 4, 4, 25, 31, 1, textTex(['IMU'], { s1: 80 }));
+chip('modem', 'board2', 'Модем Apple C2', 'Собственный 5G-модем Apple второго поколения. Превращает голос и данные в радиосигнал и обратно — вместе с антеннами в рамке.', 9, 9, 9, 51, -1, textTex(['C2', '5G modem'], { s1: 80 }));
+chip('nand', 'board2', 'Флеш-память', 'Здесь хранятся фото, видео, приложения и сама iOS. Данные сохраняются даже без питания.', 11, 13, 23, 49, -1, textTex(['NAND', 'память'], { s1: 62 }));
+chip('pmic', 'board2', 'Контроллер питания', 'Распределяет энергию по всем узлам, управляет зарядкой и следит за температурой аккумулятора.', 10, 7, -12, 31.5, -1, textTex(['PMIC', 'питание'], { s1: 64 }));
+chip('amp', 'board2', 'Аудиоусилитель', 'Усиливает звук для динамиков и Taptic Engine.', 5, 5, -25, 31.5, -1, textTex(['AMP'], { s1: 80 }));
+part('flexes', 'board', 'Шлейфы', 'Гибкие ленты с дорожками соединяют плату с экраном, камерами, аккумулятором и портом USB-C.', [-33, -10, 0]);
+add('flexes', box(2.2, 80, .25, -33.2, -18, 0), M.flex);
+add('flexes', box(2.2, 80, .25, 33.2, -18, 0), M.flex);
+add('flexes', box(12, 6, .25, 20, 22, 1.9), M.flex);
+
+/* --- корпус --- */
+part('frame', 'frame', 'Корпус — алюминиевый unibody', 'Цельная рамка из алюминия. Отлично отводит тепло от чипа. Пластиковые вставки делят её на части — эти части работают как антенны.', [36, -30, 0], true);
+{
+  const s = rr(W, H, R); s.holes.push(rrTo(new THREE.Path(), W - 3, H - 3, R - 1.5));
+  const g = new THREE.ExtrudeGeometry(s, { depth: TH - .5, bevelEnabled: true, bevelThickness: .25, bevelSize: .25, bevelSegments: 2, curveSegments: 28 });
+  g.translate(0, 0, -TH / 2 + .25); add('frame', g, M.frame, true);
+  for (const [x, y, w, h] of [[-35.2, 55, 1.6, 1], [35.2, 55, 1.6, 1], [-35.2, -55, 1.6, 1], [35.2, -55, 1.6, 1], [-22, 74.6, 1, 1.6], [22, -74.6, 1, 1.6]])
+    add('frame', box(w, h, TH - .6, x, y, 0), M.band);
+  // отверстия снизу
+  for (let i = 0; i < 6; i++) add('frame', new THREE.CylinderGeometry(.6, .6, .5, 10).translate(11 + i * 3.2, -75, 0), M.black);
+  for (let i = 0; i < 4; i++) add('frame', new THREE.CylinderGeometry(.6, .6, .5, 10).translate(-24 + i * 3.2, -75, 0), M.black);
+}
+/* антенны: подсвечиваемые участки рамки */
+part('antennas', 'frame', 'Антенны', 'Участки металлической рамки между пластиковыми вставками — это антенны 5G, LTE, Wi-Fi и GPS. Телефон сам переключается на ту, которую не закрывает ваша рука.', [-38, 66, 0], true);
+function rrPts(w, h, r) { const p = rrTo(new THREE.Path(), w, h, r); return p.getSpacedPoints(400).map(v => V(v.x, v.y, 0)); }
+const PERIM = rrPts(W + .4, H + .4, R + .2);
+function perimSeg(test) { const pts = PERIM.filter(test); return pts; }
+const antSegs = [
+  perimSeg(p => p.y > 55 && (p.x < -22 || p.x < 0 && p.y < 74)),
+  perimSeg(p => p.y > 55 && p.x > -22 && p.x > 0),
+  perimSeg(p => p.y < -55 && p.x < 22),
+  perimSeg(p => p.y < -55 && p.x > 22),
+];
+for (const seg of antSegs) {
+  if (seg.length < 2) continue;
+  seg.sort((a, b) => Math.atan2(a.y, a.x) - Math.atan2(b.y, b.x));
+  const tube = add('antennas', new THREE.TubeGeometry(new THREE.CatmullRomCurve3(seg), 60, .7, 6, false), M.ant);
+}
+
+/* --- кнопки --- */
+part('buttons', 'btnL', 'Кнопки громкости и Action', 'Слева: оранжевая настраиваемая кнопка Action и две кнопки громкости. Внутри — микропереключатели, соединённые шлейфом с платой.', [-38, 30, 0]);
+add('buttons', box(1.2, 8, 3, -36.4, 46, 0), M.action);
+add('buttons', box(1.2, 11, 3, -36.4, 32, 0), M.btn);
+add('buttons', box(1.2, 11, 3, -36.4, 19, 0), M.btn);
+part('sidebtn', 'btnR', 'Боковая кнопка', 'Включение, блокировка, Siri и Apple Pay.', [38, 34, 0]);
+add('sidebtn', box(1.2, 17, 3, 36.4, 30, 0), M.btn);
+part('ccontrol', 'btnR', 'Camera Control', 'Сенсорная кнопка из сапфирового стекла. Внутри — датчик силы нажатия и ёмкостный сенсор: лёгкое нажатие — настройки, сильное — снимок, скольжение — зум. «Щелчок» изображает Taptic Engine.', [39, -22, 0]);
+add('ccontrol', box(1.2, 17, 3.4, 36.4, -22, 0), M.sapph, true);
+add('ccontrol', box(2, 15, 2.6, 34.9, -22, 0), M.dark);
+
+/* --- аккумулятор --- */
+part('battery', 'battery', 'Аккумулятор', 'Литий-ионный, около 4 300 мА·ч (версия с eSIM). Лежит в металлическом лотке на винтах — менять его стало проще. Энергия хранится в виде ионов лития, которые при зарядке переходят с одного электрода на другой.', [-34, -18, 1.8], true);
+const BAT = { w: 62, h: 76, cx: 0, cy: -16, z0: -3.5, z1: 1.8 };
+add('battery', ext(rr(BAT.w, BAT.h, 4, BAT.cx, BAT.cy), BAT.z0, BAT.z1), M.batShell, true);
+const batFill = add('battery', box(BAT.w - 3, 1, BAT.z1 - BAT.z0 - 1.2, 0, 0, (BAT.z0 + BAT.z1) / 2), M.batFill);
+const batLabel = add('battery', new THREE.PlaneGeometry(40, 20).translate(0, -16, 1.82), new THREE.MeshBasicMaterial({ map: textTex(['Li-ion', '≈4 300 мА·ч'], { w: 512, h: 256, bg: 'rgba(0,0,0,0)', fg: '#e8edf3', s1: 70, s2: 48, lh: 70 }), transparent: true, depthWrite: false }));
+add('battery', box(10, 5, .4, -18, 23, 1), M.flex);
+
+/* --- MagSafe --- */
+part('magsafe', 'magsafe', 'MagSafe: катушка и магниты', 'Медная катушка принимает энергию беспроводной зарядки. Кольцо магнитов вокруг точно ставит зарядку и аксессуары на место.', [30, -40, -3.6], true);
+const MS = { cx: 0, cy: -14 };
+for (let i = 0; i < 9; i++) add('magsafe', new THREE.TorusGeometry(10 + i * 1.35, .5, 6, 64).translate(MS.cx, MS.cy, -3.65), M.copper);
+for (let i = 0; i < 18; i++) {
+  const a = i / 18 * Math.PI * 2;
+  const g = new THREE.BoxGeometry(5.5, 1.6, .5); g.rotateZ(a + Math.PI / 2); g.translate(MS.cx + Math.cos(a) * 25.5, MS.cy + Math.sin(a) * 25.5, -3.65);
+  add('magsafe', g, M.magnet);
+}
+add('magsafe', box(3, 9, .5, 0, -46, -3.65), M.magnet);
+const coilMats = PARTS.magsafe.meshes.filter(m => m.material === M.copper);
+const coilGlow = new THREE.MeshStandardMaterial({ color: 0xc8793c, metalness: .7, roughness: .3, emissive: 0xffa040, emissiveIntensity: 0 });
+coilMats.forEach(m => m.material = coilGlow);
+
+/* --- низ: Taptic, USB-C, динамик, микрофоны --- */
+part('taptic', 'bottom', 'Taptic Engine', 'Линейный вибромотор. Тяжёлый грузик-магнит бегает вперёд-назад на пружинах, катушка управляет им с точностью до миллисекунд — поэтому вибрация «щёлкает», а не жужжит.', [-22, -58, 2], true);
+add('taptic', box(22, 9.5, 3.6, -19.5, -64, -.6), shell(new THREE.MeshStandardMaterial({ color: 0x8892a0, metalness: .8, roughness: .35, opacity: .35 })), true);
+const tapMass = add('taptic', box(9, 7.5, 2.8, -19.5, -64, -.6), new THREE.MeshStandardMaterial({ color: 0x5a6270, metalness: .8, roughness: .3 }));
+add('taptic', box(4, 7.5, 2.8, -26.5, -64, -.6), M.copper);
+part('usbc', 'bottom', 'Порт USB-C', 'Зарядка, передача данных и подключение мониторов. Через него идёт быстрая зарядка.', [0, -80, 0], true);
+add('usbc', box(9.5, 7, 3.4, 0, -71, 0), M.steel, true);
+add('usbc', box(8.2, 1.2, 2.4, 0, -74.6, 0), M.black);
+part('speaker', 'bottom', 'Нижний динамик', 'Магнит и катушка двигают мембрану, мембрана толкает воздух — получается звук. Он выходит через отверстия внизу корпуса.', [22, -58, 2], true);
+add('speaker', box(22, 10, 3.6, 19.5, -64, -.6), M.dark, true);
+const spkMem = add('speaker', box(16, 6, .3, 19.5, -64, 1.3), M.membrane);
+part('mics', 'bottom', 'Микрофоны', 'Их несколько: снизу, сверху и у камер. Вместе они подавляют шум и записывают объёмный звук.', [-12, -78, 0]);
+add('mics', cylZ(1.3, -.8, .8, -12, -72.5, 16), M.dark);
+add('mics', cylZ(1.1, -.5, .5, 8, 72.6, 16), M.dark);
+const P_MIC = V(-12, -72.5, 0);
+
+/* --- камеры --- */
+const CAM = { main: V(-20.5, 62), ultra: V(-20.5, 45), tele: V(-4.5, 57), flash: V(20, 62), lidar: V(20, 45) };
+const ZP = -6.6; // поверхность плато
+part('camMain', 'cams', 'Основная камера 48 Мп', 'Большая матрица 48 Мп; для стабилизации сдвигается сама матрица. Новое в iPhone 18 Pro: изменяемая диафрагма ƒ/1.48–ƒ/4 — лепестки регулируют, сколько света пройдёт.', [-31, 72, ZP], true);
+add('camMain', box(16, 16, 5.5, CAM.main.x, CAM.main.y, -1.2), M.module, true);
+add('camMain', cylZ(8.2, ZP - .3, -3.8, CAM.main.x, CAM.main.y, 40, 8.2, true), M.barrel);
+add('camMain', cylZ(6.6, ZP - .4, ZP - .2, CAM.main.x, CAM.main.y, 40), M.lens);
+const mainSensor = add('camMain', box(11, 9, .5, CAM.main.x, CAM.main.y, 1.3), M.sensor);
+const blades = [];
+for (let i = 0; i < 6; i++) {
+  const b = add('camMain', new THREE.BoxGeometry(9, 3.4, .15), new THREE.MeshStandardMaterial({ color: 0x1a1c20, metalness: .7, roughness: .4 }));
+  b.userData.a = i / 6 * Math.PI * 2; blades.push(b);
+}
+part('camUltra', 'cams', 'Сверхширокая камера 48 Мп', 'Угол обзора 120°, умеет снимать макро с пары сантиметров.', [-33, 40, ZP]);
+add('camUltra', box(13, 13, 5.5, CAM.ultra.x, CAM.ultra.y, -1.4), M.module, true);
+add('camUltra', cylZ(7, ZP - .3, -3.8, CAM.ultra.x, CAM.ultra.y, 40, 7, true), M.barrel);
+add('camUltra', box(9, 7, .5, CAM.ultra.x, CAM.ultra.y, 1.2), M.sensor);
+add('camUltra', cylZ(5.4, ZP - .4, ZP - .2, CAM.ultra.x, CAM.ultra.y, 40), M.lens);
+part('camTele', 'cams', 'Телекамера 48 Мп (тетрапризма)', 'Свет четыре раза отражается внутри призмы, поэтому «длинный» объектив помещается в тонкий корпус. 4-кратный оптический зум.', [2, 70, ZP], true);
+add('camTele', box(12, 18, 5.5, CAM.tele.x, 53, -1.4), shell(new THREE.MeshStandardMaterial({ color: 0x2a2e36, metalness: .6, roughness: .4, opacity: .4 })), true);
+add('camTele', cylZ(7, ZP - .3, -3.8, CAM.tele.x, CAM.tele.y, 40, 7, true), M.barrel);
+add('camTele', cylZ(5.4, ZP - .4, ZP - .2, CAM.tele.x, CAM.tele.y, 40), M.lens);
+add('camTele', box(7, 11, 3.4, CAM.tele.x, 53.5, -2.5), M.prism);
+const teleSensor = add('camTele', box(7, .4, 3.4, CAM.tele.x, 47.2, -2.5), M.sensor.clone());
+part('flash', 'cams', 'Вспышка True Tone', 'Светодиоды разной цветовой температуры — вспышка подстраивается под освещение.', [28, 66, ZP]);
+const flashM = add('flash', cylZ(3.2, ZP - .3, -3.8, CAM.flash.x, CAM.flash.y, 24), M.white);
+part('lidar', 'cams', 'Сканер LiDAR', 'Измеряет расстояние до предметов лазерными импульсами. Помогает фокусироваться в темноте и строит 3D-карту комнаты для дополненной реальности.', [28, 40, ZP]);
+add('lidar', cylZ(3.4, ZP - .3, -3.8, CAM.lidar.x, CAM.lidar.y, 24), M.black);
+add('mics', cylZ(.9, ZP - .3, -4, 27, 53.5, 12), M.dark);
+
+/* --- задняя панель --- */
+part('back', 'back', 'Задняя панель и плато камер', 'Алюминиевая спинка со стеклянной вставкой — сквозь стекло проходит беспроводная зарядка. Сверху — выступающее плато во всю ширину, в нём камеры, вспышка и LiDAR.', [-34, -50, -4.4], true);
+add('back', ext(rr(W - 1, H - 1, R - .5), -4.38, -3.8), M.back, true);
+{
+  const s = rr(W - 1, 36, 8, 0, 55); for (const c of [CAM.main, CAM.ultra, CAM.tele]) { const p = new THREE.Path(); p.absarc(c.x, c.y, c.equals(CAM.main) ? 8.4 : 7.2, 0, Math.PI * 2, true); s.holes.push(p); }
+  for (const c of [CAM.flash, CAM.lidar]) { const p = new THREE.Path(); p.absarc(c.x, c.y, 3.6, 0, Math.PI * 2, true); s.holes.push(p); }
+  add('back', ext(s, ZP, -4.38), M.plateau, true);
+}
+
+/* ---------- внешние объекты: лицо, вышка, зарядка, кабель, палец ---------- */
+const world = new THREE.Group(); scene.add(world);
+const ghost = c => new THREE.MeshStandardMaterial({ color: c, roughness: .6, transparent: true, opacity: .32, depthWrite: false });
+const head = new THREE.Group(); head.position.set(0, 50, 230); world.add(head);
+const HEAD = { rx: 58, ry: 76, rz: 62 };
+head.add(new THREE.Mesh(new THREE.SphereGeometry(1, 40, 30).scale(HEAD.rx, HEAD.ry, HEAD.rz), ghost(0xe0a27a)));
+const nose = new THREE.Mesh(new THREE.ConeGeometry(9, 26, 16), ghost(0xe8b48f)); nose.rotation.x = Math.PI / 2 + .2; nose.rotation.x = -Math.PI / 2; nose.position.set(0, -6, -HEAD.rz - 8); head.add(nose);
+const DOTN = 1400, dots = new THREE.InstancedMesh(new THREE.SphereGeometry(.9, 6, 4), new THREE.MeshBasicMaterial({ color: 0xff3048 }), DOTN);
+const dotPts = [];
+{
+  const d = new THREE.Object3D();
+  for (let i = 0; i < DOTN; i++) {
+    const u = Math.random() * 2 - 1, v = Math.random() * 2 - 1;
+    const x = u * .85, y = v * .9; const zz = -Math.sqrt(Math.max(0, 1 - x * x - y * y * .9));
+    const p = V(x * HEAD.rx, y * HEAD.ry, zz * HEAD.rz - .8);
+    if (Math.abs(p.x) < 9 && p.y < 10 && p.y > -20) p.z -= 10 * (1 - Math.abs(p.x) / 9) * (1 - Math.abs(p.y + 5) / 15);
+    dotPts.push(p); d.position.copy(p); d.updateMatrix(); dots.setMatrixAt(i, d.matrix);
+  }
+}
+head.add(dots);
+const dotRays = new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(new Array(120).fill(0).map(() => V())), new THREE.LineBasicMaterial({ color: 0xff3048, transparent: true, opacity: 0, depthWrite: false }));
+world.add(dotRays);
+const floodCone = new THREE.Mesh(new THREE.ConeGeometry(70, 1, 32, 1, true), new THREE.MeshBasicMaterial({ color: 0xff5060, transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending }));
+world.add(floodCone);
+const headLbl = mkLabel('Лицо', null, world, V(0, 140, 230), 'big');
+
+const tower = new THREE.Group(); tower.position.set(-340, -60, -260); world.add(tower);
+tower.add(new THREE.Mesh(new THREE.CylinderGeometry(3, 7, 240, 8).translate(0, 120, 0), new THREE.MeshStandardMaterial({ color: 0x9aa3ae, metalness: .6, roughness: .4 })));
+for (let i = 0; i < 3; i++) { const p = new THREE.Mesh(new THREE.BoxGeometry(14, 40, 5), new THREE.MeshStandardMaterial({ color: 0xe5e7eb, roughness: .5 })); const a = i / 3 * Math.PI * 2; p.position.set(Math.cos(a) * 12, 220, Math.sin(a) * 12); p.rotation.y = -a + Math.PI / 2; tower.add(p); }
+const towerLbl = mkLabel('Вышка 5G', null, tower, V(0, 265, 0), 'big');
+const TOWER_P = V(-340, 160, -260);
+
+const puck = new THREE.Group(); world.add(puck);
+puck.add(new THREE.Mesh(cylZ(28, -6, 0, 0, 0, 48), new THREE.MeshStandardMaterial({ color: 0xf1f3f5, roughness: .35, metalness: .1, transparent: true, opacity: .45, depthWrite: false })));
+puck.add(new THREE.Mesh(new THREE.TorusGeometry(26, .8, 8, 64), new THREE.MeshStandardMaterial({ color: 0xc0c6ce, roughness: .4, metalness: .6 })));
+const pc = new THREE.Mesh(new THREE.CylinderGeometry(1.6, 1.6, 120, 10), new THREE.MeshStandardMaterial({ color: 0xf1f3f5, roughness: .5 })); pc.position.set(0, -80, -3); puck.add(pc);
+const puckLbl = mkLabel('Зарядка MagSafe', null, puck, V(30, -26, -3));
+
+const plug = new THREE.Group(); world.add(plug);
+plug.add(new THREE.Mesh(box(8, 6, 2.4, 0, 3, 0), M.steel));
+plug.add(new THREE.Mesh(box(11, 16, 5, 0, -8, 0), new THREE.MeshStandardMaterial({ color: 0xf1f3f5, roughness: .45 })));
+plug.add(new THREE.Mesh(new THREE.CylinderGeometry(1.8, 1.8, 100, 10).translate(0, -66, 0), new THREE.MeshStandardMaterial({ color: 0xf1f3f5, roughness: .5 })));
+const plugLbl = mkLabel('Кабель USB-C', null, plug, V(14, -20, 0));
+
+const finger = new THREE.Mesh(new THREE.CapsuleGeometry(7.5, 30, 6, 16), new THREE.MeshStandardMaterial({ color: 0xf0b896, roughness: .55, transparent: true, opacity: .75 }));
+finger.rotation.x = Math.PI / 2 - .35; world.add(finger);
+
+/* лупа для пикселей */
+const pixCanvas = document.createElement('canvas'); pixCanvas.width = pixCanvas.height = 192;
+const pixCtx = pixCanvas.getContext('2d'); const pixTex = new THREE.CanvasTexture(pixCanvas); pixTex.colorSpace = THREE.SRGBColorSpace;
+const pixPlane = new THREE.Mesh(new THREE.CircleGeometry(24, 48), new THREE.MeshBasicMaterial({ map: pixTex, transparent: true, opacity: 0, toneMapped: false }));
+pixPlane.position.set(68, 10, 30); phone.add(pixPlane);
+const pixRing = new THREE.Mesh(new THREE.RingGeometry(24, 26, 48), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0 }));
+pixPlane.add(pixRing);
+const pixLine = new THREE.Line(new THREE.BufferGeometry().setFromPoints([V(), V()]), new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0 }));
+phone.add(pixLine);
+const pixLbl = mkLabel('Пиксели под лупой: красный, зелёный, синий', null, pixPlane, V(0, 30, 0));
+
+/* ---------- подписи ---------- */
+function mkLabel(text, key, parent, pos, cls = '') {
+  const el = document.createElement('div'); el.className = 'lbl ' + cls; el.textContent = text;
+  if (key) el.addEventListener('click', e => { e.stopPropagation(); selectPart(key, true); });
+  const o = new CSS2DObject(el); o.position.copy(pos); o.userData.key = key; parent.add(o); if (key) labels.push(o); return o;
+}
+for (const k in PARTS) { const p = PARTS[k]; p.label = mkLabel(p.name.split(' — ')[0].split(' (')[0], k, G[p.gk].g, p.lbl); }
+
+/* ---------- потоки частиц ---------- */
+const FLOWS = {};
+const dotGeo = new THREE.SphereGeometry(1, 8, 6);
+function flow(name, color, pointsFn, n = 26, speed = .5, size = .9) {
+  const mesh = new THREE.InstancedMesh(dotGeo, new THREE.MeshBasicMaterial({ color, transparent: true, opacity: .95, depthWrite: false, toneMapped: false }), n);
+  mesh.frustumCulled = false; mesh.renderOrder = 5; phone.add(mesh);
+  FLOWS[name] = { mesh, pointsFn, n, speed, size, e: 0 };
+}
+const gp = k => G[k].g.position;
+const A = (k, x, y, z) => V(x, y, z).add(gp(k));
+const dm = new THREE.Object3D();
+function updateFlows(t) {
+  for (const k in FLOWS) {
+    const f = FLOWS[k]; f.e += ((E[k] || 0) - f.e) * .12;
+    if (f.e < .01) { f.mesh.visible = false; continue; }
+    f.mesh.visible = true;
+    const pts = f.pointsFn(); const L = [0];
+    for (let i = 1; i < pts.length; i++) L.push(L[i - 1] + pts[i].distanceTo(pts[i - 1]));
+    const tot = L[L.length - 1];
+    for (let i = 0; i < f.n; i++) {
+      const u = ((t * f.speed * 60 / tot) + i / f.n) % 1, d = u * tot;
+      let j = 1; while (j < L.length - 1 && L[j] < d) j++;
+      const a = (d - L[j - 1]) / Math.max(1e-6, L[j] - L[j - 1]);
+      dm.position.lerpVectors(pts[j - 1], pts[j], a);
+      const s = f.size * f.e * Math.min(1, u * 8, (1 - u) * 8);
+      dm.scale.setScalar(Math.max(.001, s)); dm.updateMatrix(); f.mesh.setMatrixAt(i, dm.matrix);
+    }
+    f.mesh.instanceMatrix.needsUpdate = true;
+  }
+}
+const SOC = () => A('board', 16.5, 47, 2.1);
+const TOUCH = V(-12, -18, 0);
+flow('fTouch', 0x38bdf8, () => [A('touch', TOUCH.x, TOUCH.y, 3.6), A('touch', TOUCH.x, -40, 3.4), A('oled', 30, -40, 3.0), A('oled', 30, 18, 2.8), A('board', 22, 24, 1.9), SOC()], 24, .5);
+flow('fSoc2Oled', 0xf472b6, () => [SOC(), A('board', 22, 24, 1.9), A('oled', 25, 18, 3.0), A('oled', 25, -18, 3.3), A('oled', 0, -18, 3.4)], 24, .5);
+for (let i = 0; i < 5; i++) {
+  const a = i / 5 * Math.PI * 2, dx = Math.cos(a), dy = Math.sin(a);
+  flow('fRay' + i, 0xfde047, () => [A('cams', CAM.main.x + dx * 30, CAM.main.y + dy * 30, -190), A('cams', CAM.main.x + dx * 5, CAM.main.y + dy * 5, ZP), A('cams', CAM.main.x - dx * 3.5, CAM.main.y - dy * 3, 1.0)], 14, .6, .8);
+}
+flow('fTele', 0xfde047, () => [A('cams', CAM.tele.x, CAM.tele.y, -190), A('cams', CAM.tele.x, CAM.tele.y, ZP), A('cams', CAM.tele.x, 57, -4.1), A('cams', CAM.tele.x, 55, -.9), A('cams', CAM.tele.x, 53, -4.1), A('cams', CAM.tele.x, 51, -.9), A('cams', CAM.tele.x, 49, -4.1), A('cams', CAM.tele.x, 47.4, -2.5)], 30, .35, .85);
+flow('fCam2Soc', 0xa78bfa, () => [A('cams', CAM.main.x, CAM.main.y, 1.6), A('board', -8, 40, 1.8), A('board', 4, 40, 1.9), SOC()], 22, .5);
+flow('fSoc2Nand', 0x34d399, () => [SOC(), A('board', 16.5, 47, -1), A('board2', 23, 49, -2.5)], 14, .35);
+flow('fIr2Soc', 0xff4d6d, () => [A('front', P_IR.x, P_IR.y, 2), A('front', -14, 60, 1.5), A('board', 4, 56, 1.9), SOC()], 18, .45);
+flow('fCoil', 0xfbbf24, () => [A('magsafe', -10, MS.cy, -3.6), A('magsafe', -28, MS.cy, -2.5), A('board2', -28, 26, -1.8), A('board2', -12, 31.5, -2.5)], 22, .55, 1);
+flow('fUsb', 0xfbbf24, () => [A('bottom', 0, -70, 0), A('bottom', 5, -60, 0), A('board', 33.2, -55, 0), A('board', 33.2, 20, 0), A('board2', 10, 28, -1.8), A('board2', -12, 31.5, -2.5)], 26, .6, 1);
+flow('fPmic2Bat', 0x22c55e, () => [A('board2', -12, 31.5, -2.5), A('battery', -18, 23, 1), A('battery', -18, 10, 1.8), A('battery', 0, -10, 1.9)], 18, .5, 1);
+flow('fMic', 0x60a5fa, () => [A('bottom', P_MIC.x, P_MIC.y, 0), A('board', -33.2, -55, 0), A('board', -33.2, 20, 0), A('board', -10, 30, 1.9), SOC(), A('board2', 9, 51, -2.5)], 26, .55);
+flow('fRadioOut', 0x22d3ee, () => [A('board2', 9, 51, -2.5), A('frame', -20, 62, 0), A('frame', -36, 66, 0), TOWER_P.clone()], 30, 1.4, 1.4);
+flow('fRadioIn', 0x818cf8, () => [TOWER_P.clone().add(V(20, -10, 0)), A('frame', 36, -66, 0), A('board', 33.2, -20, 0), A('board2', 9, 51, -2.5), SOC(), A('front', 0, 71.6, 2.2)], 30, 1.4, 1.4);
+flow('fSoc2Spk', 0xf472b6, () => [SOC(), A('board2', -25, 31.5, -2.5), A('board', -33.2, 20, 0), A('board', -33.2, -50, 0), A('bottom', 19.5, -64, 1)], 26, .6);
+flow('fSoc2Ear', 0xf472b6, () => [A('board2', -25, 31.5, -2.5), A('front', 0, 71.6, 2.2)], 12, .5);
+flow('fSoc2Tap', 0xfb923c, () => [A('board2', -25, 31.5, -2.5), A('board', -33.2, 20, 0), A('board', -33.2, -55, 0), A('bottom', -19.5, -64, 1)], 22, .6);
+
+/* ---------- волны (кольца) ---------- */
+const WAVES = []; const ringGeo = new THREE.BufferGeometry().setFromPoints(new Array(65).fill(0).map((_, i) => V(Math.cos(i / 64 * Math.PI * 2), Math.sin(i / 64 * Math.PI * 2), 0)));
+function emitter(name, color, posFn, normal, r0, r1, period, life, inward = false) {
+  const pool = []; for (let i = 0; i < 5; i++) { const l = new THREE.Line(ringGeo, new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0, depthWrite: false, toneMapped: false })); l.visible = false; scene.add(l); pool.push({ l, age: 99 }); }
+  WAVES.push({ name, posFn, normal: normal.clone().normalize(), r0, r1, period, life, inward, pool, acc: 0 });
+}
+const tmpQ = new THREE.Quaternion();
+function updateWaves(dt) {
+  for (const w of WAVES) {
+    const on = (E[w.name] || 0) > .5;
+    w.acc += dt; if (on && w.acc > w.period) { w.acc = 0; const s = w.pool.find(p => p.age >= w.life) || w.pool[0]; s.age = 0; }
+    tmpQ.setFromUnitVectors(V(0, 0, 1), w.normal);
+    for (const p of w.pool) {
+      p.age += dt; const k = p.age / w.life;
+      if (k >= 1) { p.l.visible = false; continue; }
+      p.l.visible = true; const kk = w.inward ? 1 - k : k;
+      p.l.position.copy(w.posFn()); p.l.quaternion.copy(tmpQ).premultiply(phone.quaternion); p.l.scale.setScalar(lerp(w.r0, w.r1, kk));
+      p.l.material.opacity = Math.sin(k * Math.PI) * .9;
+    }
+  }
+}
+const wp = (k, x, y, z) => () => phone.localToWorld(A(k, x, y, z));
+emitter('wField', 0x60a5fa, wp('magsafe', MS.cx, MS.cy, -5), V(0, 0, 1), 6, 30, .35, 1.1);
+emitter('wSpk', 0xf472b6, wp('bottom', 19.5, -76, 0), V(0, 1, 0), 3, 46, .3, 1.2);
+emitter('wEar', 0xf472b6, wp('front', 0, 72, 4), V(0, 0, 1), 2, 30, .35, 1.1);
+emitter('wVoice', 0x60a5fa, wp('bottom', P_MIC.x, -80, 0), V(0, 1, 0), 3, 40, .3, 1.1, true);
+emitter('wRadio', 0x22d3ee, wp('frame', -36, 66, 0), V(0, 1, 0), 10, 260, .45, 2.2);
+emitter('wTower', 0x818cf8, () => TOWER_P.clone(), V(0, 1, 0), 10, 200, .5, 2.2);
+emitter('wLidar', 0x9b5cff, wp('cams', CAM.lidar.x, CAM.lidar.y, ZP - 2), V(0, 0, -1), 2, 60, .25, .9);
+
+/* пар в испарительной камере */
+const VAPN = 90;
+const vapor = new THREE.InstancedMesh(dotGeo, new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: .9, depthWrite: false, toneMapped: false }), VAPN);
+vapor.frustumCulled = false; phone.add(vapor); vapor.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(VAPN * 3), 3);
+const vapSeeds = new Array(VAPN).fill(0).map(() => ({ a: Math.random() * Math.PI * 2, p: Math.random(), s: .6 + Math.random() * .6 }));
+
+/* ---------- сценарии ---------- */
+const SC = {
+  touch: { name: '👆 Касание', sub: 'экран и сенсор', cam: 'front', screen: 'home', steps: [
+    { d: 4, t: 'Палец касается стекла', x: 'Под защитным стеклом — сетка прозрачных электродов. Палец проводит ток и «оттягивает» заряд в узлах сетки рядом с собой. Видите, как загорелись узлы под пальцем?', on: ['finger', 'tap'], p: ['glass', 'touch'] },
+    { d: 3.5, t: 'Контроллер находит точку', x: 'Контроллер опрашивает всю сетку до 240 раз в секунду, находит узлы с изменённой ёмкостью и вычисляет координаты касания с точностью до долей миллиметра.', on: ['finger', 'tap', 'fTouch'], p: ['touch', 'flexes', 'board'] },
+    { d: 3.5, t: 'Процессор решает, что делать', x: 'Координаты по шлейфу приходят в процессор A20 Pro. iOS понимает: вы нажали на значок приложения — и запускает его.', on: ['fTouch', 'socHot1'], p: ['soc', 'board'] },
+    { d: 5, t: 'Экран рисует новый кадр', x: 'Графический процессор рисует картинку и отправляет её на экран. Каждый пиксель OLED — это три крошечные лампочки: красная, зелёная и синяя. Смешивая их яркость, экран получает любой цвет — до 120 раз в секунду.', on: ['fSoc2Oled', 'pix', 'appOpen', 'hz120'], p: ['oled', 'soc'] },
+  ] },
+  photo: { name: '📷 Фото', sub: 'камеры и диафрагма', cam: 'cams', screen: 'camera', steps: [
+    { d: 4, t: 'Свет входит в объектив', x: 'Свет от предмета проходит через линзы. Линзы собирают его и переворачивают изображение вверх ногами — прямо на матрицу.', on: ['rays', 'sensor'], p: ['camMain'] },
+    { d: 5, t: 'Диафрагма регулирует свет', x: 'Новое в iPhone 18 Pro: изменяемая диафрагма. Шесть лепестков сужают отверстие от ƒ/1.48 (много света, размытый фон) до ƒ/4 (всё резкое) — как у профессионального фотоаппарата.', on: ['rays', 'iris', 'sensor'], p: ['camMain'] },
+    { d: 4.5, t: 'Стабилизация: двигается матрица', x: 'Руки дрожат — гироскоп это замечает за миллисекунды, а магниты сдвигают саму матрицу в обратную сторону. Изображение на матрице стоит на месте, фото получается чётким.', on: ['rays', 'ois', 'sensor'], p: ['camMain', 'gyro'] },
+    { d: 5, t: 'Телекамера: свет идёт зигзагом', x: 'Чтобы приблизить в 4 раза, нужен длинный объектив. Он не влезает в тонкий телефон — поэтому свет 4 раза отражается внутри стеклянной тетрапризмы и только потом попадает на матрицу.', on: ['tele'], p: ['camTele'] },
+    { d: 5, t: 'Матрица → процессор → память', x: 'Матрица превращает свет в электрический сигнал. Процессор обработки фото и нейросеть в A20 Pro склеивают несколько кадров в один — убирают шум, вытягивают тени — и сохраняют фото во флеш-память.', on: ['fCam2Soc', 'fSoc2Nand', 'sensor', 'socHot1', 'shot'], p: ['camMain', 'soc', 'nand'] },
+  ] },
+  face: { name: '🙂 Face ID', sub: 'разблокировка лицом', cam: 'face', screen: 'faceid', steps: [
+    { d: 3.5, t: 'Невидимая подсветка', x: 'Вы берёте телефон. ИК-подсветка освещает лицо инфракрасным светом — глаз его не видит, поэтому Face ID работает даже в полной темноте.', on: ['face', 'flood'], p: ['truedepth'] },
+    { d: 4.5, t: '30 000 невидимых точек', x: 'Проектор рассыпает по лицу 30 000 инфракрасных точек (здесь они показаны красным). На носу, щеках и лбу точки ложатся по-разному — в зависимости от рельефа.', on: ['face', 'dots'], p: ['truedepth'] },
+    { d: 4, t: 'ИК-камера снимает узор', x: 'Инфракрасная камера фотографирует узор из точек. В iPhone 18 Pro она спрятана прямо под экраном — поэтому Dynamic Island стал меньше.', on: ['face', 'dotsOn', 'irBack'], p: ['truedepth', 'oled'] },
+    { d: 4.5, t: 'Secure Enclave сверяет лицо', x: 'Защищённый блок внутри процессора строит 3D-карту лица и сравнивает её с сохранённой. Данные никогда не покидают телефон. Шанс, что подойдёт чужое лицо, — 1 к миллиону.', on: ['face', 'dotsOn', 'fIr2Soc', 'socHot1', 'unlock'], p: ['soc'] },
+  ] },
+  charge: { name: '🔋 MagSafe', sub: 'беспроводная зарядка', cam: 'back', screen: 'charge', steps: [
+    { d: 3.5, t: 'Магниты притягивают зарядку', x: 'Кольцо из 18 магнитов «щёлкает» зарядку точно по центру катушки. Без точного выравнивания беспроводная зарядка теряет много энергии.', on: ['puck'], p: ['magsafe'] },
+    { d: 4.5, t: 'Магнитное поле передаёт энергию', x: 'В зарядке течёт переменный ток — он создаёт быстро меняющееся магнитное поле. Поле проходит сквозь стекло и наводит ток в медной катушке телефона. Проводов нет!', on: ['puck', 'wField', 'coil'], p: ['magsafe', 'back'] },
+    { d: 4, t: 'Контроллер питания', x: 'Ток бежит в контроллер питания. Он выпрямляет его, подбирает нужное напряжение и следит, чтобы ничего не перегрелось.', on: ['puck', 'wField', 'coil', 'fCoil'], p: ['pmic', 'board2'] },
+    { d: 6, t: 'Аккумулятор наполняется', x: 'Энергия уходит в аккумулятор: ионы лития переходят с одного электрода на другой и «запасаются». Когда заряд почти полный, ток плавно уменьшается — это бережёт батарею.', on: ['puck', 'wField', 'coil', 'fCoil', 'fPmic2Bat', 'charging'], p: ['battery', 'pmic'] },
+  ] },
+  cable: { name: '🔌 USB-C', sub: 'проводная зарядка', cam: 'bottom', screen: 'charge', steps: [
+    { d: 3, t: 'Кабель вставляется в порт', x: 'В разъёме USB-C 24 контакта. Телефон и зарядка «договариваются», какое напряжение и ток можно дать.', on: ['plug'], p: ['usbc'] },
+    { d: 4.5, t: 'Ток бежит по шлейфу', x: 'От порта по гибкому шлейфу вдоль корпуса энергия идёт наверх — к контроллеру питания на плате.', on: ['plug', 'fUsb'], p: ['usbc', 'flexes', 'pmic'] },
+    { d: 6, t: 'Быстрая зарядка', x: 'Контроллер питания заряжает аккумулятор большим током. Первые 50% набираются очень быстро, а ближе к 100% скорость снижается, чтобы батарея дольше жила.', on: ['plug', 'fUsb', 'fPmic2Bat', 'charging'], p: ['battery', 'pmic'] },
+  ] },
+  call: { name: '📞 Звонок', sub: '5G, антенны, звук', cam: 'call', screen: 'call', steps: [
+    { d: 4, t: 'Голос попадает в микрофон', x: 'Звуковые волны вашего голоса качают крошечную мембрану микрофона. Другие микрофоны в это время слушают шум вокруг, чтобы его вычесть.', on: ['wVoice', 'fMic'], p: ['mics'] },
+    { d: 4, t: 'Модем C2 делает радиосигнал', x: 'Процессор сжимает голос в цифровые данные, а собственный модем Apple C2 превращает их в радиосигнал 5G.', on: ['fMic', 'socHot1', 'modemHot'], p: ['modem', 'soc'] },
+    { d: 4.5, t: 'Антенны в рамке излучают волны', x: 'Части металлической рамки — это антенны. Сигнал летит к вышке со скоростью света. Если вы закрыли одну антенну рукой, телефон переключится на другую.', on: ['fRadioOut', 'wRadio', 'antennas', 'modemHot'], p: ['antennas', 'modem'] },
+    { d: 5, t: 'Ответ звучит в динамике', x: 'Голос собеседника приходит с вышки, модем расшифровывает его, и разговорный динамик над экраном превращает сигнал обратно в звук.', on: ['wTower', 'fRadioIn', 'antennas', 'wEar', 'ear'], p: ['earpiece', 'antennas'] },
+  ] },
+  heat: { name: '🔥 Охлаждение', sub: 'игры и испарительная камера', cam: 'heat', ex: .55, screen: 'game', steps: [
+    { d: 4, t: 'Игра нагружает чип', x: 'Тяжёлая 3D-игра: CPU и GPU работают на максимуме, миллиарды транзисторов переключаются — и выделяют тепло. Без охлаждения чип быстро перегрелся бы и сбросил скорость.', on: ['socHot2', 'hz120'], p: ['soc'] },
+    { d: 6, t: 'Испарительная камера', x: 'Над чипом — испарительная камера. Внутри капля воды: у горячего чипа она закипает, пар разлетается по пластине (оранжевые точки), отдаёт тепло, превращается обратно в воду и по медной сетке возвращается к чипу (синие точки).', on: ['socHot2', 'vapor', 'hz120'], p: ['vapor', 'soc'] },
+    { d: 5, t: 'Тепло уходит в корпус', x: 'Пластина передаёт тепло алюминиевому корпусу, а корпус рассеивает его в воздух. Камера в iPhone 18 Pro стала в 3 раза больше по площади — чип дольше держит максимальную скорость.', on: ['socHot2', 'vapor', 'frameWarm', 'hz120'], p: ['frame', 'vapor'] },
+  ] },
+  sound: { name: '🎵 Звук', sub: 'динамики и вибрация', cam: 'bottom', screen: 'music', steps: [
+    { d: 4, t: 'Сигнал идёт к усилителю', x: 'Процессор раскодирует музыку и передаёт её в усилитель. Тот делает сигнал достаточно сильным, чтобы двигать мембраны.', on: ['fSoc2Spk', 'fSoc2Ear'], p: ['amp', 'soc'] },
+    { d: 5, t: 'Динамики толкают воздух', x: 'Ток в катушке динамика то притягивает, то отталкивает её от магнита. Мембрана дрожит сотни раз в секунду, толкает воздух — и вы слышите звук. Два динамика (снизу и сверху) дают стерео.', on: ['fSoc2Spk', 'spk', 'wSpk', 'wEar', 'ear'], p: ['speaker', 'earpiece'] },
+    { d: 5, t: 'Taptic Engine: тактильный отклик', x: 'Под битом и при нажатиях включается Taptic Engine: тяжёлый грузик резко сдвигается и останавливается. Телефон «щёлкает» в руке, как настоящая кнопка.', on: ['fSoc2Tap', 'taptic', 'spk', 'wSpk'], p: ['taptic'] },
+  ] },
+};
+const CAMS = {
+  iso: [V(-170, 70, 250), V(0, 0, 0)], front: [V(0, 10, 300), V(0, 0, 0)], back: [V(60, 40, -290), V(0, 0, 0)],
+  side: [V(320, 30, 40), V(0, 0, 0)], bottom: [V(90, -230, 170), V(0, -40, 0)], cams: [V(-230, 120, -170), V(-20, 30, -70)],
+  board: [V(110, 150, 170), V(8, 30, 0)], heat: [V(240, 150, 250), V(0, 5, 10)], face: [V(560, 120, 70), V(0, 30, 95)], call: [V(260, 260, 600), V(-150, 10, -110)],
+};
+function camFor(k) { const c = CAMS[k]; const exK = S.ex; return [c[0].clone().multiplyScalar(1 + exK * .35), c[1]]; }
+
+/* ---------- состояние ---------- */
+const S = { sc: null, st: -1, t: 0, play: true, speed: 1, ex: 0, exT: 0, xr: .72, charge: 23, socT: 34, fnum: 1.48, unlocked: 0, rot: false, lbl: true, iso: null, sel: null, hz: 1 };
+const E = {};
+const ALL = new Set(); for (const k in SC) for (const s of SC[k].steps) s.on.forEach(o => ALL.add(o)); Object.keys(FLOWS).forEach(f => ALL.add(f));
+for (const k of ALL) E[k] = 0;
+const EV = {}; for (const k of ALL) EV[k] = 0; // плавные значения
+
+/* ---------- UI ---------- */
+const scsEl = $('scs');
+for (const k in SC) {
+  const b = document.createElement('button'); b.className = 'btn'; b.dataset.k = k; b.setAttribute('aria-pressed', 'false');
+  b.innerHTML = `${SC[k].name}<small>${SC[k].sub}</small>`; b.onclick = () => S.sc === k ? stopSc() : startSc(k); scsEl.appendChild(b);
+}
+function startSc(k) {
+  S.sc = k; S.t = 0; S.st = -1; S.play = true; S.unlocked = 0;
+  if (k === 'charge' || k === 'cable') S.charge = 23;
+  if (SC[k].ex != null) { S.exT = SC[k].ex; S.exAuto = true; } else if (S.exAuto) { S.exT = 0; S.exAuto = false; }
+  document.body.classList.remove('idle');
+  scsEl.querySelectorAll('.btn').forEach(b => b.setAttribute('aria-pressed', b.dataset.k === k));
+  const st = $('steps'); st.innerHTML = '';
+  SC[k].steps.forEach((s, i) => { const b = document.createElement('button'); b.className = 'st'; b.textContent = (i + 1) + '. ' + s.t; b.onclick = () => jump(i); st.appendChild(b); });
+  setIso(null); closeInfo();
+  const [p, t] = camFor(SC[k].cam); flyTo(p, t);
+  $('bPlay').textContent = '❚❚';
+}
+function stopSc() {
+  if (S.exAuto) { S.exT = 0; S.exAuto = false; }
+  S.sc = null; document.body.classList.add('idle'); for (const k of ALL) E[k] = 0;
+  scsEl.querySelectorAll('.btn').forEach(b => b.setAttribute('aria-pressed', 'false'));
+  $('rNow').textContent = 'Выберите сценарий'; updateLabels();
+}
+function stepStart(i) { let t = 0; for (let j = 0; j < i; j++) t += SC[S.sc].steps[j].d; return t; }
+function jump(i) { if (!S.sc) return; const n = SC[S.sc].steps.length; i = (i + n) % n; S.t = stepStart(i) + .001; }
+$('bPrev').onclick = () => jump(S.st - 1); $('bNext').onclick = () => jump(S.st + 1);
+$('bPlay').onclick = () => { S.play = !S.play; $('bPlay').textContent = S.play ? '❚❚' : '▶'; };
+$('bStop').onclick = stopSc;
+document.querySelectorAll('#speed .btn').forEach(b => b.onclick = () => { S.speed = +b.dataset.s; document.querySelectorAll('#speed .btn').forEach(x => x.setAttribute('aria-pressed', x === b)); });
+
+document.querySelectorAll('.tab').forEach(t => t.onclick = () => {
+  document.querySelectorAll('.tab').forEach(x => x.setAttribute('aria-selected', x === t));
+  document.querySelectorAll('.pane').forEach(p => p.classList.toggle('hidden', p.dataset.pane !== t.dataset.tab));
+});
+function setPanel(open) { $('panel').classList.toggle('closed', !open); document.body.classList.toggle('nopanel', !open); $('panelToggle').setAttribute('aria-pressed', open); }
+$('panelHide').onclick = () => setPanel(false);
+$('panelToggle').onclick = () => setPanel($('panel').classList.contains('closed'));
+$('cleanToggle').onclick = () => { const c = !document.body.classList.contains('clean'); document.body.classList.toggle('clean', c); $('cleanToggle').setAttribute('aria-pressed', c); };
+if (innerWidth < 760) setPanel(false);
+
+$('ex').oninput = e => { S.exT = e.target.value / 100; S.exAuto = false; };
+$('btnEx').onclick = () => { S.exT = 1; S.exAuto = false; }; $('btnAsm').onclick = () => { S.exT = 0; S.exAuto = false; };
+$('xr').oninput = e => { S.xr = e.target.value / 100; applyXr(); };
+function applyXr() {
+  $('vX').textContent = Math.round(S.xr * 100) + '%';
+  for (const m of shellMats) m.opacity = lerp(Math.min(1, m.userData.op * 3.2 + .35), m.userData.op * .55, S.xr) ;
+  scrMat.opacity = lerp(1, .14, S.xr);
+}
+applyXr();
+$('tLbl').onclick = () => { S.lbl = !S.lbl; $('tLbl').setAttribute('aria-pressed', S.lbl); updateLabels(); };
+$('tRot').onclick = () => { S.rot = !S.rot; $('tRot').setAttribute('aria-pressed', S.rot); controls.autoRotate = S.rot; };
+document.querySelectorAll('#cams .btn').forEach(b => b.onclick = () => { const [p, t] = camFor(b.dataset.c); flyTo(p, t); });
+
+/* список деталей */
+const GROUPS = [
+  ['Экран и фронт', ['glass', 'touch', 'oled', 'truedepth', 'earpiece']],
+  ['Мозг и связь', ['soc', 'board', 'board2', 'modem', 'nand', 'n1', 'pmic', 'gyro', 'amp', 'flexes', 'antennas']],
+  ['Энергия и тепло', ['battery', 'magsafe', 'usbc', 'vapor']],
+  ['Камеры', ['camMain', 'camUltra', 'camTele', 'lidar', 'flash']],
+  ['Корпус, звук, кнопки', ['frame', 'back', 'buttons', 'sidebtn', 'ccontrol', 'speaker', 'taptic', 'mics']],
+];
+const plist = $('partList');
+for (const [h, ks] of GROUPS) {
+  const t = document.createElement('h3'); t.textContent = h; plist.appendChild(t);
+  const c = document.createElement('div'); c.className = 'chips'; plist.appendChild(c);
+  for (const k of ks) { const b = document.createElement('button'); b.className = 'btn'; b.dataset.k = k; b.textContent = PARTS[k].name.split(' (')[0].split(' — ')[0].replace(':', ''); b.onclick = () => selectPart(k, true); c.appendChild(b); }
+}
+
+/* выбор, фокус, изоляция */
+function partBox(k) { const b = new THREE.Box3(); for (const m of PARTS[k].meshes) if (m.isMesh) b.expandByObject(m); return b; }
+function selectPart(k, fly) {
+  S.sel = k; const p = PARTS[k];
+  $('infoTitle').textContent = p.name; $('infoText').textContent = p.text; $('info').classList.remove('hidden');
+  $('infoIso').textContent = S.iso === k ? 'Показать всё' : 'Только эта деталь';
+  plist.querySelectorAll('.btn').forEach(b => b.classList.toggle('sel', b.dataset.k === k));
+  if (fly) {
+    const b = partBox(k), c = b.getCenter(V()), sz = b.getSize(V()).length();
+    const dir = camera.position.clone().sub(controls.target).normalize();
+    flyTo(c.clone().add(dir.multiplyScalar(Math.max(70, sz * 2.2))), c);
+  }
+  updateLabels();
+}
+function closeInfo() { $('info').classList.add('hidden'); S.sel = null; plist.querySelectorAll('.btn').forEach(b => b.classList.remove('sel')); updateLabels(); }
+$('infoClose').onclick = () => { closeInfo(); if (S.iso) setIso(null); };
+$('infoIso').onclick = () => { setIso(S.iso === S.sel ? null : S.sel); $('infoIso').textContent = S.iso ? 'Показать всё' : 'Только эта деталь'; };
+function setIso(k) {
+  S.iso = k;
+  for (const pk in PARTS) for (const m of PARTS[pk].meshes) m.visible = !k || pk === k;
+  updateLabels();
+}
+let camAnim = null;
+function flyTo(p, t) { camAnim = { p0: camera.position.clone(), t0: controls.target.clone(), p1: p.clone(), t1: t.clone(), k: 0 }; }
+
+function updateLabels() {
+  const step = S.sc && S.st >= 0 ? SC[S.sc].steps[S.st] : null;
+  for (const l of labels) {
+    const k = l.userData.key; let show, hot = false;
+    if (S.iso) show = k === S.iso;
+    else if (step) { show = step.p.includes(k); hot = show; }
+    else show = S.lbl && (PARTS[k].main || k === S.sel);
+    if (k === S.sel) { show = true; hot = true; }
+    l.visible = show; l.element.classList.toggle('hot', hot);
+  }
+}
+updateLabels();
+
+/* клики по модели */
+const ray = new THREE.Raycaster(); let down = null;
+renderer.domElement.addEventListener('pointerdown', e => down = [e.clientX, e.clientY]);
+renderer.domElement.addEventListener('pointerup', e => {
+  if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 5) return;
+  ray.setFromCamera(new THREE.Vector2(e.clientX / innerWidth * 2 - 1, -e.clientY / innerHeight * 2 + 1), camera);
+  const hits = ray.intersectObjects(pickables.filter(m => m.visible), false);
+  const h = hits.find(h => !h.object.material.transparent) || hits[0];
+  if (h) selectPart(h.object.userData.key, false);
+});
+
+/* ---------- экран телефона ---------- */
+const ICONS = ['#34c759', '#0a84ff', '#ff9f0a', '#ff375f', '#5e5ce6', '#64d2ff', '#ffd60a', '#bf5af2', '#30d158', '#ff453a', '#0a84ff', '#ac8e68', '#32ade6', '#ff9f0a', '#5856d6', '#34c759', '#ff2d55', '#8e8e93', '#ffcc00', '#007aff'];
+function rrect(g, x, y, w, h, r) { g.beginPath(); g.roundRect(x, y, w, h, r); }
+function drawScreen(time) {
+  const g = scrCtx, Wc = scrCanvas.width, Hc = scrCanvas.height, k = Wc / SCR.w;
+  const mode = S.sc ? SC[S.sc].screen : 'lock'; const lt = S.lt || 0;
+  g.save();
+  const wall = () => { const gr = g.createLinearGradient(0, 0, Wc, Hc); gr.addColorStop(0, '#1e3a8a'); gr.addColorStop(.55, '#7c3aed'); gr.addColorStop(1, '#f97316'); g.fillStyle = gr; g.fillRect(0, 0, Wc, Hc); };
+  const now = new Date(), hhmm = now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
+  g.textAlign = 'center'; g.fillStyle = '#fff';
+  if (mode === 'lock' || mode === 'faceid') {
+    wall(); g.font = '600 92px Inter, Arial'; g.fillText(hhmm, Wc / 2, 210);
+    g.font = '500 22px Inter, Arial'; g.fillText(now.toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' }), Wc / 2, 112);
+    if (mode === 'faceid') {
+      const u = S.unlocked; g.strokeStyle = u > .5 ? '#4ade80' : '#fff'; g.lineWidth = 5;
+      const cx = Wc / 2, cy = 80; rrect(g, cx - 14, cy, 28, 22, 4); g.stroke();
+      g.beginPath(); g.arc(cx + (u > .5 ? 14 : 0), cy - 2, 9, Math.PI, 0); g.stroke();
+      g.font = '600 20px Inter, Arial'; g.fillText(u > .5 ? 'Разблокировано' : 'Face ID…', Wc / 2, Hc - 90);
+      if (u > .5) { g.globalAlpha = clamp((u - .5) * 2); g.fillStyle = '#000'; g.fillRect(0, 0, Wc, Hc); g.globalAlpha = 1; drawHome(g, Wc, Hc, time, 1); }
+    } else { g.font = '500 18px Inter, Arial'; g.fillText('Выберите сценарий справа →', Wc / 2, Hc - 70); }
+  } else if (mode === 'home') {
+    drawHome(g, Wc, Hc, time, 1);
+    const tx = (TOUCH.x + SCR.w / 2) * k, ty = (SCR.h / 2 - TOUCH.y) * k;
+    if (E.tap) { g.strokeStyle = 'rgba(255,255,255,.9)'; g.lineWidth = 3; g.beginPath(); g.arc(tx, ty, 18 + (time * 40 % 30), 0, 7); g.stroke(); }
+    if (EV.appOpen > .01) {
+      const a = ease(clamp(EV.appOpen)); const w = lerp(56, Wc, a), h = lerp(56, Hc, a), x = lerp(tx - 28, 0, a), y = lerp(ty - 28, 0, a);
+      g.fillStyle = '#fffaf0'; rrect(g, x, y, w, h, lerp(14, 40, a)); g.fill();
+      if (a > .7) { g.globalAlpha = (a - .7) / .3; g.fillStyle = '#ff9f0a'; g.font = '700 30px Inter, Arial'; g.textAlign = 'left'; g.fillText('Заметки', 24, 110); g.fillStyle = '#333'; g.font = '400 20px Inter, Arial'; ['Купить молоко', 'Позвонить маме', 'Посмотреть, как', 'устроен iPhone ✓'].forEach((s, i) => g.fillText(s, 24, 160 + i * 34)); g.globalAlpha = 1; g.textAlign = 'center'; }
+    }
+  } else if (mode === 'camera') {
+    const sk = g.createLinearGradient(0, 0, 0, Hc); sk.addColorStop(0, '#60a5fa'); sk.addColorStop(.55, '#fde68a'); sk.addColorStop(.56, '#166534'); sk.addColorStop(1, '#14532d'); g.fillStyle = sk; g.fillRect(0, 0, Wc, Hc);
+    const sh = EV.ois > .1 ? Math.sin(time * 37) * 6 * (1 - EV.ois) : 0;
+    g.fillStyle = '#fff7cc'; g.beginPath(); g.arc(250 + sh, 250, 38, 0, 7); g.fill();
+    g.fillStyle = '#365314'; g.beginPath(); g.moveTo(0, 430); g.lineTo(110, 300); g.lineTo(200, 400); g.lineTo(290, 320); g.lineTo(Wc, 420); g.lineTo(Wc, 440); g.lineTo(0, 440); g.fill();
+    const blur = (S.fnum - 1.48) / 2.52;
+    g.strokeStyle = 'rgba(255,255,255,.35)'; g.lineWidth = 1; for (let i = 1; i < 3; i++) { g.beginPath(); g.moveTo(Wc * i / 3, 60); g.lineTo(Wc * i / 3, Hc - 140); g.stroke(); g.beginPath(); g.moveTo(0, 60 + (Hc - 200) * i / 3); g.lineTo(Wc, 60 + (Hc - 200) * i / 3); g.stroke(); }
+    g.fillStyle = 'rgba(0,0,0,.75)'; g.fillRect(0, Hc - 150, Wc, 150); g.fillRect(0, 0, Wc, 70);
+    g.fillStyle = '#fff'; g.beginPath(); g.arc(Wc / 2, Hc - 75, 34, 0, 7); g.fill(); g.strokeStyle = '#000'; g.lineWidth = 4; g.beginPath(); g.arc(Wc / 2, Hc - 75, 28, 0, 7); g.stroke();
+    g.fillStyle = '#ffd60a'; g.font = '700 22px Inter, Arial'; g.fillText(S.sc && S.st === 3 ? '4×  120 мм' : 'ƒ/' + S.fnum.toFixed(2), Wc / 2, Hc - 165);
+    g.fillStyle = '#fff'; g.font = '600 15px Inter, Arial'; g.fillText('ФОТО', Wc / 2, Hc - 20);
+    if (EV.shot > .01) { const f = (lt % 2.2) < .25 ? 1 - (lt % 2.2) / .25 : 0; g.fillStyle = `rgba(255,255,255,${f})`; g.fillRect(0, 0, Wc, Hc); }
+    void blur;
+  } else if (mode === 'charge') {
+    g.fillStyle = '#000'; g.fillRect(0, 0, Wc, Hc);
+    const c = S.charge / 100; g.lineWidth = 16; g.strokeStyle = '#1f2937'; g.beginPath(); g.arc(Wc / 2, Hc / 2 - 40, 100, 0, 7); g.stroke();
+    g.strokeStyle = '#22c55e'; g.beginPath(); g.arc(Wc / 2, Hc / 2 - 40, 100, -Math.PI / 2, -Math.PI / 2 + c * Math.PI * 2); g.stroke();
+    g.fillStyle = '#fff'; g.font = '700 54px Inter, Arial'; g.fillText(Math.round(S.charge) + '%', Wc / 2, Hc / 2 - 22);
+    g.font = '500 20px Inter, Arial'; g.fillStyle = '#9ca3af'; g.fillText(S.sc === 'cable' ? 'Зарядка по USB-C' : 'Зарядка MagSafe', Wc / 2, Hc / 2 + 110);
+  } else if (mode === 'call') {
+    const gr = g.createLinearGradient(0, 0, 0, Hc); gr.addColorStop(0, '#334155'); gr.addColorStop(1, '#0f172a'); g.fillStyle = gr; g.fillRect(0, 0, Wc, Hc);
+    g.fillStyle = '#64748b'; g.beginPath(); g.arc(Wc / 2, 210, 60, 0, 7); g.fill(); g.fillStyle = '#fff'; g.font = '600 50px Inter, Arial'; g.fillText('М', Wc / 2, 228);
+    g.font = '600 32px Inter, Arial'; g.fillText('Мама', Wc / 2, 320);
+    const s = Math.floor(S.t); g.font = '500 20px Inter, Arial'; g.fillStyle = '#cbd5e1'; g.fillText('00:' + String(s).padStart(2, '0'), Wc / 2, 355);
+    g.fillStyle = '#ef4444'; g.beginPath(); g.arc(Wc / 2, Hc - 120, 38, 0, 7); g.fill();
+  } else if (mode === 'game') {
+    g.fillStyle = '#0b1020'; g.fillRect(0, 0, Wc, Hc);
+    for (let i = 0; i < 26; i++) { const y = ((time * 260 + i * 63) % (Hc + 60)) - 30; g.fillStyle = ['#22d3ee', '#a78bfa', '#f472b6', '#facc15'][i % 4]; g.fillRect((i * 97) % (Wc - 20), y, 16 + (i % 3) * 10, 6); }
+    g.fillStyle = '#f97316'; g.beginPath(); g.moveTo(Wc / 2 + Math.sin(time * 3) * 90, Hc - 180); g.lineTo(Wc / 2 - 24 + Math.sin(time * 3) * 90, Hc - 130); g.lineTo(Wc / 2 + 24 + Math.sin(time * 3) * 90, Hc - 130); g.fill();
+    g.fillStyle = '#4ade80'; g.font = '700 20px Inter, Arial'; g.textAlign = 'left'; g.fillText('120 к/с', 18, 92); g.textAlign = 'right'; g.fillStyle = S.socT > 60 ? '#fb923c' : '#fff'; g.fillText('чип ' + Math.round(S.socT) + '°C', Wc - 18, 92); g.textAlign = 'center';
+  } else if (mode === 'music') {
+    g.fillStyle = '#18181b'; g.fillRect(0, 0, Wc, Hc);
+    const gr = g.createLinearGradient(40, 110, Wc - 40, 390); gr.addColorStop(0, '#f43f5e'); gr.addColorStop(1, '#8b5cf6'); g.fillStyle = gr; rrect(g, 40, 110, Wc - 80, Wc - 80, 18); g.fill();
+    for (let i = 0; i < 14; i++) { const h = 20 + Math.abs(Math.sin(time * (5 + i * .7) + i)) * 90; g.fillStyle = 'rgba(255,255,255,.85)'; g.fillRect(62 + i * 17, 360 - h, 10, h); }
+    g.fillStyle = '#fff'; g.font = '700 26px Inter, Arial'; g.fillText('Ритм внутри', Wc / 2, Wc + 90); g.fillStyle = '#a1a1aa'; g.font = '500 18px Inter, Arial'; g.fillText('Модель в разрезе', Wc / 2, Wc + 120);
+    g.fillStyle = '#3f3f46'; g.fillRect(40, Wc + 160, Wc - 80, 6); g.fillStyle = '#fff'; g.fillRect(40, Wc + 160, (Wc - 80) * ((time * .03) % 1), 6);
+  }
+  // Dynamic Island
+  const iw = 16.6 * k * (mode === 'call' || mode === 'charge' ? 1.7 : 1), ih = 5.2 * k, iy = (SCR.h / 2 - 66) * k;
+  g.fillStyle = '#000'; rrect(g, Wc / 2 - iw / 2, iy - ih / 2, iw, ih, ih / 2); g.fill();
+  if (mode === 'call') { g.fillStyle = '#22c55e'; g.beginPath(); g.arc(Wc / 2 + iw / 2 - 16, iy, 6, 0, 7); g.fill(); }
+  if (mode === 'charge') { g.fillStyle = '#22c55e'; g.font = '700 14px Inter, Arial'; g.textAlign = 'right'; g.fillText(Math.round(S.charge) + '%', Wc / 2 + iw / 2 - 12, iy + 5); g.textAlign = 'center'; }
+  g.restore();
+  scrTex.needsUpdate = true;
+}
+function drawHome(g, Wc, Hc, time) {
+  const gr = g.createLinearGradient(0, 0, Wc, Hc); gr.addColorStop(0, '#0ea5e9'); gr.addColorStop(1, '#6d28d9'); g.fillStyle = gr; g.fillRect(0, 0, Wc, Hc);
+  const s = 56, gx = (Wc - 4 * s) / 5; let n = 0;
+  for (let r = 0; r < 5; r++) for (let c = 0; c < 4; c++) { g.fillStyle = ICONS[n++ % ICONS.length]; rrect(g, gx + c * (s + gx), 100 + r * 96, s, s, 14); g.fill(); }
+  g.fillStyle = 'rgba(255,255,255,.25)'; rrect(g, 14, Hc - 110, Wc - 28, 88, 30); g.fill();
+  for (let c = 0; c < 4; c++) { g.fillStyle = ICONS[c + 3]; rrect(g, gx + c * (s + gx), Hc - 94, s, s, 14); g.fill(); }
+}
+function drawPix(time) {
+  const g = pixCtx, n = 6, cs = 192 / n;
+  g.fillStyle = '#05060a'; g.fillRect(0, 0, 192, 192);
+  for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+    const ph = time * 2 + i * .5 + j * .3, c = [Math.sin(ph) * .5 + .5, Math.sin(ph + 2.1) * .5 + .5, Math.sin(ph + 4.2) * .5 + .5];
+    ['255,40,60', '40,255,90', '60,120,255'].forEach((col, q) => { g.fillStyle = `rgba(${col},${.15 + c[q] * .85})`; rrect(g, i * cs + 3 + q * (cs - 6) / 3, j * cs + 4, (cs - 6) / 3 - 2, cs - 8, 3); g.fill(); });
+  }
+  pixTex.needsUpdate = true;
+}
+
+/* ---------- тепло ---------- */
+function drawHeat(heat, spread) {
+  const g = heatCtx; g.clearRect(0, 0, 64, 96); g.fillStyle = '#000'; g.fillRect(0, 0, 64, 96);
+  if (heat < .02) { heatTex.needsUpdate = true; return; }
+  const sx = (16.5 - VC.cx + VC.w / 2) / VC.w * 64, sy = (1 - (47 - VC.cy + VC.h / 2) / VC.h) * 96;
+  const r = lerp(8, 90, spread);
+  const gr = g.createRadialGradient(sx, sy, 0, sx, sy, r);
+  gr.addColorStop(0, `rgba(255,${Math.round(lerp(200, 90, heat))},40,${heat})`); gr.addColorStop(.4, `rgba(255,120,30,${heat * .6})`); gr.addColorStop(1, 'rgba(255,60,0,0)');
+  g.fillStyle = gr; g.fillRect(0, 0, 64, 96); heatTex.needsUpdate = true;
+}
+
+/* ---------- главный цикл ---------- */
+const clock = new THREE.Clock(); let T = 0, hudT = 0;
+function tick() {
+  const dt = Math.min(.05, clock.getDelta()); T += dt;
+  // сценарий
+  let step = null;
+  if (S.sc) {
+    const sc = SC[S.sc], tot = sc.steps.reduce((a, s) => a + s.d, 0);
+    if (S.play) S.t += dt * S.speed;
+    if (S.t >= tot + .6) { S.t = 0; S.unlocked = 0; if (S.sc === 'charge' || S.sc === 'cable') S.charge = 23; }
+    let acc = 0, idx = sc.steps.length - 1;
+    for (let i = 0; i < sc.steps.length; i++) { if (S.t < acc + sc.steps[i].d) { idx = i; break; } acc += sc.steps[i].d; }
+    if (S.t >= tot) acc = tot - sc.steps[idx].d;
+    step = sc.steps[idx]; S.lt = S.t - acc;
+    if (idx !== S.st) {
+      S.st = idx; $('stepNum').textContent = idx + 1; $('stepName').textContent = step.t; $('stepText').textContent = step.x; $('rNow').textContent = sc.name.replace(/^\S+\s/, '') + ': ' + step.t;
+      document.querySelectorAll('#steps .st').forEach((b, i) => { b.classList.toggle('cur', i === idx); b.classList.toggle('done', i < idx); });
+      const cur = document.querySelectorAll('#steps .st')[idx]; if (cur) cur.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      for (const k of ALL) E[k] = step.on.includes(k) ? 1 : 0;
+      for (const r of ['fRay0', 'fRay1', 'fRay2', 'fRay3', 'fRay4']) E[r] = step.on.includes('rays') ? 1 : 0;
+      E.fTele = step.on.includes('tele') ? 1 : 0;
+      updateLabels();
+    }
+    $('prog').firstChild.style.width = (S.lt / step.d * 100) + '%';
+  }
+  for (const k of ALL) EV[k] += ((E[k] || 0) - EV[k]) * Math.min(1, dt * 4);
+  const on = k => EV[k] || 0;
+
+  // разборка
+  S.ex += (S.exT - S.ex) * Math.min(1, dt * 3.5);
+  if (Math.abs(S.ex - S.exT) > .001) { $('ex').value = Math.round(S.ex * 100); }
+  $('vEx').textContent = Math.round(S.exT * 100) + '%';
+  const ek = ease(clamp(S.ex));
+  for (const k in G) G[k].g.position.copy(G[k].off).multiplyScalar(ek);
+
+  // касание
+  const tapE = on('tap'), fing = on('finger');
+  const tp = A('touch', TOUCH.x, TOUCH.y, 0);
+  finger.visible = fing > .02; finger.position.copy(phone.localToWorld(V(tp.x, tp.y + 7.7, gp('glass').z + 26 + lerp(60, 0, ease(clamp(fing))))));
+  {
+    const col = new THREE.Color(); let n = 0;
+    for (let i = 0; i < TG.nx; i++) for (let j = 0; j < TG.ny; j++) {
+      const x = TG.x0 + i * TG.sx, y = TG.y0 + j * TG.sy, d = Math.hypot(x - TOUCH.x, y - TOUCH.y);
+      const h = tapE * clamp(1 - d / 16) * (.7 + .3 * Math.sin(T * 10));
+      col.setRGB(.25 + h * .2, .45 + h * .5, .7 + h * .3); touchNodes.setColorAt(n++, col);
+    }
+    touchNodes.instanceColor.needsUpdate = true;
+    touchNodes.material.opacity = .25 + tapE * .7; TG.lines.material.opacity = .14 + tapE * .4;
+  }
+  // лупа
+  const px = on('pix'); pixPlane.material.opacity = px; pixRing.material.opacity = px * .9; pixLine.material.opacity = px * .8; pixPlane.visible = pixLine.visible = px > .02; pixLbl.visible = px > .5;
+  if (px > .02) { drawPix(T); const a = A('oled', TOUCH.x, TOUCH.y, 3.5); pixLine.geometry.setFromPoints([a, pixPlane.position.clone().add(V(-24, 0, 0))]); pixPlane.lookAt(camera.position); }
+
+  // процессор / нагрев
+  const hotT = 34 + on('socHot1') * 16 + on('socHot2') * 50;
+  S.socT += (hotT - S.socT) * Math.min(1, dt * (on('vapor') > .5 ? .5 : .9));
+  if (on('vapor') > .5) S.socT += (62 - S.socT) * dt * .4;
+  const h = clamp((S.socT - 34) / 50);
+  socMat.emissive = socMat.emissive || new THREE.Color(); socMat.emissive.setRGB(1, .35, .1); socMat.emissiveIntensity = h * 1.4;
+  drawHeat(Math.max(h * on('vapor'), h * .4), on('vapor') * clamp(S.lt / 3) + (on('frameWarm') > .5 ? 1 : 0));
+  M.frame.emissive.setRGB(1, .4, .1); M.frame.emissiveIntensity = on('frameWarm') * .35;
+  {
+    const ve = on('vapor'); vapor.visible = ve > .02; const c = new THREE.Color();
+    if (vapor.visible) {
+      const so = A('vapor', 16.5, 47, 0);
+      vapSeeds.forEach((s, i) => {
+        s.p = (s.p + dt * .35 * s.s) % 1; const out = s.p < .5, k = out ? s.p * 2 : 2 - s.p * 2;
+        const rx = Math.cos(s.a) * 30 * k, ry = Math.sin(s.a) * 40 * k;
+        dm.position.set(clamp(so.x + rx, -29, 29), clamp(so.y + ry, -19, 59), so.z + (out ? 3.0 : 2.8));
+        dm.scale.setScalar(.75 * ve); dm.updateMatrix(); vapor.setMatrixAt(i, dm.matrix);
+        vapor.setColorAt(i, out ? c.setRGB(1, .55, .2) : c.setRGB(.3, .6, 1));
+      });
+      vapor.instanceMatrix.needsUpdate = true; vapor.instanceColor.needsUpdate = true;
+    }
+  }
+
+  // камера: диафрагма, OIS, вспышка
+  const iris = on('iris');
+  S.fnum = lerp(1.48, 4, iris * (.5 - .5 * Math.cos(clamp(S.lt / 2.4) * Math.PI)) * (S.st === 1 ? 1 : 0) + 0);
+  if (S.sc === 'photo' && S.st === 1 && S.lt > 2.4) S.fnum = lerp(4, 1.48, clamp((S.lt - 3.2) / 1.4));
+  const ap = lerp(5.4, 1.9, (S.fnum - 1.48) / 2.52);
+  for (const b of blades) { const a = b.userData.a; b.rotation.z = a - Math.PI / 2 + .35; b.position.set(CAM.main.x + Math.cos(a) * (ap + 1.7), CAM.main.y + Math.sin(a) * (ap + 1.7), ZP + .7); }
+  const ois = on('ois'), jx = Math.sin(T * 23) * .03 + Math.sin(T * 41) * .02, jy = Math.cos(T * 19) * .03;
+  phone.rotation.set(jy * ois, jx * ois, 0);
+  if (S.sc === 'sound' && S.st === 2) { const pulse = Math.max(0, Math.sin(T * 9)) ** 8; phone.position.x = pulse * 1.2 * Math.sin(T * 120); } else phone.position.x = 0;
+  mainSensor.position.set(-jx * ois * 40, jy * ois * 40, 0);
+  M.sensor.emissiveIntensity = on('sensor') * (.6 + .4 * Math.sin(T * 6));
+  teleSensor.material.emissiveIntensity = on('tele') * (.6 + .4 * Math.sin(T * 6));
+  M.white.emissiveIntensity = on('shot') * ((S.lt % 2.2) < .25 ? 3 : 0);
+
+  // Face ID
+  scrMat.opacity = lerp(1, .14, S.xr) * (S.sc === 'heat' ? .15 : S.sc && !['touch', 'face', 'charge'].includes(S.sc) ? .45 : 1);
+  const fe = on('face'); head.visible = fe > .02; headLbl.visible = fe > .5;
+  head.children[0].material.opacity = .45 * fe; nose.material.opacity = .45 * fe;
+  const de = Math.max(on('dots') * clamp(S.lt / 2.5), on('dotsOn'));
+  dots.count = Math.round(DOTN * de); dots.visible = de > .01;
+  {
+    const src = phone.localToWorld(A('front', P_DOT.x, P_DOT.y, P_DOT.z)), pos = dotRays.geometry.attributes.position;
+    for (let i = 0; i < 60; i++) { const p = head.localToWorld(dotPts[i * 23 % DOTN].clone()); pos.setXYZ(i * 2, src.x, src.y, src.z); pos.setXYZ(i * 2 + 1, p.x, p.y, p.z); }
+    pos.needsUpdate = true; dotRays.material.opacity = on('dots') * .35 + on('irBack') * .0;
+  }
+  {
+    const fl = on('flood'); floodCone.visible = fl > .02; floodCone.material.opacity = fl * .1 * (.8 + .2 * Math.sin(T * 8));
+    const a = phone.localToWorld(A('front', P_FLOOD.x, P_FLOOD.y, P_FLOOD.z)), b = head.position.clone();
+    const len = a.distanceTo(b); floodCone.scale.set(1, len, 1); floodCone.position.lerpVectors(a, b, .5); floodCone.quaternion.setFromUnitVectors(V(0, -1, 0), b.clone().sub(a).normalize());
+  }
+  if (on('unlock') > .5 && S.lt > 1.5) S.unlocked = Math.min(1, S.unlocked + dt * 1.2);
+  // ИК обратно: используем отдельные лучи
+  irRays.visible = on('irBack') > .02; if (irRays.visible) {
+    const dst = phone.localToWorld(A('front', P_IR.x, P_IR.y, P_IR.z)), pos = irRays.geometry.attributes.position;
+    for (let i = 0; i < 40; i++) { const p = head.localToWorld(dotPts[(i * 37 + 11) % DOTN].clone()); const k = (T * .8 + i / 40) % 1; const q = p.clone().lerp(dst, k); const q2 = p.clone().lerp(dst, Math.min(1, k + .06)); pos.setXYZ(i * 2, q.x, q.y, q.z); pos.setXYZ(i * 2 + 1, q2.x, q2.y, q2.z); }
+    pos.needsUpdate = true; irRays.material.opacity = on('irBack');
+  }
+
+  // зарядка
+  const pk = on('puck'); puck.visible = pk > .02; puckLbl.visible = pk > .5;
+  tower.visible = towerLbl.visible = S.sc === 'call';
+  { const c = phone.localToWorld(A('back', MS.cx, MS.cy, -4.4 - lerp(80, 0, ease(clamp(pk))))); puck.position.copy(c); puck.quaternion.copy(phone.quaternion); }
+  const pl = on('plug'); plug.visible = pl > .02; plugLbl.visible = pl > .5;
+  { const c = phone.localToWorld(A('bottom', 0, lerp(-170, -76, ease(clamp(pl))), 0)); plug.position.copy(c); }
+  coilGlow.emissiveIntensity = on('coil') * (.5 + .4 * Math.sin(T * 12));
+  if (on('charging') > .5 && S.play) S.charge = Math.min(100, S.charge + dt * S.speed * (S.charge < 80 ? 9 : 3));
+  batFill.scale.y = Math.max(.01, (BAT.h - 3) * S.charge / 100); batFill.position.y = BAT.cy - (BAT.h - 3) / 2 + batFill.scale.y / 2;
+  M.batFill.color.setHSL(lerp(0, .33, clamp(S.charge / 60)), .75, .5); M.batFill.emissive.copy(M.batFill.color).multiplyScalar(.6);
+  M.batFill.emissiveIntensity = .25 + on('charging') * (.35 + .25 * Math.sin(T * 5));
+
+  // звук, антенны, Taptic
+  M.ant.opacity = on('antennas') * (.55 + .35 * Math.sin(T * 7));
+  const sp = on('spk') * Math.sin(T * 70) * .35; spkMem.position.z = sp;
+  earMem.position.z = on('ear') * Math.sin(T * 60) * .25;
+  const tp2 = on('taptic') * Math.pow(Math.max(0, Math.sin(T * 9)), 4) * 4.5 * Math.sign(Math.sin(T * 4.5)); tapMass.position.x = tp2;
+  const mh = on('modemHot'); PARTS.modem.meshes[0].material[5].emissive = PARTS.modem.meshes[0].material[5].emissive.setRGB(.2, .8, 1); PARTS.modem.meshes[0].material[5].emissiveIntensity = mh * .6;
+  S.hz = (S.sc && (on('hz120') > .5 || S.sc === 'photo' || S.sc === 'touch')) ? 120 : (S.sc ? 60 : 10);
+
+  // анимация камеры
+  if (camAnim) {
+    camAnim.k = Math.min(1, camAnim.k + dt / 1.1); const k = ease(camAnim.k);
+    camera.position.lerpVectors(camAnim.p0, camAnim.p1, k); controls.target.lerpVectors(camAnim.t0, camAnim.t1, k);
+    if (camAnim.k >= 1) camAnim = null;
+  }
+  controls.update();
+  updateFlows(T); updateWaves(dt);
+  drawScreen(T);
+
+  hudT -= dt; if (hudT < 0) {
+    hudT = .2;
+    $('rBat').textContent = Math.round(S.charge) + '%';
+    $('rT').textContent = Math.round(S.socT) + ' °C';
+    $('rHz').textContent = S.hz + ' Гц';
+  }
+  renderer.render(scene, camera); labelRenderer.render(scene, camera);
+  requestAnimationFrame(tick);
+}
+const irRays = new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(new Array(80).fill(0).map(() => V())), new THREE.LineBasicMaterial({ color: 0xff6b81, transparent: true, opacity: 0, depthWrite: false }));
+irRays.frustumCulled = false; world.add(irRays); dotRays.frustumCulled = false;
+
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight); labelRenderer.setSize(innerWidth, innerHeight);
+  fitCam();
+});
+function fitCam() { camera.fov = innerWidth / innerHeight < .8 ? 44 : 32; camera.updateProjectionMatrix(); }
+fitCam();
+$('loading').remove();
+window.__S = S; window.__start = startSc; window.__jump = jump;
+tick();
+</script>
+</body>
+</html>
