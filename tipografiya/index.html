@@ -778,12 +778,43 @@ textarea{min-height:80px;resize:vertical}
 
   // С файлами — обычная отправка формы в скрытый фрейм: только так FormSubmit прикладывает вложения.
   function sendWithFiles(fields){
-    // Прямой POST на обычный (не ajax) адрес FormSubmit — тот же запрос, что отправляет обычная HTML-форма,
-    // поэтому вложения прикладываются. Ответ прочитать нельзя (no-cors), но запрос уходит целиком.
-    var fd = new FormData();
-    fields.forEach(function(p){ fd.append(p[0], p[1]); });
-    picked.forEach(function(file){ fd.append("attachment", file, file.name); });
-    return fetch("https://formsubmit.co/" + EMAIL, { method: "POST", mode: "no-cors", body: fd });
+    // Файлы FormSubmit прикладывает только при обычной отправке HTML-формы.
+    // Форму и фрейм кладём ВНУТРЬ открытого окна заявки: всё вне модального окна браузер блокирует.
+    return new Promise(function(resolve, reject){
+      var name = "fs_" + Date.now();
+      var host = orderDlg.open ? orderDlg : document.body;
+      var frame = document.createElement("iframe");
+      frame.name = name; frame.setAttribute("aria-hidden", "true"); frame.tabIndex = -1;
+      frame.style.cssText = /debugform/.test(location.search)
+        ? "display:block;width:100%;height:320px;border:3px solid #ff2e88;border-radius:12px;margin:0 0 20px"
+        : "position:absolute;width:1px;height:1px;border:0;opacity:0;pointer-events:none;left:-9999px";
+      var hf = document.createElement("form");
+      hf.method = "POST"; hf.enctype = "multipart/form-data"; hf.target = name; hf.style.display = "none";
+      hf.action = "https://formsubmit.co/" + EMAIL;
+      fields.forEach(function(p){
+        var i = document.createElement("input"); i.type = "hidden"; i.name = p[0]; i.value = p[1]; hf.appendChild(i);
+      });
+      var dt = new DataTransfer();
+      picked.forEach(function(file){ dt.items.add(file); });
+      var fi = document.createElement("input"); fi.type = "file"; fi.name = "attachment"; fi.multiple = true; fi.files = dt.files;
+      hf.appendChild(fi);
+      host.appendChild(frame); host.appendChild(hf);
+      var done = false;
+      function finish(ok){
+        if (done) return; done = true; clearTimeout(timer);
+        if (!/debugform/.test(location.search)) setTimeout(function(){ frame.remove(); }, 1500);
+        hf.remove();
+        ok ? resolve() : reject(new Error("timeout"));
+      }
+      var timer = setTimeout(function(){ finish(false); }, 90000);
+      frame.addEventListener("load", function(){
+        // пустой фрейм тоже «загружается» — считаем успехом только ответ с сервера FormSubmit (другой домен)
+        var sameOrigin = true;
+        try { void frame.contentWindow.location.href; } catch (e) { sameOrigin = false; }
+        if (!sameOrigin) finish(true);
+      });
+      setTimeout(function(){ hf.submit(); }, 50);
+    });
   }
 })();
 </script>
