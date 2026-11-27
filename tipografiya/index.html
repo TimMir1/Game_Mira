@@ -907,25 +907,26 @@ footer a{text-decoration:none}footer a:hover{color:#fff}
       chat = window.open("https://t.me/+" + PHONE, "_blank");
     }
 
-    var fd = new FormData();
-    fd.append("_subject", "Заявка с сайта: " + (svc.join(", ") || "расчёт стоимости"));
-    fd.append("_template", "table");
-    fd.append("_captcha", "false");
-    fd.append("Услуги", svc.join(", ") || "не выбрано");
-    fd.append("Имя", f.name.value || "—");
-    fd.append("Контакт", f.contact.value);
-    fd.append("Тираж", f.qty.value || "—");
-    fd.append("Срок", f.when.value);
-    fd.append("Комментарий", f.comment.value || "—");
-    fd.append("Канал", via === "wa" ? "WhatsApp" : via === "tg" ? "Telegram" : "Форма на сайте");
-    picked.forEach(function(file, i){ fd.append(i === 0 ? "attachment" : "attachment" + (i+1), file, file.name); });
+    var fields = [
+      ["_subject", "Заявка с сайта: " + (svc.join(", ") || "расчёт стоимости")],
+      ["_template", "table"],
+      ["_captcha", "false"],
+      ["Услуги", svc.join(", ") || "не выбрано"],
+      ["Имя", f.name.value || "—"],
+      ["Контакт", f.contact.value],
+      ["Тираж", f.qty.value || "—"],
+      ["Срок", f.when.value],
+      ["Комментарий", f.comment.value || "—"],
+      ["Канал", via === "wa" ? "WhatsApp" : via === "tg" ? "Telegram" : "Форма на сайте"],
+      ["Файлы", picked.length ? picked.map(function(p){ return p.name; }).join(", ") : "нет"]
+    ];
 
     var btns = form.querySelectorAll("button[type=submit]");
     btns.forEach(function(b){ b.disabled = true; });
     say(picked.length ? "Отправляем заявку и файлы…" : "Отправляем заявку…", true);
 
-    fetch("https://formsubmit.co/ajax/" + EMAIL, { method: "POST", headers: { "Accept": "application/json" }, body: fd })
-      .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(j){ if(!r.ok || j.success === "false" || j.success === false) throw new Error(j.message || r.status); }); })
+    var sending = picked.length ? sendWithFiles(fields) : sendAjax(fields);
+    sending
       .then(function(){
         say("Готово! Заявка" + (picked.length ? " и файлы" : "") + " отправлены. Ответим в течение 15 минут в рабочее время." +
           (via === "tg" ? " Текст заявки скопирован — вставьте его в чат Telegram." : ""), true);
@@ -940,6 +941,39 @@ footer a{text-decoration:none}footer a:hover{color:#fff}
       })
       .finally(function(){ btns.forEach(function(b){ b.disabled = false; }); });
   });
+
+  // Без файлов — фоновый запрос с проверкой ответа.
+  function sendAjax(fields){
+    var fd = new FormData();
+    fields.forEach(function(p){ fd.append(p[0], p[1]); });
+    return fetch("https://formsubmit.co/ajax/" + EMAIL, { method: "POST", headers: { "Accept": "application/json" }, body: fd })
+      .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(j){ if(!r.ok || j.success === "false" || j.success === false) throw new Error(j.message || r.status); }); });
+  }
+
+  // С файлами — обычная отправка формы в скрытый фрейм: только так FormSubmit прикладывает вложения.
+  function sendWithFiles(fields){
+    return new Promise(function(resolve, reject){
+      var name = "fs_" + Date.now();
+      var frame = document.createElement("iframe");
+      frame.name = name; frame.style.display = "none"; frame.setAttribute("aria-hidden", "true");
+      var hf = document.createElement("form");
+      hf.method = "POST"; hf.enctype = "multipart/form-data"; hf.target = name; hf.style.display = "none";
+      hf.action = "https://formsubmit.co/" + EMAIL;
+      fields.forEach(function(p){
+        var i = document.createElement("input"); i.type = "hidden"; i.name = p[0]; i.value = p[1]; hf.appendChild(i);
+      });
+      var dt = new DataTransfer();
+      picked.forEach(function(file){ dt.items.add(file); });
+      var fi = document.createElement("input"); fi.type = "file"; fi.name = "attachment"; fi.multiple = true; fi.files = dt.files;
+      hf.appendChild(fi);
+      document.body.appendChild(frame); document.body.appendChild(hf);
+      var done = false;
+      var timer = setTimeout(function(){ if(!done){ done = true; cleanup(); reject(new Error("timeout")); } }, 60000);
+      function cleanup(){ setTimeout(function(){ frame.remove(); hf.remove(); }, 1000); }
+      frame.addEventListener("load", function(){ if(done) return; done = true; clearTimeout(timer); cleanup(); resolve(); });
+      hf.submit();
+    });
+  }
 })();
 </script>
 </body>
