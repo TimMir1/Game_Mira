@@ -601,6 +601,29 @@ textarea{min-height:80px;resize:vertical}
   var EMAIL = "timyur0530@gmail.com";
   var MAX_FILES = 5, MAX_TOTAL = 10 * 1024 * 1024;
 
+  // Мессенджеры: на телефоне открываем приложение напрямую (сайты wa.me / t.me в РФ часто не открываются),
+  // на компьютере — обычные ссылки.
+  var MOBILE = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  function chatUrls(kind, text){
+    if (kind === "wa") return {
+      app: "whatsapp://send?phone=" + PHONE + (text ? "&text=" + encodeURIComponent(text) : ""),
+      web: "https://wa.me/" + PHONE + (text ? "?text=" + encodeURIComponent(text) : "")
+    };
+    return { app: "tg://resolve?phone=" + PHONE, web: "https://t.me/+" + PHONE };
+  }
+  function openChat(kind, text){
+    var u = chatUrls(kind, text);
+    if (!MOBILE) return window.open(u.web, "_blank");
+    location.href = u.app;
+    return true;
+  }
+  document.addEventListener("click", function(e){
+    var a = e.target.closest && e.target.closest('a[href*="wa.me/"], a[href*="t.me/"]');
+    if (!a || !MOBILE) return;
+    e.preventDefault();
+    openChat(/wa\.me/.test(a.href) ? "wa" : "tg");
+  });
+
   var SVC = [
     {n:"Печать на футболках", img:"futbolki", price:"от 450 ₽", time:"от 1 дня",
      d:"Футболки, худи, свитшоты и шопперы с вашим логотипом, надписью или фото. Яркая стойкая печать, которая не трескается после стирок. Можно на нашей одежде или на вашей.",
@@ -725,11 +748,7 @@ textarea{min-height:80px;resize:vertical}
     }
     var text = buildText(svc, f);
     var chat = null;
-    if (via === "wa") chat = window.open("https://wa.me/" + PHONE + "?text=" + encodeURIComponent(text), "_blank");
-    if (via === "tg") {
-      if (navigator.clipboard) navigator.clipboard.writeText(text).catch(function(){});
-      chat = window.open("https://t.me/+" + PHONE, "_blank");
-    }
+    if (via === "tg" && navigator.clipboard) navigator.clipboard.writeText(text).catch(function(){});
 
     var fields = [
       ["_subject", "Заявка с сайта: " + (svc.join(", ") || "расчёт стоимости") + " · " + new Date().toLocaleString("ru-RU", {day:"2-digit", month:"2-digit", hour:"2-digit", minute:"2-digit"})],
@@ -753,6 +772,9 @@ textarea{min-height:80px;resize:vertical}
     // одна заявка = одно письмо: с файлами — обычной формой (только так FormSubmit прикладывает вложения),
     // без файлов — быстрым запросом с проверкой ответа
     var sending = picked.length ? sendWithFiles(fields) : sendAjax(fields);
+    // мессенджер открываем уже после того, как заявка ушла в отправку
+    if (via === "wa") chat = openChat("wa", text);
+    if (via === "tg") chat = openChat("tg");
     sending
       .then(function(){
         say("Готово! Заявка" + (picked.length ? " с файлами" : "") + " отправлена. Ответим в течение 15 минут в рабочее время." +
@@ -813,7 +835,7 @@ textarea{min-height:80px;resize:vertical}
         try { void frame.contentWindow.location.href; } catch (e) { sameOrigin = false; }
         if (!sameOrigin) finish(true);
       });
-      setTimeout(function(){ hf.submit(); }, 50);
+      hf.submit();
     });
   }
 })();
