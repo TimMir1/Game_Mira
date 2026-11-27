@@ -742,7 +742,7 @@ textarea{min-height:80px;resize:vertical}
       ["Срок", f.when.value],
       ["Комментарий", f.comment.value || "—"],
       ["Канал", via === "wa" ? "WhatsApp" : via === "tg" ? "Telegram" : "Форма на сайте"],
-      ["Файлы", picked.length ? picked.map(function(p){ return p.name; }).join(", ") + " (придут следующим письмом)" : "нет"]
+      ["Файлы", picked.length ? picked.map(function(p){ return p.name; }).join(", ") + " (во вложении)" : "нет"]
     ];
 
     var filesFailed = false;
@@ -750,15 +750,12 @@ textarea{min-height:80px;resize:vertical}
     btns.forEach(function(b){ b.disabled = true; });
     say(picked.length ? "Отправляем заявку и файлы…" : "Отправляем заявку…", true);
 
-    var sending = sendAjax(fields).then(function(){
-      if (!picked.length) return;
-      // файлы — вторым письмом; текст заявки уже дошёл, поэтому сбой здесь не критичен
-      var ff = fields.map(function(p){ return p[0] === "_subject" ? ["_subject", p[1] + " — ФАЙЛЫ"] : p; });
-      return sendWithFiles(ff).catch(function(){ filesFailed = true; });
-    });
+    // одна заявка = одно письмо: с файлами — обычной формой (только так FormSubmit прикладывает вложения),
+    // без файлов — быстрым запросом с проверкой ответа
+    var sending = picked.length ? sendWithFiles(fields) : sendAjax(fields);
     sending
       .then(function(){
-        say((filesFailed ? "Заявка отправлена, но файлы не прошли — пришлите их, пожалуйста, в WhatsApp или Telegram." : "Готово! Заявка" + (picked.length ? " и файлы" : "") + " отправлены.") + " Ответим в течение 15 минут в рабочее время." +
+        say("Готово! Заявка" + (picked.length ? " с файлами" : "") + " отправлена. Ответим в течение 15 минут в рабочее время." +
           (via === "tg" ? " Текст заявки скопирован — вставьте его в чат Telegram." : ""), true);
         form.reset(); box.querySelectorAll("input").forEach(function(i){ i.checked = false; }); picked = []; render();
       })
