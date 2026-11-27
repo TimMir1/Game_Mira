@@ -778,27 +778,12 @@ textarea{min-height:80px;resize:vertical}
 
   // С файлами — обычная отправка формы в скрытый фрейм: только так FormSubmit прикладывает вложения.
   function sendWithFiles(fields){
-    return new Promise(function(resolve, reject){
-      var name = "fs_" + Date.now();
-      var frame = document.createElement("iframe");
-      frame.name = name; frame.style.display = "none"; frame.setAttribute("aria-hidden", "true");
-      var hf = document.createElement("form");
-      hf.method = "POST"; hf.enctype = "multipart/form-data"; hf.target = name; hf.style.display = "none";
-      hf.action = "https://formsubmit.co/" + EMAIL;
-      fields.forEach(function(p){
-        var i = document.createElement("input"); i.type = "hidden"; i.name = p[0]; i.value = p[1]; hf.appendChild(i);
-      });
-      var dt = new DataTransfer();
-      picked.forEach(function(file){ dt.items.add(file); });
-      var fi = document.createElement("input"); fi.type = "file"; fi.name = "attachment"; fi.multiple = true; fi.files = dt.files;
-      hf.appendChild(fi);
-      document.body.appendChild(frame); document.body.appendChild(hf);
-      var done = false;
-      var timer = setTimeout(function(){ if(!done){ done = true; cleanup(); reject(new Error("timeout")); } }, 60000);
-      function cleanup(){ setTimeout(function(){ frame.remove(); hf.remove(); }, 1000); }
-      frame.addEventListener("load", function(){ if(done) return; done = true; clearTimeout(timer); cleanup(); resolve(); });
-      hf.submit();
-    });
+    // Прямой POST на обычный (не ajax) адрес FormSubmit — тот же запрос, что отправляет обычная HTML-форма,
+    // поэтому вложения прикладываются. Ответ прочитать нельзя (no-cors), но запрос уходит целиком.
+    var fd = new FormData();
+    fields.forEach(function(p){ fd.append(p[0], p[1]); });
+    picked.forEach(function(file){ fd.append("attachment", file, file.name); });
+    return fetch("https://formsubmit.co/" + EMAIL, { method: "POST", mode: "no-cors", body: fd });
   }
 })();
 </script>
