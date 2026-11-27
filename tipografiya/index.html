@@ -100,175 +100,87 @@
   --ink:#1a1033; --ink-2:#3b2f5c; --muted:#6b6385;
   --cream:#fff8ef;
   --pink:#ff2e88; --cyan:#1ec8ff; --yellow:#ffd83d; --lime:#b8f34a; --violet:#7b5cff; --orange:#ff7a2f;
-  --radius:28px;
   --display:"Unbounded", system-ui, sans-serif;
   --text:"Manrope", system-ui, -apple-system, sans-serif;
-  --ease:cubic-bezier(.2,.8,.2,1);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{-webkit-text-size-adjust:100%}
-html.lenis,html.lenis body{height:auto}
-.lenis.lenis-smooth{scroll-behavior:auto!important}
-body{font-family:var(--text);color:var(--ink);background:var(--cream);line-height:1.55;font-size:17px;-webkit-font-smoothing:antialiased;overflow-x:hidden;transition:background-color .8s ease}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{font-family:var(--text);color:var(--ink);line-height:1.5;font-size:16px;-webkit-font-smoothing:antialiased;
+  background:
+    radial-gradient(900px 600px at 0% 0%, rgba(255,46,136,.14), transparent 60%),
+    radial-gradient(800px 600px at 100% 0%, rgba(30,200,255,.16), transparent 60%),
+    radial-gradient(900px 700px at 60% 100%, rgba(255,216,61,.18), transparent 60%),
+    var(--cream);
+  background-attachment:fixed}
 img,svg{display:block}
 a{color:inherit}
-.wrap{max-width:1240px;margin:0 auto;padding:0 24px}
-h1,h2,h3{font-family:var(--display);line-height:1.02;letter-spacing:-.03em}
-h2{font-size:clamp(34px,5.4vw,72px);font-weight:800;margin-bottom:18px}
-.lead{color:var(--muted);font-size:19px;max-width:640px}
-section{padding:110px 0;position:relative}
-.grad-text{background:linear-gradient(90deg,var(--pink),var(--orange),var(--yellow),var(--lime),var(--cyan),var(--violet),var(--pink));background-size:300% 100%;
-  -webkit-background-clip:text;background-clip:text;color:transparent;animation:flow 8s linear infinite}
-@keyframes flow{to{background-position:300% 0}}
-
-/* progress + cursor */
-.progress{position:fixed;top:0;left:0;height:5px;width:100%;z-index:200;transform-origin:0 50%;transform:scaleX(0);
-  background:linear-gradient(90deg,var(--cyan),var(--violet),var(--pink),var(--orange),var(--yellow))}
-.cursor{position:fixed;left:0;top:0;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;pointer-events:none;z-index:300;
-  background:var(--pink);mix-blend-mode:multiply;transition:width .3s var(--ease),height .3s var(--ease),margin .3s var(--ease),background .3s;display:none}
-.cursor.big{width:70px;height:70px;margin:-35px 0 0 -35px;background:var(--yellow)}
-@media (pointer:fine){.cursor{display:block}}
+button{font-family:inherit}
+.wrap{max-width:1400px;margin:0 auto;padding:0 20px}
+h1,h2,h3{font-family:var(--display);line-height:1.05;letter-spacing:-.03em}
+h2{font-size:clamp(28px,3.6vw,48px);font-weight:800;margin-bottom:12px}
+.lead{color:var(--muted);font-size:17px;max-width:680px}
+.grad-text{background:linear-gradient(90deg,var(--pink),var(--orange) 35%,var(--violet) 70%,var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
 
 /* buttons */
-.btn{position:relative;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;gap:10px;font:800 16px var(--text);text-decoration:none;border:0;cursor:pointer;
-  padding:18px 30px;border-radius:999px;transition:transform .3s var(--ease), box-shadow .3s;will-change:transform}
-.btn:disabled{opacity:.6;cursor:wait}
-.btn-main{background:linear-gradient(120deg,var(--pink),var(--orange));color:#fff;box-shadow:0 16px 34px -14px rgba(255,46,136,.8)}
-.btn-main::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.45) 50%,transparent 70%);transform:translateX(-100%);animation:shine 3s infinite}
-@keyframes shine{60%,100%{transform:translateX(100%)}}
-.btn-violet{background:var(--violet);color:#fff;box-shadow:0 16px 34px -16px rgba(123,92,255,.9)}
-.btn-ghost{background:#fff;color:var(--ink);box-shadow:0 10px 30px -18px rgba(26,16,51,.6)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:800 15px var(--text);text-decoration:none;border:0;cursor:pointer;
+  padding:14px 22px;border-radius:999px;transition:transform .15s ease, box-shadow .15s ease;white-space:nowrap}
+.btn:hover{transform:translateY(-2px)}
+.btn:disabled{opacity:.6;cursor:wait;transform:none}
+.btn-main{background:linear-gradient(120deg,var(--pink),var(--orange));color:#fff;box-shadow:0 12px 26px -14px rgba(255,46,136,.9)}
+.btn-violet{background:var(--violet);color:#fff}
+.btn-ghost{background:#fff;color:var(--ink);box-shadow:inset 0 0 0 2px rgba(26,16,51,.12)}
 .btn-wa{background:#25d366;color:#073b1d}
 .btn-tg{background:#2aabee;color:#fff}
-.ripple{position:absolute;border-radius:50%;transform:scale(0);animation:rip .7s var(--ease);background:rgba(255,255,255,.5);pointer-events:none}
-@keyframes rip{to{transform:scale(4);opacity:0}}
 
 /* header */
-header{position:fixed;top:14px;left:50%;transform:translateX(-50%);width:min(1240px,calc(100% - 24px));z-index:100;
-  background:rgba(255,255,255,.72);backdrop-filter:blur(18px) saturate(1.6);-webkit-backdrop-filter:blur(18px) saturate(1.6);
-  border-radius:999px;box-shadow:0 14px 40px -24px rgba(26,16,51,.45);border:1px solid rgba(255,255,255,.8);transition:transform .5s var(--ease)}
-header.hide{transform:translate(-50%,-140%)}
-.nav{display:flex;align-items:center;justify-content:space-between;gap:16px;height:64px;padding:0 10px 0 18px}
+header{position:sticky;top:0;z-index:50;background:rgba(255,248,239,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,16,51,.07)}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:16px;height:64px}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none}
-.brand img{width:40px;height:40px;transition:transform .8s var(--ease)}
-.brand:hover img{transform:rotate(240deg) scale(1.1)}
-.brand-name{font-family:var(--display);font-weight:700;font-size:16px;line-height:1.05}
+.brand img{width:38px;height:38px}
+.brand-name{font-family:var(--display);font-weight:700;font-size:15px;line-height:1.05}
 .brand-name small{display:block;font:800 10px var(--text);letter-spacing:.24em;text-transform:uppercase;color:var(--pink);margin-bottom:3px}
-.menu{display:flex;gap:6px;font-weight:700;font-size:15px}
-.menu a{text-decoration:none;padding:9px 14px;border-radius:999px;transition:background .25s,color .25s}
-.menu a:hover{background:var(--ink);color:#fff}
+.menu{display:flex;gap:4px;font-weight:700;font-size:14px}
+.menu a{text-decoration:none;padding:8px 13px;border-radius:999px}
+.menu a:hover{background:#fff}
 .nav-right{display:flex;align-items:center;gap:8px}
-.phone{font-weight:800;text-decoration:none;font-size:16px;white-space:nowrap;padding:0 8px}
-.icon-btn{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;text-decoration:none;transition:transform .3s var(--ease)}
-.icon-btn:hover{transform:scale(1.12) rotate(-10deg)}
-.icon-btn svg{width:22px;height:22px}
+.phone{font-weight:800;text-decoration:none;font-size:16px;white-space:nowrap;padding:0 6px}
+.icon-btn{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;text-decoration:none}
+.icon-btn svg{width:20px;height:20px}
 
-/* HERO */
-.hero{min-height:100vh;min-height:100svh;display:flex;align-items:center;padding:130px 0 90px;overflow:hidden}
-.mesh{position:absolute;inset:-10%;z-index:0;filter:blur(70px) saturate(1.3);opacity:.85;pointer-events:none}
-.mesh i{position:absolute;border-radius:50%;width:46vw;height:46vw;max-width:720px;max-height:720px}
-.mesh i:nth-child(1){background:var(--pink);left:-6%;top:6%;animation:m1 16s ease-in-out infinite}
-.mesh i:nth-child(2){background:var(--cyan);right:-8%;top:-4%;animation:m2 18s ease-in-out infinite}
-.mesh i:nth-child(3){background:var(--yellow);left:30%;bottom:-18%;animation:m3 14s ease-in-out infinite}
-.mesh i:nth-child(4){background:var(--violet);right:12%;bottom:4%;width:30vw;height:30vw;animation:m1 20s ease-in-out infinite reverse}
-@keyframes m1{50%{transform:translate(12vw,8vh) scale(1.15)}}
-@keyframes m2{50%{transform:translate(-14vw,12vh) scale(.9)}}
-@keyframes m3{50%{transform:translate(-10vw,-14vh) scale(1.2)}}
-.hero::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.25;
-  background-image:radial-gradient(rgba(26,16,51,.35) 1px,transparent 1px);background-size:22px 22px;
-  -webkit-mask-image:linear-gradient(transparent,#000 40%,#000 60%,transparent);mask-image:linear-gradient(transparent,#000 40%,#000 60%,transparent)}
-.hero-inner{position:relative;z-index:2;width:100%}
-.badge{display:inline-flex;align-items:center;gap:10px;background:#fff;font-weight:800;font-size:14px;padding:9px 18px 9px 10px;border-radius:999px;
-  box-shadow:0 12px 30px -18px rgba(26,16,51,.6);margin-bottom:28px}
-.badge i{width:12px;height:12px;border-radius:50%;background:var(--lime);box-shadow:0 0 0 0 rgba(184,243,74,.8);animation:ping 1.6s infinite}
-@keyframes ping{70%{box-shadow:0 0 0 12px rgba(184,243,74,0)}}
-.hero h1{font-size:clamp(54px,11.5vw,190px);font-weight:900;line-height:.9;letter-spacing:-.055em;margin-bottom:34px}
-.hero h1 .row{display:block;overflow:hidden;padding:.04em 0 .06em}
-.hero h1 .ch{display:inline-block;will-change:transform}
-.hero h1 .r2{padding-left:8vw}
-.hero h1 .r3{color:var(--pink)}
-.hero h1 .outline{color:transparent;-webkit-text-stroke:2px var(--ink)}
-.hero-bottom{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:end}
-.hero .lead{font-size:clamp(18px,1.6vw,22px);color:var(--ink-2);font-weight:500}
-.hero .lead b{background:var(--yellow);padding:0 6px;border-radius:6px}
-.cta-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
-.facts{display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end}
-.fact{background:rgba(255,255,255,.78);backdrop-filter:blur(10px);border-radius:24px;padding:18px 22px;min-width:150px;box-shadow:0 18px 40px -28px rgba(26,16,51,.7)}
-.fact b{display:block;font-family:var(--display);font-size:30px;font-weight:800;line-height:1}
-.fact > span{color:var(--muted);font-size:13px;font-weight:700}
-.fact:nth-child(1) b{color:var(--pink)}.fact:nth-child(2) b{color:var(--violet)}.fact:nth-child(3) b{color:#0aa3d8}
-.stk{position:absolute;z-index:3;font-family:var(--display);font-weight:700;font-size:clamp(13px,1.2vw,18px);padding:12px 20px;border-radius:999px;
-  box-shadow:0 18px 40px -20px rgba(26,16,51,.55);white-space:nowrap;pointer-events:none}
-.stk.s1{background:var(--yellow);top:18%;right:8%;transform:rotate(8deg)}
-.stk.s2{background:var(--cyan);color:#fff;top:38%;right:3%;transform:rotate(-6deg)}
-.stk.s3{background:var(--lime);top:58%;right:14%;transform:rotate(5deg)}
-.stk.s4{background:var(--violet);color:#fff;top:14%;right:30%;transform:rotate(-8deg)}
-.stk.s5{background:#fff;top:30%;right:22%;transform:rotate(4deg)}
-.stk.s5 span{color:var(--pink)}
-.scroll-cue{position:absolute;left:50%;bottom:24px;transform:translateX(-50%);z-index:3;font-weight:800;font-size:13px;letter-spacing:.2em;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:8px}
-.scroll-cue i{width:26px;height:42px;border:2.5px solid var(--ink);border-radius:20px;position:relative}
-.scroll-cue i::after{content:"";position:absolute;left:50%;top:7px;width:5px;height:9px;margin-left:-2.5px;border-radius:3px;background:var(--pink);animation:wheel 1.6s infinite}
-@keyframes wheel{to{transform:translateY(14px);opacity:0}}
+/* ===== MAP (first screen) ===== */
+.map{padding:14px 0 18px}
+.bento{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr)) auto;gap:12px;
+  height:calc(100vh - 64px - 32px);height:calc(100svh - 64px - 32px);min-height:620px;max-height:900px}
+.tile{border-radius:24px;padding:18px;position:relative;overflow:hidden;min-width:0;min-height:0}
 
-/* velocity marquee */
-.velo{padding:30px 0;overflow:hidden;position:relative;z-index:2}
-.vrow{display:flex;width:max-content;font-family:var(--display);font-weight:900;font-size:clamp(38px,6vw,92px);line-height:1;padding:14px 0;letter-spacing:-.03em;will-change:transform}
-.vrow span{display:flex;align-items:center;gap:.4em;padding-right:.4em;white-space:nowrap}
-.vrow span::after{content:"";width:.5em;height:.5em;border-radius:50%;background:currentColor;display:inline-block}
-.vband{transform:rotate(-2.5deg);margin:0 -40px}
-.vband.b1{background:var(--pink);color:#fff}
-.vband.b2{background:var(--yellow);color:var(--ink);transform:rotate(2deg);margin-top:-10px}
-.vband .vrow span:nth-child(odd)::after{background:var(--cyan)}
+/* intro tile */
+.intro{grid-column:1 / span 2;grid-row:1 / span 3;background:#fff;display:flex;flex-direction:column;padding:28px;box-shadow:0 20px 50px -40px rgba(26,16,51,.6)}
+.intro .badge{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;background:var(--cream);font-weight:800;font-size:12.5px;padding:7px 13px 7px 9px;border-radius:999px;margin-bottom:18px}
+.intro .badge i{width:10px;height:10px;border-radius:50%;background:var(--lime);box-shadow:0 0 0 3px rgba(184,243,74,.35)}
+.intro h1{font-size:clamp(30px,3.1vw,50px);font-weight:900;letter-spacing:-.045em;line-height:.98;margin-bottom:14px}
+.intro h1 .pk{color:var(--pink)}
+.intro p{color:var(--ink-2);font-size:15.5px;font-weight:500;margin-bottom:auto}
+.intro p b{background:var(--yellow);padding:0 5px;border-radius:5px}
+.intro .cta{display:flex;flex-direction:column;gap:8px;margin-top:16px}
+.intro .cta .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.intro .cta .btn{width:100%}
+.intro .tel{font-family:var(--display);font-weight:700;font-size:20px;text-decoration:none;text-align:center;margin-top:6px}
+.intro .mail{font-size:13px;color:var(--muted);text-align:center;font-weight:600}
 
-/* SPEED (horizontal) */
-.speed{padding:0;overflow:hidden}
-.h-track{display:flex;gap:0;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-.h-track::-webkit-scrollbar{display:none}
-.panel{flex:0 0 100vw;min-height:100vh;min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding:120px 7vw 80px;scroll-snap-align:start;position:relative;overflow:hidden}
-.panel .num{font-family:var(--display);font-weight:900;font-size:clamp(90px,19vw,320px);line-height:.85;letter-spacing:-.06em}
-.panel .num small{font-size:.32em;letter-spacing:-.02em;margin-left:.08em}
-.panel h3{font-size:clamp(24px,3vw,44px);margin:26px 0 12px;max-width:760px}
-.panel p{font-size:clamp(17px,1.5vw,21px);max-width:560px;font-weight:600;opacity:.85}
-.panel .blob{position:absolute;border-radius:50%;filter:blur(2px);opacity:.55}
-.p0{background:linear-gradient(135deg,var(--yellow),#ffb347)}
-.p0 h2{font-size:clamp(46px,8.5vw,150px);font-weight:900;max-width:1100px}
-.p0 .arrow{font-family:var(--display);font-size:clamp(22px,2.2vw,32px);font-weight:700;margin-top:30px;display:flex;align-items:center;gap:16px}
-.p0 .arrow i{display:inline-block;width:80px;height:4px;background:var(--ink);position:relative;border-radius:4px;animation:arr 1.4s ease-in-out infinite}
-.p0 .arrow i::after{content:"";position:absolute;right:-2px;top:-7px;width:14px;height:14px;border-top:4px solid var(--ink);border-right:4px solid var(--ink);transform:rotate(45deg)}
-@keyframes arr{50%{transform:translateX(14px)}}
-.p1{background:linear-gradient(135deg,var(--pink),#ff5fa8);color:#fff}
-.p2{background:linear-gradient(135deg,var(--cyan),#5be0ff);color:var(--ink)}
-.p3{background:linear-gradient(135deg,var(--violet),#a48bff);color:#fff}
-.p4{background:linear-gradient(135deg,var(--lime),#e2ff8a);color:var(--ink)}
-.panel .blob.a{width:40vw;height:40vw;right:-8vw;top:-10vw;background:rgba(255,255,255,.35)}
-.panel .blob.b{width:22vw;height:22vw;right:16vw;bottom:-8vw;background:rgba(255,255,255,.25)}
-.panel .idx{position:absolute;right:7vw;bottom:60px;font-family:var(--display);font-weight:700;font-size:18px;opacity:.7}
-
-/* SERVICES (horizontal) */
-.svc{padding:0;overflow:hidden}
-.svc-pin{min-height:100vh;min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding:120px 0 60px}
-.svc-head{display:flex;justify-content:space-between;align-items:flex-end;gap:30px;margin-bottom:40px;flex-wrap:wrap}
-.svc-track{display:flex;gap:22px;padding:10px 24px 30px max(24px,calc((100vw - 1240px)/2 + 24px));overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch}
-.svc-track::-webkit-scrollbar{display:none}
-.card{flex:0 0 clamp(290px,27vw,380px);min-height:470px;border-radius:var(--radius);padding:30px 28px;display:flex;flex-direction:column;scroll-snap-align:start;
-  position:relative;overflow:hidden;color:#fff;transition:transform .45s var(--ease),box-shadow .45s;transform-style:preserve-3d;box-shadow:0 30px 60px -40px rgba(26,16,51,.8)}
-.card.lt{color:var(--ink)}
-.card::before{content:"";position:absolute;width:260px;height:260px;border-radius:50%;right:-80px;top:-80px;background:rgba(255,255,255,.22);transition:transform .6s var(--ease)}
-.card:hover::before{transform:scale(1.5)}
-.card::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .3s;background:radial-gradient(320px circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,.35),transparent 60%)}
-.card:hover::after{opacity:1}
-.card .no{font-family:var(--display);font-weight:800;font-size:14px;opacity:.75;position:relative}
-.card .ico{width:84px;height:84px;border-radius:26px;display:grid;place-items:center;margin:26px 0 auto;background:rgba(255,255,255,.25);backdrop-filter:blur(6px);position:relative;transition:transform .6s var(--ease)}
-.card:hover .ico{transform:rotate(-12deg) scale(1.12)}
-.card .ico svg{width:42px;height:42px}
-.card h3{font-size:clamp(24px,2.2vw,30px);margin:34px 0 12px;position:relative}
-.card p{font-size:15px;font-weight:600;opacity:.9;position:relative;margin-bottom:22px}
-.card .meta{display:flex;justify-content:space-between;align-items:center;gap:10px;position:relative}
-.card .price{font-family:var(--display);font-weight:800;font-size:22px}
-.card .time{font-weight:800;font-size:13px;background:rgba(255,255,255,.3);padding:7px 12px;border-radius:999px}
-.card .order{margin-top:18px;position:relative;align-self:flex-start;font:800 15px var(--text);background:#fff;color:var(--ink);border:0;border-radius:999px;padding:12px 20px;cursor:pointer;transition:transform .3s var(--ease)}
-.card .order:hover{transform:translateX(6px)}
-.card.hot .no::after{content:" · ХИТ";color:inherit}
+/* service tiles */
+.svc{cursor:pointer;border:0;text-align:left;color:#fff;display:flex;flex-direction:column;transition:transform .15s ease, box-shadow .15s ease;font:inherit}
+.svc:hover,.svc:focus-visible{transform:translateY(-3px);box-shadow:0 18px 34px -20px rgba(26,16,51,.7);outline:none}
+.svc:focus-visible{box-shadow:0 0 0 4px rgba(123,92,255,.45)}
+.svc.lt{color:var(--ink)}
+.svc::before{content:"";position:absolute;width:140px;height:140px;border-radius:50%;right:-50px;top:-50px;background:rgba(255,255,255,.2)}
+.svc .top{display:flex;justify-content:space-between;align-items:flex-start;position:relative}
+.svc .ico{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:rgba(255,255,255,.28)}
+.svc .ico svg{width:24px;height:24px}
+.svc .hit{font-size:11px;font-weight:800;background:#fff;color:var(--pink);padding:4px 9px;border-radius:999px}
+.svc h3{font-size:clamp(14px,1.15vw,18px);margin:auto 0 8px;position:relative;line-height:1.12}
+.svc .meta{display:flex;justify-content:space-between;align-items:center;gap:6px;position:relative;flex-wrap:wrap}
+.svc .price{font-family:var(--display);font-weight:800;font-size:clamp(13px,1vw,16px)}
+.svc .time{font-weight:800;font-size:11.5px;background:rgba(255,255,255,.32);padding:4px 9px;border-radius:999px}
 .g1{background:linear-gradient(145deg,var(--pink),var(--orange))}
 .g2{background:linear-gradient(145deg,var(--cyan),var(--violet))}
 .g3{background:linear-gradient(145deg,var(--yellow),var(--orange))}
@@ -279,201 +191,180 @@ header.hide{transform:translate(-50%,-140%)}
 .g8{background:linear-gradient(145deg,var(--cyan),var(--lime))}
 .g9{background:linear-gradient(145deg,var(--pink),var(--violet))}
 .g10{background:linear-gradient(145deg,var(--yellow),var(--lime))}
-.svc-bar{max-width:1240px;margin:10px auto 0;padding:0 24px}
-.svc-bar div{height:6px;border-radius:6px;background:rgba(26,16,51,.1);overflow:hidden}
-.svc-bar i{display:block;height:100%;width:100%;transform-origin:0 50%;transform:scaleX(0);background:linear-gradient(90deg,var(--pink),var(--violet),var(--cyan))}
 
-/* big scrub text */
-.bigtext{padding:80px 0;overflow:hidden}
-.bigtext .line{font-family:var(--display);font-weight:900;font-size:clamp(56px,12vw,210px);line-height:.95;letter-spacing:-.05em;white-space:nowrap;will-change:transform}
-.bigtext .line:nth-child(2){color:transparent;-webkit-text-stroke:2px var(--violet)}
-.bigtext .line:nth-child(3){color:var(--pink)}
+/* speed + other tiles */
+.speed{background:#fff;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 20px 50px -40px rgba(26,16,51,.6)}
+.speed .lbl{font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.speed ul{list-style:none;display:grid;gap:6px}
+.speed li{display:flex;align-items:baseline;gap:8px;font-size:13px;font-weight:700;color:var(--ink-2)}
+.speed li b{font-family:var(--display);font-size:clamp(15px,1.2vw,19px);min-width:3.6em}
+.speed li:nth-child(1) b{color:var(--pink)}.speed li:nth-child(2) b{color:var(--violet)}.speed li:nth-child(3) b{color:#0aa3d8}
+.other{background:repeating-linear-gradient(-45deg,#fff,#fff 10px,#fff4fa 10px,#fff4fa 20px);border:2px dashed rgba(255,46,136,.45);color:var(--ink);cursor:pointer;text-align:left;display:flex;flex-direction:column;justify-content:space-between;font:inherit;transition:transform .15s ease}
+.other:hover{transform:translateY(-3px)}
+.other h3{font-size:clamp(14px,1.15vw,18px)}
+.other p{font-size:12.5px;font-weight:600;color:var(--muted)}
+.other .go{font-weight:800;color:var(--pink);font-size:13px}
 
-/* TERMS stack */
-.terms{display:flex;flex-direction:column;gap:26px;margin-top:50px}
-.term{position:sticky;top:110px;border-radius:36px;padding:46px clamp(26px,5vw,64px);min-height:300px;display:grid;grid-template-columns:1fr 1.2fr;gap:30px;align-items:center;
-  box-shadow:0 -10px 50px -30px rgba(26,16,51,.6);transform-origin:50% 0;will-change:transform}
-.term:nth-child(1){background:var(--yellow)}
-.term:nth-child(2){background:var(--cyan)}
-.term:nth-child(3){background:var(--pink);color:#fff}
-.term:nth-child(4){background:var(--lime)}
-.term:nth-child(5){background:var(--violet);color:#fff}
-.term:nth-child(6){background:linear-gradient(135deg,var(--orange),var(--pink));color:#fff}
-.term .big{font-family:var(--display);font-weight:900;font-size:clamp(46px,7vw,104px);line-height:.95;letter-spacing:-.04em}
-.term h3{font-size:clamp(22px,2.2vw,30px);margin-bottom:12px}
-.term p{font-size:clamp(16px,1.4vw,19px);font-weight:600;opacity:.88}
-.term ul{list-style:none;display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
-.term li{background:rgba(255,255,255,.45);border-radius:999px;padding:8px 14px;font-size:14px;font-weight:800}
+/* terms strip */
+.terms{grid-column:1 / -1;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
+.term{border-radius:18px;padding:12px 14px;display:flex;align-items:center;gap:10px;font-weight:700;font-size:13px;line-height:1.25;background:#fff;box-shadow:0 14px 30px -28px rgba(26,16,51,.7)}
+.term b{font-family:var(--display);font-size:15px;white-space:nowrap}
+.term:nth-child(1) b{color:var(--pink)}.term:nth-child(2) b{color:var(--violet)}.term:nth-child(3) b{color:#0aa3d8}
+.term:nth-child(4) b{color:#d08a00}.term:nth-child(5) b{color:#5b9a00}.term:nth-child(6) b{color:var(--orange)}
 
-/* STEPS */
-.steps-wrap{position:relative;margin-top:60px}
-.steps-line{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;overflow:visible}
-.steps-line path{fill:none;stroke:url(#lg);stroke-width:6;stroke-linecap:round}
-.steps{display:grid;grid-template-columns:repeat(5,1fr);gap:18px;position:relative}
-.step{background:#fff;border-radius:28px;padding:28px 22px;box-shadow:0 24px 50px -36px rgba(26,16,51,.7);position:relative}
-.step:nth-child(even){margin-top:70px}
-.step .n{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:22px;margin-bottom:18px;color:#fff}
+/* ===== below the fold ===== */
+section{padding:70px 0}
+.cards3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:28px}
+.info{background:#fff;border-radius:24px;padding:24px;box-shadow:0 18px 40px -36px rgba(26,16,51,.7);border-top:6px solid var(--c,var(--pink))}
+.info h3{font-size:18px;margin-bottom:8px}
+.info p{color:var(--muted);font-size:15px;font-weight:500}
+.info ul{list-style:none;display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.info li{background:var(--cream);border-radius:999px;padding:5px 11px;font-size:13px;font-weight:700}
+.cards3 .info:nth-child(2){--c:var(--violet)}.cards3 .info:nth-child(3){--c:var(--cyan)}
+.cards3 .info:nth-child(4){--c:var(--yellow)}.cards3 .info:nth-child(5){--c:var(--lime)}.cards3 .info:nth-child(6){--c:var(--orange)}
+.steps{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-top:28px}
+.step{background:#fff;border-radius:22px;padding:22px 20px;box-shadow:0 18px 40px -36px rgba(26,16,51,.7)}
+.step .n{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:18px;margin-bottom:12px;color:#fff}
 .step:nth-child(1) .n{background:var(--pink)}.step:nth-child(2) .n{background:var(--orange)}.step:nth-child(3) .n{background:#e6b800}
 .step:nth-child(4) .n{background:var(--cyan)}.step:nth-child(5) .n{background:var(--violet)}
-.step h3{font-size:18px;margin-bottom:8px}
-.step p{font-size:15px;color:var(--muted);font-weight:500}
+.step h3{font-size:16px;margin-bottom:6px}
+.step p{font-size:14px;color:var(--muted);font-weight:500}
+.seo-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:28px}
+.seo-grid article{background:#fff;border-radius:22px;padding:24px;box-shadow:0 18px 40px -36px rgba(26,16,51,.7)}
+.seo-grid h3{font-size:17px;margin-bottom:8px}
+.seo-grid p{color:var(--muted);font-size:15px;font-weight:500}
+.areas{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.areas span{background:#fff;border-radius:999px;padding:8px 14px;font-size:14px;font-weight:700}
+.faq{max-width:900px;margin-top:28px}
+details{background:#fff;border-radius:20px;padding:20px 24px;margin-bottom:10px;box-shadow:0 14px 30px -28px rgba(26,16,51,.7)}
+summary{font-weight:800;font-size:17px;cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:20px;align-items:center}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";flex:0 0 32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--pink);color:#fff;font-family:var(--display);font-size:20px;line-height:1}
+details[open] summary::after{content:"–";background:var(--violet)}
+details p{color:var(--muted);margin-top:10px;font-weight:500}
 
-/* ORDER */
-.order-sec{background:linear-gradient(135deg,#ffe3f0,#e6f8ff 50%,#fff6cc)}
-.order-box{background:#fff;border-radius:40px;padding:56px;display:grid;grid-template-columns:.85fr 1.15fr;gap:52px;box-shadow:0 40px 80px -50px rgba(26,16,51,.6)}
-.order-box .contacts{display:flex;flex-direction:column;gap:12px;margin-top:30px}
-.order-box .mail{font-weight:700;color:var(--muted);font-size:15px;text-align:center}
-.order-box .mail a{color:var(--ink)}
-form{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-content:start}
-label,.lbl{display:flex;flex-direction:column;gap:7px;font-weight:800;font-size:14px}
+footer{background:linear-gradient(135deg,var(--violet),var(--pink) 60%,var(--orange));color:rgba(255,255,255,.9);padding:50px 0 30px;margin-top:30px}
+.foot{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:36px}
+footer .brand-name{color:#fff}
+footer .brand-name small{color:var(--yellow)}
+footer h4{color:#fff;font-family:var(--display);font-size:14px;margin-bottom:12px;font-weight:700}
+footer ul{list-style:none;display:grid;gap:7px;font-size:15px;font-weight:600}
+footer a{text-decoration:none}footer a:hover{text-decoration:underline}
+.copy{border-top:1px solid rgba(255,255,255,.25);margin-top:34px;padding-top:18px;font-size:13px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+
+/* ===== dialogs ===== */
+dialog{margin:auto;border:0;padding:0;border-radius:28px;max-width:min(760px,calc(100vw - 24px));width:100%;max-height:calc(100vh - 24px);color:var(--ink);background:#fff;box-shadow:0 40px 80px -30px rgba(26,16,51,.6)}
+dialog::backdrop{background:rgba(26,16,51,.45);backdrop-filter:blur(3px)}
+dialog[open]{animation:dlg .18s ease-out}
+@keyframes dlg{from{opacity:0;transform:translateY(10px) scale(.98)}}
+.dlg-x{position:absolute;top:14px;right:14px;width:40px;height:40px;border-radius:50%;border:0;background:rgba(255,255,255,.85);font-size:22px;font-weight:700;cursor:pointer;z-index:2;color:var(--ink)}
+.dlg-head{padding:28px 28px 22px;color:#fff;position:relative}
+.dlg-head.lt{color:var(--ink)}
+.dlg-head h2{font-size:clamp(24px,3vw,34px);margin:6px 0 0}
+.dlg-head .meta{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.dlg-head .meta span{background:rgba(255,255,255,.32);font-weight:800;font-size:14px;padding:6px 12px;border-radius:999px}
+.dlg-body{padding:24px 28px 28px}
+.dlg-body p{color:var(--ink-2);font-size:16px;font-weight:500}
+.dlg-body h4{font-family:var(--display);font-size:14px;margin:18px 0 8px}
+.dlg-body ul{list-style:none;display:flex;flex-wrap:wrap;gap:6px}
+.dlg-body li{background:var(--cream);border-radius:999px;padding:6px 12px;font-size:13.5px;font-weight:700}
+.dlg-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:22px}
+.dlg-actions .btn-main{flex:1 1 220px}
+
+/* order form */
+#orderDlg{max-width:min(860px,calc(100vw - 24px))}
+.order-head{padding:26px 28px 6px}
+.order-head h2{font-size:clamp(24px,3vw,34px);margin-bottom:6px}
+.order-head p{color:var(--muted);font-weight:500}
+form{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:18px 28px 28px}
+label,.lbl{display:flex;flex-direction:column;gap:6px;font-weight:800;font-size:13.5px}
 .full{grid-column:1/-1}
-input,select,textarea{font:600 16px var(--text);padding:15px 18px;border-radius:16px;border:2px solid transparent;background:#f6f1fb;color:var(--ink);width:100%;transition:border-color .2s,background .2s,box-shadow .2s}
-input:focus,select:focus,textarea:focus{outline:none;border-color:var(--violet);background:#fff;box-shadow:0 0 0 5px rgba(123,92,255,.14)}
-input.err{border-color:#ff3b3b;animation:shake .4s}
-@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
-textarea{min-height:92px;resize:vertical}
-.chips{display:flex;flex-wrap:wrap;gap:8px}
+input,select,textarea{font:600 16px var(--text);padding:13px 16px;border-radius:14px;border:2px solid transparent;background:#f6f1fb;color:var(--ink);width:100%}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--violet);background:#fff}
+input.err{border-color:#ff3b3b}
+textarea{min-height:80px;resize:vertical}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
 .chips input{position:absolute;opacity:0;width:1px;height:1px}
-.chips label{font-weight:700;padding:10px 15px;border-radius:999px;background:#f6f1fb;cursor:pointer;flex-direction:row;font-size:14px;transition:all .25s var(--ease)}
-.chips label:hover{background:#ece4f9}
-.chips input:checked + label{background:linear-gradient(120deg,var(--pink),var(--violet));color:#fff;transform:scale(1.05)}
+.chips label{font-weight:700;padding:8px 13px;border-radius:999px;background:#f6f1fb;cursor:pointer;flex-direction:row;font-size:13.5px}
+.chips input:checked + label{background:linear-gradient(120deg,var(--pink),var(--violet));color:#fff}
 .chips input:focus-visible + label{box-shadow:0 0 0 3px rgba(255,46,136,.4)}
-.drop{border:2.5px dashed rgba(123,92,255,.4);border-radius:22px;padding:24px;text-align:center;cursor:pointer;background:linear-gradient(135deg,#f6f1fb,#fff2f8);transition:all .3s var(--ease);position:relative}
-.drop:hover,.drop.over{border-color:var(--pink);transform:scale(1.01)}
+.drop{border:2.5px dashed rgba(123,92,255,.4);border-radius:18px;padding:18px;text-align:center;cursor:pointer;background:#faf7fd;position:relative}
+.drop:hover,.drop.over{border-color:var(--pink)}
 .drop input{position:absolute;inset:0;opacity:0;cursor:pointer}
-.drop .plus{width:52px;height:52px;border-radius:50%;margin:0 auto 10px;display:grid;place-items:center;background:linear-gradient(120deg,var(--pink),var(--violet));color:#fff;font-size:30px;font-weight:400;transition:transform .4s var(--ease)}
-.drop:hover .plus{transform:rotate(90deg) scale(1.1)}
-.drop b{display:block;font-size:17px}
-.drop small{display:block;color:var(--muted);font-weight:600;font-size:13px;margin-top:4px}
-.files{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:10px}
-.file{position:relative;background:#f6f1fb;border-radius:16px;overflow:hidden;aspect-ratio:1;display:grid;place-items:center;animation:pop .4s var(--ease)}
-@keyframes pop{from{transform:scale(.6) rotate(-8deg);opacity:0}}
+.drop .plus{width:44px;height:44px;border-radius:50%;margin:0 auto 8px;display:grid;place-items:center;background:linear-gradient(120deg,var(--pink),var(--violet));color:#fff;font-size:26px}
+.drop b{display:block;font-size:16px}
+.drop small{display:block;color:var(--muted);font-weight:600;font-size:12.5px;margin-top:3px}
+.files{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px}
+.file{position:relative;background:#f6f1fb;border-radius:14px;overflow:hidden;aspect-ratio:1;display:grid;place-items:center}
 .file img{width:100%;height:100%;object-fit:cover}
-.file .ext{font-family:var(--display);font-size:15px;color:var(--pink)}
+.file .ext{font-family:var(--display);font-size:14px;color:var(--pink)}
 .file .nm{position:absolute;left:0;right:0;bottom:0;background:rgba(123,92,255,.85);color:#fff;font-size:10px;padding:3px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.file button{position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;border:0;background:#fff;cursor:pointer;font-weight:800;line-height:1;box-shadow:0 2px 6px rgba(0,0,0,.25)}
-.send-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
+.file button{position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;border:0;background:#fff;cursor:pointer;font-weight:800;line-height:1}
+.send-row{display:flex;gap:8px;flex-wrap:wrap}
 .send-row .btn-main{flex:1 1 100%}
-.send-row .btn-wa,.send-row .btn-tg{flex:1 1 180px}
-.note{font-size:13px;color:var(--muted)}
-.status{display:none;padding:16px 18px;border-radius:18px;font-weight:800;font-size:15px}
+.send-row .btn-wa,.send-row .btn-tg{flex:1 1 160px}
+.note{font-size:12.5px;color:var(--muted)}
+.status{display:none;padding:14px 16px;border-radius:16px;font-weight:800;font-size:15px}
 .status.ok{display:block;background:rgba(184,243,74,.35);color:#2b4a00}
 .status.bad{display:block;background:rgba(255,46,136,.12);color:#b0004f}
 .hp{position:absolute;left:-9999px}
 
-/* SEO */
-.seo-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:40px}
-.seo-grid article{background:#fff;border-radius:26px;padding:28px;box-shadow:0 20px 40px -34px rgba(26,16,51,.7);border-top:6px solid var(--c,var(--pink))}
-.seo-grid article:nth-child(2){--c:var(--cyan)}.seo-grid article:nth-child(3){--c:var(--yellow)}.seo-grid article:nth-child(4){--c:var(--lime)}
-.seo-grid article:nth-child(5){--c:var(--violet)}.seo-grid article:nth-child(6){--c:var(--orange)}.seo-grid article:nth-child(7){--c:var(--cyan)}
-.seo-grid h3{font-size:19px;margin-bottom:10px}
-.seo-grid p{color:var(--muted);font-size:15px;font-weight:500}
-.areas{display:flex;flex-wrap:wrap;gap:8px;margin-top:28px}
-.areas span{background:#fff;border-radius:999px;padding:9px 16px;font-size:14px;font-weight:700;box-shadow:0 8px 20px -16px rgba(26,16,51,.6);transition:transform .3s var(--ease),background .3s}
-.areas span:hover{transform:translateY(-4px) rotate(-2deg);background:var(--yellow)}
-
-/* FAQ */
-.faq{max-width:900px;margin-top:40px}
-details{background:#fff;border-radius:24px;padding:24px 28px;margin-bottom:12px;box-shadow:0 18px 40px -34px rgba(26,16,51,.7);transition:background .3s}
-details[open]{background:linear-gradient(135deg,#fff,#fff1f7)}
-summary{font-weight:800;font-size:18px;cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:20px;align-items:center}
-summary::-webkit-details-marker{display:none}
-summary::after{content:"+";flex:0 0 38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--pink);color:#fff;font-family:var(--display);font-size:22px;line-height:1;transition:transform .4s var(--ease),background .3s}
-details[open] summary::after{transform:rotate(135deg);background:var(--violet)}
-details p{color:var(--muted);margin-top:12px;font-weight:500;animation:fadein .5s var(--ease)}
-@keyframes fadein{from{opacity:0;transform:translateY(-8px)}}
-
-/* FOOTER */
-footer{background:linear-gradient(135deg,var(--violet),var(--pink) 60%,var(--orange));color:rgba(255,255,255,.88);padding:80px 0 40px;position:relative;overflow:hidden}
-footer .huge{font-family:var(--display);font-weight:900;font-size:clamp(46px,10vw,170px);line-height:.9;letter-spacing:-.05em;color:#fff;margin-bottom:50px}
-.foot{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:40px}
-footer .brand-name{color:#fff}
-footer .brand-name small{color:var(--yellow)}
-footer h4{color:#fff;font-family:var(--display);font-size:14px;margin-bottom:14px;font-weight:700;letter-spacing:.04em}
-footer ul{list-style:none;display:grid;gap:8px;font-size:15px;font-weight:600}
-footer a{text-decoration:none}footer a:hover{color:var(--yellow)}
-.copy{border-top:1px solid rgba(255,255,255,.25);margin-top:40px;padding-top:22px;font-size:13px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
-
 .mbar{display:none}
 
-@media (max-width:1380px){ .stk.s5,.stk.s2{display:none} }
-@media (min-width:900px) and (max-height:860px){
-  .svc-pin{padding:96px 0 30px}
-  .svc-head{margin-bottom:22px}
-  .svc-head h2{font-size:clamp(30px,4.2vw,56px);margin-bottom:8px}
-  .svc-head .lead{font-size:16px}
-  .card{min-height:390px;padding:24px 24px}
-  .card .ico{width:64px;height:64px;margin-top:16px}
-  .card .ico svg{width:32px;height:32px}
-  .card h3{margin-top:20px}
-}
-
-/* JS-driven initial states (only when GSAP is running) */
-.anim .rv{opacity:0;transform:translateY(60px)}
-
-@media (max-width:980px){
+/* ===== responsive ===== */
+@media (max-width:1180px){
   .menu{display:none}
-  .hero-bottom{grid-template-columns:1fr}
-  .facts{justify-content:flex-start}
-  .stk{display:none}
-  .order-box{grid-template-columns:1fr;padding:34px 22px}
-  .foot{grid-template-columns:1fr}
-  .seo-grid{grid-template-columns:1fr}
-  .steps{grid-template-columns:1fr 1fr}
-  .step:nth-child(even){margin-top:0}
-  .steps-line{display:none}
-  .term{grid-template-columns:1fr;gap:12px;top:96px;min-height:0}
+  .bento{grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:none;grid-auto-rows:auto;height:auto;max-height:none;min-height:0}
+  .svc,.speed,.other{min-height:150px}
+  .intro{grid-column:1 / -1;grid-row:auto}
+  .terms{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .cards3{grid-template-columns:1fr 1fr}
+  .steps{grid-template-columns:repeat(3,1fr)}
 }
-@media (max-width:620px){
-  body{font-size:16px}
-  section{padding:80px 0}
-  header{top:8px;width:calc(100% - 16px)}
-  .nav{height:58px}
+@media (max-width:640px){
   .phone{display:none}
-  .brand-name{font-size:14px}
-  .hero{padding:110px 0 80px}
-  .hero h1{font-size:12.6vw}
-  .hero h1 .r2{padding-left:0}
-  .hero h1 .outline{-webkit-text-stroke:1.5px var(--ink)}
-  .panel{flex-basis:88vw;min-height:78svh;padding:90px 26px 60px}
-  .speed .h-track{scroll-padding:0 6vw}
-  .card{flex-basis:82vw;min-height:440px}
-  .steps{grid-template-columns:1fr}
-  form{grid-template-columns:1fr}
-  .order-box{border-radius:30px}
-  .term{border-radius:28px;padding:32px 24px}
-  .mbar{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;position:fixed;left:10px;right:10px;bottom:10px;z-index:90;
-    background:rgba(255,255,255,.85);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding:8px;border-radius:22px;box-shadow:0 14px 34px -10px rgba(26,16,51,.45);
-    transform:translateY(130%);transition:transform .5s var(--ease)}
-  .mbar.show{transform:none}
-  .mbar a{color:#fff;text-decoration:none;font-weight:800;font-size:14px;text-align:center;padding:13px 6px;border-radius:16px}
-  .mbar a:nth-child(1){background:linear-gradient(120deg,var(--pink),var(--orange))}
+  .brand-name{font-size:13.5px}
+  .bento{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .svc,.speed,.other{min-height:138px}
+  .intro{padding:22px}
+  .intro h1{font-size:34px}
+  .tile{padding:14px;border-radius:20px}
+  .svc h3{font-size:14.5px}
+  .terms{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .term{padding:10px 12px;font-size:12px;flex-direction:column;align-items:flex-start;gap:2px}
+  .cards3,.steps,.seo-grid{grid-template-columns:1fr}
+  .foot{grid-template-columns:1fr}
+  section{padding:50px 0}
+  form{grid-template-columns:1fr;padding:14px 18px 22px}
+  .order-head{padding:22px 18px 4px}
+  .dlg-head{padding:24px 20px 18px}
+  .dlg-body{padding:18px 20px 22px}
+  dialog{max-height:calc(100svh - 16px)}
+  .mbar{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;position:fixed;left:8px;right:8px;bottom:8px;z-index:40;
+    background:rgba(255,255,255,.9);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);padding:6px;border-radius:20px;box-shadow:0 12px 30px -10px rgba(26,16,51,.4)}
+  .mbar a,.mbar button{color:#fff;text-decoration:none;font-weight:800;font-size:14px;text-align:center;padding:12px 4px;border-radius:15px;border:0;cursor:pointer}
+  .mbar button{background:linear-gradient(120deg,var(--pink),var(--orange))}
   .mbar a:nth-child(2){background:#25d366;color:#073b1d}
   .mbar a:nth-child(3){background:#2aabee}
-  footer{padding-bottom:110px}
+  footer{padding-bottom:90px}
 }
-@media (prefers-reduced-motion:reduce){
-  *,*::before,*::after{animation:none!important;transition:none!important}
-  .anim .rv{opacity:1;transform:none}
-}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}html{scroll-behavior:auto}}
 </style>
 </head>
 <body>
-<div class="progress" id="progress"></div>
-<div class="cursor" id="cursor"></div>
 
-<header id="hdr">
-  <div class="nav">
+<header>
+  <div class="wrap nav">
     <a class="brand" href="#top" aria-label="Типография Мира и Соломон — на главную">
-      <img src="logo.svg" alt="Логотип типографии Мира и Соломон" width="40" height="40">
+      <img src="logo.svg" alt="Логотип типографии Мира и Соломон" width="38" height="38">
       <span class="brand-name"><small>Типография</small>Мира&nbsp;и&nbsp;Соломон</span>
     </a>
     <nav class="menu" aria-label="Меню">
-      <a href="#uslugi">Услуги</a>
-      <a href="#sroki">Сроки</a>
+      <a href="#top">Услуги</a>
       <a href="#usloviya">Условия</a>
+      <a href="#kak">Как заказать</a>
       <a href="#faq">Вопросы</a>
-      <a href="#zakaz">Заказать</a>
+      <a href="#kontakty">Контакты</a>
     </nav>
     <div class="nav-right">
       <a class="phone" href="tel:+79779662521">+7 977 966-25-21</a>
@@ -489,313 +380,163 @@ footer a{text-decoration:none}footer a:hover{color:var(--yellow)}
 
 <main id="top">
 
-<!-- HERO -->
-<section class="hero" data-bg="#fff8ef">
-  <div class="mesh" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-  <div class="stk s1" data-speed="1.6" aria-hidden="true">Футболки завтра</div>
-  <div class="stk s2" data-speed="2.4" aria-hidden="true">УФ-печать</div>
-  <div class="stk s3" data-speed="1.2" aria-hidden="true">3D-фигурки</div>
-  <div class="stk s4" data-speed="2.8" aria-hidden="true">Объёмные наклейки</div>
-  <div class="stk s5" data-speed="2" aria-hidden="true">от <span>1</span> штуки</div>
+<!-- ===== MAP: everything on one screen ===== -->
+<section class="map" aria-label="Услуги и контакты">
+  <div class="wrap bento" id="bento">
 
-  <div class="wrap hero-inner" id="heroInner">
-    <span class="badge"><i></i>Север Москвы · принимаем срочные заказы сегодня</span>
-    <h1 aria-label="Печатаем всё. Быстро от 1 дня.">
-      <span class="row split" aria-hidden="true">Печатаем</span>
-      <span class="row r2 split outline" aria-hidden="true">всё. быстро</span>
-      <span class="row r3 split" aria-hidden="true">от 1 дня</span>
-    </h1>
-    <div class="hero-bottom">
-      <div>
-        <p class="lead">Футболки, УФ- и 3D-печать, объёмные наклейки, эпоксидная смола, ростовые фигуры, коробки, визитки и таблички. <b>От 1 штуки</b> до большого тиража — для людей и компаний.</p>
-        <div class="cta-row">
-          <a class="btn btn-main magnet" href="#zakaz">Рассчитать за 15 минут →</a>
-          <a class="btn btn-ghost magnet" href="#uslugi">Смотреть услуги</a>
+    <div class="tile intro">
+      <span class="badge"><i></i>Север Москвы · м. Войковская · без выходных</span>
+      <h1>Печатаем всё. <span class="pk">Быстро — от&nbsp;1&nbsp;дня.</span></h1>
+      <p>Футболки, УФ- и 3D-печать, наклейки, смола, ростовые фигуры, коробки, визитки и таблички. <b>От 1 штуки</b> — для людей и компаний. Нажмите на услугу, чтобы узнать подробности.</p>
+      <div class="cta">
+        <button class="btn btn-main" data-order>Рассчитать стоимость за 15 минут</button>
+        <div class="row">
+          <a class="btn btn-wa" href="https://wa.me/79779662521" target="_blank" rel="noopener">WhatsApp</a>
+          <a class="btn btn-tg" href="https://t.me/+79779662521" target="_blank" rel="noopener">Telegram</a>
         </div>
-      </div>
-      <div class="facts">
-        <div class="fact"><b>1 день</b><span>срочное производство</span></div>
-        <div class="fact"><b>1 шт.</b><span>минимальный тираж</span></div>
-        <div class="fact"><b>60 мин</b><span>согласование макета</span></div>
+        <a class="tel" href="tel:+79779662521">+7 977 966-25-21</a>
+        <span class="mail"><a href="mailto:timyur0530@gmail.com">timyur0530@gmail.com</a> · ежедневно 9:00–21:00</span>
       </div>
     </div>
-  </div>
-  <div class="scroll-cue" aria-hidden="true"><i></i>листайте</div>
-</section>
 
-<!-- VELOCITY MARQUEE -->
-<div class="velo" aria-hidden="true">
-  <div class="vband b1"><div class="vrow" data-dir="-1"><span>Печать на футболках</span><span>УФ-печать</span><span>3D-печать</span><span>Объёмные наклейки</span><span>Эпоксидная смола</span><span>Ростовые фигуры</span><span>Коробки</span><span>Визитки</span><span>Таблички</span><span>Печать на футболках</span><span>УФ-печать</span><span>3D-печать</span><span>Объёмные наклейки</span><span>Эпоксидная смола</span><span>Ростовые фигуры</span><span>Коробки</span><span>Визитки</span><span>Таблички</span></div></div>
-  <div class="vband b2"><div class="vrow" data-dir="1"><span>От 1 штуки</span><span>Макет за 1 час</span><span>Юрлица и физлица</span><span>Наличные и безнал</span><span>Доставка по Москве</span><span>Без выходных</span><span>От 1 штуки</span><span>Макет за 1 час</span><span>Юрлица и физлица</span><span>Наличные и безнал</span><span>Доставка по Москве</span><span>Без выходных</span></div></div>
-</div>
+    <button class="tile svc g1" data-svc="0"><span class="top"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M8 3 3 6l2 5 2-1v11h10V10l2 1 2-5-5-3a4 4 0 0 1-8 0Z"/></svg></span><span class="hit">ХИТ</span></span>
+      <h3>Печать на футболках</h3><span class="meta"><span class="price">от 450 ₽</span><span class="time">от 1 дня</span></span></button>
 
-<!-- SPEED: horizontal panels -->
-<section class="speed" id="sroki">
-  <div class="h-track" id="speedTrack">
-    <div class="panel p0">
-      <h2>Скорость — наша главная фишка</h2>
-      <p>Мероприятие завтра, а футболок ещё нет? Это к нам. Сразу называем реальный срок и держим его.</p>
-      <div class="arrow">листайте дальше <i></i></div>
+    <button class="tile svc g2" data-svc="1"><span class="top"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg></span><span class="hit">ХИТ</span></span>
+      <h3>УФ-печать</h3><span class="meta"><span class="price">от 150 ₽</span><span class="time">от 1 дня</span></span></button>
+
+    <button class="tile svc g3 lt" data-svc="2"><span class="top"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="m12 2 9 5v10l-9 5-9-5V7l9-5Z"/><path d="m3 7 9 5 9-5M12 12v10"/></svg></span></span>
+      <h3>3D-печать</h3><span class="meta"><span class="price">от 300 ₽</span><span class="time">от 1 дня</span></span></button>
+
+    <button class="tile svc g4 lt" data-svc="3"><span class="top"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 4h12l4 4v12H4Z"/><path d="M16 4v4h4"/><path d="M8 14c1.5 1.5 4.5 1.5 6 0"/></svg></span></span>
+      <h3>Объёмные наклейки</h3><span class="meta"><span class="price">от 25 ₽/шт</span><span class="time">2–3 дня</span></span></button>
+
+    <button class="tile svc g5" data-svc="4"><span class="top"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11Z"/></svg></span></span>
+      <h3>Эпоксидная смола</h3><span class="meta"><span class="price">от 200 ₽</span><span class="time">2–4 дня</span></span></button>
+
+    <button class="tile svc g6 lt" data-svc="5"><span class="top"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><circle cx="12" cy="5" r="2.5"/><path d="M8 22v-7l-2-1 1-5h10l1 5-2 1v7M10 22v-5h4v5"/></svg></span><span class="hit">ХИТ</span></span>
+      <h3>Ростовые фигуры из ПВХ</h3><span class="meta"><span class="price">от 3 500 ₽</span><span class="time">2–3 дня</span></span></button>
+
+    <button class="tile svc g7" data-svc="6"><span class="top"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M3 8 12 4l9 4v9l-9 4-9-4Z"/><path d="m3 8 9 4 9-4M12 12v9"/></svg></span></span>
+      <h3>Картонные коробки</h3><span class="meta"><span class="price">от 60 ₽/шт</span><span class="time">от 3 дней</span></span></button>
+
+    <button class="tile svc g8 lt" data-svc="7"><span class="top"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 11h7M6 14h4"/></svg></span></span>
+      <h3>Визитки</h3><span class="meta"><span class="price">от 990 ₽</span><span class="time">от 1 дня</span></span></button>
+
+    <button class="tile svc g9" data-svc="8"><span class="top"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="5" width="18" height="12" rx="1.5"/><path d="M7 9h10M7 13h6M12 17v3"/></svg></span></span>
+      <h3>Таблички</h3><span class="meta"><span class="price">от 450 ₽</span><span class="time">от 1 дня</span></span></button>
+
+    <button class="tile svc g10 lt" data-svc="9"><span class="top"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M7 14h10v7H7Z"/></svg></span></span>
+      <h3>Полиграфия</h3><span class="meta"><span class="price">от 1 500 ₽</span><span class="time">от 1 дня</span></span></button>
+
+    <div class="tile speed">
+      <span class="lbl">Сроки</span>
+      <ul>
+        <li><b>15 мин</b>ответ и цена</li>
+        <li><b>1 час</b>макет</li>
+        <li><b>1 день</b>готово</li>
+      </ul>
     </div>
-    <div class="panel p1">
-      <span class="blob a"></span><span class="blob b"></span>
-      <div class="num">15<small>мин</small></div>
-      <h3>Отвечаем и считаем цену</h3>
-      <p>Присылаете задачу — в рабочее время через 15 минут у вас стоимость и срок.</p>
-      <span class="idx">01 / 04</span>
+
+    <button class="tile other" data-order>
+      <h3>Не нашли нужное?</h3>
+      <p>Значки, кружки, мерч, подарки — напишите, сделаем.</p>
+      <span class="go">Оставить заявку →</span>
+    </button>
+
+    <div class="terms">
+      <div class="term"><b>от 1 шт.</b>без минимального тиража</div>
+      <div class="term"><b>1 час</b>согласуем макет</div>
+      <div class="term"><b>Юр + физ</b>договор и документы</div>
+      <div class="term"><b>Оплата</b>наличные, карта, счёт</div>
+      <div class="term"><b>Доставка</b>по Москве и самовывоз</div>
+      <div class="term"><b>7 / 7</b>с 9:00 до 21:00</div>
     </div>
-    <div class="panel p2">
-      <span class="blob a"></span><span class="blob b"></span>
-      <div class="num">1<small>час</small></div>
-      <h3>Готовим и согласуем макет</h3>
-      <p>Нет макета? Сделаем по фото, логотипу или идее и пришлём превью на согласование.</p>
-      <span class="idx">02 / 04</span>
-    </div>
-    <div class="panel p3">
-      <span class="blob a"></span><span class="blob b"></span>
-      <div class="num">1<small>день</small></div>
-      <h3>Изготавливаем срочные заказы</h3>
-      <p>Футболки, визитки, УФ-печать и таблички — часто уже на следующий день.</p>
-      <span class="idx">03 / 04</span>
-    </div>
-    <div class="panel p4">
-      <span class="blob a"></span><span class="blob b"></span>
-      <div class="num">7<small>дней</small></div>
-      <h3>Работаем без выходных</h3>
-      <p>Принимаем заказы каждый день с 9:00 до 21:00. Пишите в любой мессенджер.</p>
-      <span class="idx">04 / 04</span>
-    </div>
-  </div>
-</section>
-
-<!-- SERVICES: horizontal cards -->
-<section class="svc" id="uslugi" data-bg="#fff4fa">
-  <div class="svc-pin" id="svcPin">
-    <div class="wrap svc-head">
-      <div>
-        <h2 class="rv">Что мы <span class="grad-text">печатаем</span></h2>
-        <p class="lead rv">Десять направлений под одной крышей: один менеджер, один счёт, один срок. Цены ориентировочные — точную сумму назовём после макета.</p>
-      </div>
-      <a class="btn btn-violet magnet rv" href="#zakaz">Заказать расчёт</a>
-    </div>
-    <div class="svc-track" id="svcTrack">
-      <article class="card g1 hot"><span class="no">01</span>
-        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M8 3 3 6l2 5 2-1v11h10V10l2 1 2-5-5-3a4 4 0 0 1-8 0Z"/></svg></div>
-        <h3>Печать на футболках</h3><p>Футболки, худи, свитшоты, шопперы. Логотипы, надписи, фото — яркая стойкая печать, не трескается после стирок.</p>
-        <div class="meta"><span class="price">от 450 ₽</span><span class="time">от 1 дня</span></div>
-        <button class="order" data-svc="Печать на футболках">Заказать →</button></article>
-
-      <article class="card g2 hot"><span class="no">02</span>
-        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg></div>
-        <h3>УФ-печать</h3><p>Дерево, металл, стекло, пластик, кожа, чехлы, кнопки и сувениры. Фотокачество и объёмный лак.</p>
-        <div class="meta"><span class="price">от 150 ₽</span><span class="time">от 1 дня</span></div>
-        <button class="order" data-svc="УФ-печать">Заказать →</button></article>
-
-      <article class="card g3 lt"><span class="no">03</span>
-        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="m12 2 9 5v10l-9 5-9-5V7l9-5Z"/><path d="m3 7 9 5 9-5M12 12v10"/></svg></div>
-        <h3>3D-печать</h3><p>Фигурки, прототипы, запчасти, корпуса, сувениры. По вашей модели или смоделируем по фото и эскизу.</p>
-        <div class="meta"><span class="price">от 300 ₽</span><span class="time">от 1 дня</span></div>
-        <button class="order" data-svc="3D-печать">Заказать →</button></article>
-
-      <article class="card g4 lt"><span class="no">04</span>
-        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 4h12l4 4v12H4Z"/><path d="M16 4v4h4"/><path d="M8 14c1.5 1.5 4.5 1.5 6 0"/></svg></div>
-        <h3>Объёмные наклейки</h3><p>3D-стикеры с прозрачной полимерной заливкой: на технику, авто, сувениры и упаковку.</p>
-        <div class="meta"><span class="price">от 25 ₽/шт</span><span class="time">2–3 дня</span></div>
-        <button class="order" data-svc="Объёмные наклейки">Заказать →</button></article>
-
-      <article class="card g5"><span class="no">05</span>
-        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11Z"/></svg></div>
-        <h3>Эпоксидная смола</h3><p>Брелоки, значки, шильды, заливка логотипов и подарки с эффектом стекла. Любые цвета и вкрапления.</p>
-        <div class="meta"><span class="price">от 200 ₽</span><span class="time">2–4 дня</span></div>
-        <button class="order" data-svc="Изделия из эпоксидной смолы">Заказать →</button></article>
-
-      <article class="card g6 lt hot"><span class="no">06</span>
-        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><circle cx="12" cy="5" r="2.5"/><path d="M8 22v-7l-2-1 1-5h10l1 5-2 1v7M10 22v-5h4v5"/></svg></div>
-        <h3>Ростовые фигуры из ПВХ</h3><p>Фигуры в полный рост для магазинов, выставок, фотозон и праздников. Фигурная резка и подставка.</p>
-        <div class="meta"><span class="price">от 3 500 ₽</span><span class="time">2–3 дня</span></div>
-        <button class="order" data-svc="Ростовые фигуры из ПВХ">Заказать →</button></article>
-
-      <article class="card g7"><span class="no">07</span>
-        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M3 8 12 4l9 4v9l-9 4-9-4Z"/><path d="m3 8 9 4 9-4M12 12v9"/></svg></div>
-        <h3>Картонные коробки</h3><p>Для доставки, подарков и маркетплейсов. Любой размер, печать логотипа, малые тиражи.</p>
-        <div class="meta"><span class="price">от 60 ₽/шт</span><span class="time">от 3 дней</span></div>
-        <button class="order" data-svc="Картонные коробки">Заказать →</button></article>
-
-      <article class="card g8 lt"><span class="no">08</span>
-        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 11h7M6 14h4"/></svg></div>
-        <h3>Визитки</h3><p>Плотный картон, ламинация, скругление углов, выборочный лак. Срочно — за день.</p>
-        <div class="meta"><span class="price">от 990 ₽</span><span class="time">от 1 дня</span></div>
-        <button class="order" data-svc="Визитки">Заказать →</button></article>
-
-      <article class="card g9"><span class="no">09</span>
-        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="5" width="18" height="12" rx="1.5"/><path d="M7 9h10M7 13h6M12 17v3"/></svg></div>
-        <h3>Таблички</h3><p>Офисные, дверные, адресные, указатели. Акрил, пластик, металл, дерево — УФ-печать или гравировка.</p>
-        <div class="meta"><span class="price">от 450 ₽</span><span class="time">от 1 дня</span></div>
-        <button class="order" data-svc="Таблички">Заказать →</button></article>
-
-      <article class="card g10 lt"><span class="no">10</span>
-        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M7 14h10v7H7Z"/></svg></div>
-        <h3>Полиграфия</h3><p>Листовки, флаеры, буклеты, наклейки, меню, плакаты, сертификаты. Малые и средние тиражи.</p>
-        <div class="meta"><span class="price">от 1 500 ₽</span><span class="time">от 1 дня</span></div>
-        <button class="order" data-svc="Полиграфия">Заказать →</button></article>
-    </div>
-    <div class="svc-bar" aria-hidden="true"><div><i id="svcBar"></i></div></div>
   </div>
 </section>
 
-<!-- BIG TEXT -->
-<div class="bigtext" aria-hidden="true">
-  <div class="line" data-x="-1">ОТ 1 ШТУКИ · ОТ 1 ДНЯ ·</div>
-  <div class="line" data-x="1">МАКЕТ ЗА ЧАС · БЕЗ ВЫХОДНЫХ ·</div>
-  <div class="line" data-x="-1">ПЕЧАТАЕМ ВСЁ · ПЕЧАТАЕМ ВСЁ ·</div>
-</div>
-
-<!-- TERMS -->
-<section id="usloviya" data-bg="#f3f9ff">
+<!-- ===== below: details for those who want to read ===== -->
+<section id="usloviya">
   <div class="wrap">
-    <h2 class="rv">Условия <span class="grad-text">работы</span></h2>
-    <p class="lead rv">Просто, прозрачно и официально — для частных заказчиков и для бизнеса.</p>
-    <div class="terms" id="terms">
-      <div class="term"><div class="big">от 1 шт.</div><div><h3>Без минимального тиража</h3><p>Одна футболка, одна табличка или одна фигурка — так же внимательно, как тираж в тысячу.</p></div></div>
-      <div class="term"><div class="big">1 час</div><div><h3>Оперативно согласуем макет</h3><p>Присылаем превью, вносим правки и запускаем в работу без долгих переписок.</p></div></div>
-      <div class="term"><div class="big">Юр + физ</div><div><h3>Работаем с компаниями и людьми</h3><p>Для компаний — договор, счёт и закрывающие документы. Всё официально.</p></div></div>
-      <div class="term"><div class="big">Оплата</div><div><h3>Любым удобным способом</h3><ul><li>наличные</li><li>карта</li><li>перевод</li><li>безнал по счёту</li></ul></div></div>
-      <div class="term"><div class="big">Доставка</div><div><h3>Привезём или заберёте сами</h3><p>Курьером по Москве и области или самовывоз на севере Москвы — район Коптево, м. Войковская.</p></div></div>
-      <div class="term"><div class="big">7 / 7</div><div><h3>Без выходных</h3><p>Принимаем заказы каждый день с 9:00 до 21:00. Пишите в мессенджеры — отвечаем быстро.</p></div></div>
+    <h2>Условия <span class="grad-text">работы</span></h2>
+    <p class="lead">Просто, прозрачно и официально — для частных заказчиков и для бизнеса.</p>
+    <div class="cards3">
+      <div class="info"><h3>От 1 штуки</h3><p>Одна футболка, одна табличка или одна фигурка — так же внимательно, как тираж в тысячу.</p></div>
+      <div class="info"><h3>Макет за 1 час</h3><p>Нет макета? Сделаем по фото, логотипу или идее, пришлём превью и внесём правки.</p></div>
+      <div class="info"><h3>Юрлица и физлица</h3><p>Для компаний — договор, счёт и закрывающие документы. Всё официально.</p></div>
+      <div class="info"><h3>Оплата</h3><p>Любым удобным способом:</p><ul><li>наличные</li><li>карта</li><li>перевод</li><li>безнал по счёту</li></ul></div>
+      <div class="info"><h3>Доставка и самовывоз</h3><p>Курьером по Москве и области или самовывоз на севере Москвы — район Коптево, м. Войковская.</p></div>
+      <div class="info"><h3>Без выходных</h3><p>Принимаем заказы каждый день с 9:00 до 21:00. Отвечаем в течение 15 минут.</p></div>
     </div>
   </div>
 </section>
 
-<!-- STEPS -->
-<section id="kak" data-bg="#fffbe8">
+<section id="kak" style="padding-top:20px">
   <div class="wrap">
-    <h2 class="rv">Как <span class="grad-text">заказать</span></h2>
-    <p class="lead rv">Пять шагов — от идеи до готового изделия у вас в руках.</p>
-    <div class="steps-wrap">
-      <svg class="steps-line" viewBox="0 0 1000 300" preserveAspectRatio="none" aria-hidden="true">
-        <defs><linearGradient id="lg" x1="0" x2="1"><stop offset="0" stop-color="#ff2e88"/><stop offset=".5" stop-color="#ffd83d"/><stop offset="1" stop-color="#7b5cff"/></linearGradient></defs>
-        <path id="stepsPath" d="M20 60 C 150 60, 150 200, 300 200 S 450 60, 500 60 S 650 200, 700 200 S 850 60, 980 60"/>
-      </svg>
-      <div class="steps">
-        <div class="step rv"><div class="n">1</div><h3>Заявка</h3><p>Заполняете форму и прикрепляете фото, логотип или макет. Или пишете в мессенджер.</p></div>
-        <div class="step rv"><div class="n">2</div><h3>Расчёт</h3><p>Называем цену и срок за 15 минут — без скрытых доплат.</p></div>
-        <div class="step rv"><div class="n">3</div><h3>Макет</h3><p>Готовим или проверяем макет и согласуем в течение часа.</p></div>
-        <div class="step rv"><div class="n">4</div><h3>Производство</h3><p>Запускаем в работу и присылаем фото готового изделия.</p></div>
-        <div class="step rv"><div class="n">5</div><h3>Доставка</h3><p>Привозим курьером по Москве или отдаём самовывозом.</p></div>
-      </div>
+    <h2>Как <span class="grad-text">заказать</span></h2>
+    <div class="steps">
+      <div class="step"><div class="n">1</div><h3>Заявка</h3><p>Нажмите «Рассчитать» и прикрепите фото, логотип или макет. Или напишите в мессенджер.</p></div>
+      <div class="step"><div class="n">2</div><h3>Расчёт</h3><p>Называем цену и срок за 15 минут — без скрытых доплат.</p></div>
+      <div class="step"><div class="n">3</div><h3>Макет</h3><p>Готовим или проверяем макет и согласуем в течение часа.</p></div>
+      <div class="step"><div class="n">4</div><h3>Производство</h3><p>Запускаем в работу и присылаем фото готового изделия.</p></div>
+      <div class="step"><div class="n">5</div><h3>Доставка</h3><p>Привозим курьером по Москве или отдаём самовывозом.</p></div>
     </div>
   </div>
 </section>
 
-<!-- ORDER -->
-<section id="zakaz" class="order-sec">
+<section id="o-nas" style="padding-top:20px">
   <div class="wrap">
-    <div class="order-box rv">
-      <div>
-        <h2>Рассчитаем за&nbsp;<span class="grad-text">15&nbsp;минут</span></h2>
-        <p class="lead">Опишите задачу и прикрепите фото, логотип или макет — заявка с файлами сразу придёт нам. Или напишите в мессенджер.</p>
-        <div class="contacts">
-          <a class="btn btn-violet" href="tel:+79779662521">📞 +7 977 966-25-21</a>
-          <a class="btn btn-wa" href="https://wa.me/79779662521" target="_blank" rel="noopener">Написать в WhatsApp</a>
-          <a class="btn btn-tg" href="https://t.me/+79779662521" target="_blank" rel="noopener">Написать в Telegram</a>
-          <p class="mail">или на почту <a href="mailto:timyur0530@gmail.com">timyur0530@gmail.com</a></p>
-        </div>
-      </div>
-      <form id="orderForm" novalidate>
-        <div class="lbl full">Что нужно сделать?
-          <div class="chips" id="svcChips"></div>
-        </div>
-        <label>Ваше имя<input name="name" autocomplete="name" placeholder="Как к вам обращаться"></label>
-        <label>Телефон или @Telegram *<input name="contact" autocomplete="tel" placeholder="+7 900 000-00-00" required></label>
-        <label>Тираж<input name="qty" placeholder="Например, 50 шт."></label>
-        <label>Когда нужно?
-          <select name="when">
-            <option>Срочно — завтра</option>
-            <option>За 2–3 дня</option>
-            <option>В течение недели</option>
-            <option>Сроки не горят</option>
-          </select>
-        </label>
-        <label class="full">Комментарий<textarea name="comment" placeholder="Размер, материал, цвет, количество, есть ли макет…"></textarea></label>
-        <div class="lbl full">Фото, логотип или макет
-          <div class="drop" id="drop">
-            <input type="file" id="fileInput" multiple
-              accept="image/*,.heic,.heif,.pdf,.svg,.ai,.eps,.cdr,.psd,.tif,.tiff,.stl,.obj,.3mf,.zip,.rar,.doc,.docx">
-            <div class="plus">+</div>
-            <b>Добавить файл</b>
-            <small>Перетащите сюда или нажмите · JPG, PNG, HEIC, PDF, SVG, AI, EPS, CDR, PSD, STL, ZIP · до 5 файлов, до 10 МБ</small>
-          </div>
-        </div>
-        <div class="files full" id="files"></div>
-        <input class="hp" type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true">
-        <div class="full send-row">
-          <button type="submit" class="btn btn-main" data-via="mail">Отправить заявку с файлами</button>
-          <button type="submit" class="btn btn-wa" data-via="wa">+ WhatsApp</button>
-          <button type="submit" class="btn btn-tg" data-via="tg">+ Telegram</button>
-        </div>
-        <div class="status full" id="status" role="status" aria-live="polite"></div>
-        <p class="note full">Заявка и файлы уходят нам на почту. Кнопки WhatsApp и Telegram дополнительно откроют чат с текстом заявки. Нажимая кнопку, вы соглашаетесь на обработку контактных данных для связи по заказу.</p>
-      </form>
-    </div>
-  </div>
-</section>
-
-<!-- SEO / ABOUT -->
-<section id="o-nas" data-bg="#fff8ef">
-  <div class="wrap">
-    <h2 class="rv">Типография на севере Москвы: <span class="grad-text">Коптево, Войковская</span> и вся Москва</h2>
-    <p class="lead rv">«Мира и Соломон» — современная срочная типография и мастерская печати. Делаем брендированную продукцию, подарки, мерч и упаковку от одной штуки — быстро, аккуратно и по понятной цене.</p>
+    <h2>Типография на севере Москвы: <span class="grad-text">Коптево, Войковская</span> и вся Москва</h2>
+    <p class="lead">«Мира и Соломон» — срочная типография и мастерская печати. Делаем брендированную продукцию, подарки, мерч и упаковку от одной штуки — быстро, аккуратно и по понятной цене.</p>
     <div class="seo-grid">
-      <article class="rv"><h3>Печать на футболках в Москве срочно</h3><p>Печать на футболках на заказ от 1 штуки: футболки с логотипом для команды, футболки с принтом и фото в подарок, худи и свитшоты с надписью, мерч для мероприятий. DTF-печать и термоперенос — ярко, стойко, без минимального тиража, срочно за 1 день.</p></article>
-      <article class="rv"><h3>УФ-печать (UV-печать) на любых поверхностях</h3><p>УФ-печать на дереве, металле, стекле, акриле, пластике, коже, чехлах для телефонов, значках, кнопках, ручках и флешках. Печать логотипа на сувенирах, подарочные таблички, нанесение на корпоративные подарки — фотокачество и объёмный лак.</p></article>
-      <article class="rv"><h3>3D-печать на заказ</h3><p>3D-печать фигурок, миниатюр, прототипов, деталей и запчастей, корпусов и макетов. Печатаем по вашей 3D-модели (STL, OBJ, 3MF) или моделируем по фото и эскизу. Пластики PLA, PETG, смола — подберём под задачу.</p></article>
-      <article class="rv"><h3>Объёмные наклейки и изделия из эпоксидной смолы</h3><p>Объёмные 3D-наклейки с логотипом, наклейки с эпоксидной заливкой для техники, авто и упаковки. Брелоки, значки, шильды и сувениры из эпоксидной смолы — с блёстками, цветными вставками и эффектом стекла.</p></article>
-      <article class="rv"><h3>Ростовые фигуры из ПВХ</h3><p>Ростовая фигура на заказ для фотозоны, выставки, магазина, свадьбы или дня рождения. Печать на ПВХ 3–5 мм, фигурная резка по контуру, устойчивая подставка. Изготовим ростовую фигуру человека, персонажа или промо-фигуру бренда.</p></article>
-      <article class="rv"><h3>Картонные коробки на заказ</h3><p>Картонные коробки с логотипом малым тиражом: коробки для маркетплейсов (Wildberries, Ozon), подарочные коробки, коробки для доставки и интернет-магазинов. Любой размер, печать логотипа и брендирование упаковки.</p></article>
-      <article class="rv"><h3>Визитки и полиграфия срочно</h3><p>Визитки за 1 день, листовки и флаеры, буклеты, наклейки на заказ, меню для кафе, плакаты, сертификаты и открытки. Цифровая печать малых и средних тиражей — от 1 штуки.</p></article>
-      <article class="rv"><h3>Таблички на заказ</h3><p>Таблички на дверь, офисные таблички, адресные таблички, режим работы, указатели и навигация. Акрил, пластик, композит, металл и дерево — с УФ-печатью или гравировкой.</p></article>
+      <article><h3>Печать на футболках в Москве срочно</h3><p>Печать на футболках на заказ от 1 штуки: футболки с логотипом для команды, футболки с принтом и фото в подарок, худи и свитшоты с надписью, мерч для мероприятий. DTF-печать и термоперенос — ярко, стойко, без минимального тиража, срочно за 1 день.</p></article>
+      <article><h3>УФ-печать (UV-печать) на любых поверхностях</h3><p>УФ-печать на дереве, металле, стекле, акриле, пластике, коже, чехлах для телефонов, значках, кнопках, ручках и флешках. Печать логотипа на сувенирах, подарочные таблички, нанесение на корпоративные подарки — фотокачество и объёмный лак.</p></article>
+      <article><h3>3D-печать на заказ</h3><p>3D-печать фигурок, миниатюр, прототипов, деталей и запчастей, корпусов и макетов. Печатаем по вашей 3D-модели (STL, OBJ, 3MF) или моделируем по фото и эскизу. Пластики PLA, PETG, смола — подберём под задачу.</p></article>
+      <article><h3>Объёмные наклейки и изделия из эпоксидной смолы</h3><p>Объёмные 3D-наклейки с логотипом, наклейки с эпоксидной заливкой для техники, авто и упаковки. Брелоки, значки, шильды и сувениры из эпоксидной смолы — с блёстками, цветными вставками и эффектом стекла.</p></article>
+      <article><h3>Ростовые фигуры из ПВХ</h3><p>Ростовая фигура на заказ для фотозоны, выставки, магазина, свадьбы или дня рождения. Печать на ПВХ 3–5 мм, фигурная резка по контуру, устойчивая подставка. Изготовим ростовую фигуру человека, персонажа или промо-фигуру бренда.</p></article>
+      <article><h3>Картонные коробки на заказ</h3><p>Картонные коробки с логотипом малым тиражом: коробки для маркетплейсов (Wildberries, Ozon), подарочные коробки, коробки для доставки и интернет-магазинов. Любой размер, печать логотипа и брендирование упаковки.</p></article>
+      <article><h3>Визитки и полиграфия срочно</h3><p>Визитки за 1 день, листовки и флаеры, буклеты, наклейки на заказ, меню для кафе, плакаты, сертификаты и открытки. Цифровая печать малых и средних тиражей — от 1 штуки.</p></article>
+      <article><h3>Таблички на заказ</h3><p>Таблички на дверь, офисные таблички, адресные таблички, режим работы, указатели и навигация. Акрил, пластик, композит, металл и дерево — с УФ-печатью или гравировкой.</p></article>
     </div>
-    <div class="areas rv" aria-label="Районы обслуживания">
+    <div class="areas" aria-label="Районы обслуживания">
       <span>Коптево</span><span>Войковская</span><span>Сокол</span><span>Аэропорт</span><span>Тимирязевский</span><span>Савёловский</span><span>Беговой</span><span>Головинский</span><span>Ховрино</span><span>Левобережный</span><span>Дмитровский</span><span>Бескудниковский</span><span>Западное Дегунино</span><span>Хорошёвский</span><span>Марьина Роща</span><span>Вся Москва и область</span>
     </div>
   </div>
 </section>
 
-<!-- FAQ -->
-<section id="faq" data-bg="#fdf3ff" style="padding-top:40px">
+<section id="faq" style="padding-top:20px">
   <div class="wrap">
-    <h2 class="rv">Частые <span class="grad-text">вопросы</span></h2>
+    <h2>Частые <span class="grad-text">вопросы</span></h2>
     <div class="faq">
-      <details open class="rv"><summary>Как быстро вы делаете заказ?</summary><p>Срочные заказы — от 1 дня. Визитки, футболки, УФ-печать и таблички часто готовы на следующий день, крупные тиражи и ростовые фигуры — за 2–5 дней. Точный срок называем сразу при расчёте.</p></details>
-      <details class="rv"><summary>Есть ли минимальный тираж?</summary><p>Нет, работаем от 1 штуки: одна футболка, одна табличка, одна 3D-фигурка или одна ростовая фигура.</p></details>
-      <details class="rv"><summary>У меня нет макета. Поможете?</summary><p>Да. Пришлите идею, логотип или фото прямо через форму на сайте — подготовим макет и согласуем его в течение часа.</p></details>
-      <details class="rv"><summary>В каком формате присылать файлы?</summary><p>Подойдут JPG, PNG, HEIC, WEBP, PDF, SVG, AI, EPS, CDR, PSD, STL, OBJ или ZIP-архив. Даже фото с телефона — доведём до печати.</p></details>
-      <details class="rv"><summary>Работаете с юрлицами?</summary><p>Да, работаем с юридическими и физическими лицами. Для компаний — счёт, договор и закрывающие документы, безналичная оплата.</p></details>
-      <details class="rv"><summary>Какие способы оплаты?</summary><p>Наличные, банковская карта, перевод или безналичный расчёт по счёту.</p></details>
-      <details class="rv"><summary>Как получить заказ?</summary><p>Доставка курьером по Москве и области или самовывоз на севере Москвы — район Коптево, м. Войковская, по договорённости.</p></details>
-      <details class="rv"><summary>Где заказать срочную печать на футболках на севере Москвы?</summary><p>В типографии Мира и Соломон: район Коптево, рядом с метро Войковская. Печать от 1 футболки, срочно от 1 дня, доставка по Москве.</p></details>
+      <details open><summary>Как быстро вы делаете заказ?</summary><p>Срочные заказы — от 1 дня. Визитки, футболки, УФ-печать и таблички часто готовы на следующий день, крупные тиражи и ростовые фигуры — за 2–5 дней. Точный срок называем сразу при расчёте.</p></details>
+      <details><summary>Есть ли минимальный тираж?</summary><p>Нет, работаем от 1 штуки: одна футболка, одна табличка, одна 3D-фигурка или одна ростовая фигура.</p></details>
+      <details><summary>У меня нет макета. Поможете?</summary><p>Да. Пришлите идею, логотип или фото прямо через форму на сайте — подготовим макет и согласуем его в течение часа.</p></details>
+      <details><summary>В каком формате присылать файлы?</summary><p>Подойдут JPG, PNG, HEIC, WEBP, PDF, SVG, AI, EPS, CDR, PSD, STL, OBJ или ZIP-архив. Даже фото с телефона — доведём до печати.</p></details>
+      <details><summary>Работаете с юрлицами?</summary><p>Да, работаем с юридическими и физическими лицами. Для компаний — счёт, договор и закрывающие документы, безналичная оплата.</p></details>
+      <details><summary>Какие способы оплаты?</summary><p>Наличные, банковская карта, перевод или безналичный расчёт по счёту.</p></details>
+      <details><summary>Как получить заказ?</summary><p>Доставка курьером по Москве и области или самовывоз на севере Москвы — район Коптево, м. Войковская, по договорённости.</p></details>
+      <details><summary>Где заказать срочную печать на футболках на севере Москвы?</summary><p>В типографии Мира и Соломон: район Коптево, рядом с метро Войковская. Печать от 1 футболки, срочно от 1 дня, доставка по Москве.</p></details>
     </div>
   </div>
 </section>
 
 </main>
 
-<footer>
+<footer id="kontakty">
   <div class="wrap">
-    <div class="huge">Печатаем всё.<br>Быстро.</div>
     <div class="foot">
       <div>
-        <a class="brand" href="#top"><img src="logo.svg" alt="" width="40" height="40"><span class="brand-name"><small>Типография</small>Мира&nbsp;и&nbsp;Соломон</span></a>
-        <p style="margin-top:18px;font-size:15px;max-width:380px;font-weight:600">Срочная типография на севере Москвы: печать на футболках, УФ и 3D-печать, объёмные наклейки, ростовые фигуры, коробки, визитки и таблички — от 1 штуки.</p>
+        <a class="brand" href="#top"><img src="logo.svg" alt="" width="38" height="38"><span class="brand-name"><small>Типография</small>Мира&nbsp;и&nbsp;Соломон</span></a>
+        <p style="margin-top:16px;font-size:15px;max-width:380px;font-weight:600">Срочная типография на севере Москвы: печать на футболках, УФ и 3D-печать, объёмные наклейки, ростовые фигуры, коробки, визитки и таблички — от 1 штуки.</p>
       </div>
       <div>
         <h4>Услуги</h4>
         <ul>
-          <li><a href="#uslugi">Печать на футболках</a></li>
-          <li><a href="#uslugi">УФ-печать и 3D-печать</a></li>
-          <li><a href="#uslugi">Объёмные наклейки</a></li>
-          <li><a href="#uslugi">Ростовые фигуры из ПВХ</a></li>
-          <li><a href="#uslugi">Коробки и визитки</a></li>
+          <li><a href="#top">Печать на футболках</a></li>
+          <li><a href="#top">УФ-печать и 3D-печать</a></li>
+          <li><a href="#top">Объёмные наклейки</a></li>
+          <li><a href="#top">Ростовые фигуры из ПВХ</a></li>
+          <li><a href="#top">Коробки и визитки</a></li>
         </ul>
       </div>
       <div>
@@ -813,223 +554,149 @@ footer a{text-decoration:none}footer a:hover{color:var(--yellow)}
   </div>
 </footer>
 
-<nav class="mbar" id="mbar" aria-label="Быстрая связь">
-  <a href="tel:+79779662521">Позвонить</a>
+<nav class="mbar" aria-label="Быстрая связь">
+  <button type="button" data-order>Рассчитать</button>
   <a href="https://wa.me/79779662521" target="_blank" rel="noopener">WhatsApp</a>
   <a href="https://t.me/+79779662521" target="_blank" rel="noopener">Telegram</a>
 </nav>
 
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<!-- service details -->
+<dialog id="svcDlg" aria-labelledby="svcTitle">
+  <button class="dlg-x" type="button" data-close aria-label="Закрыть">×</button>
+  <div class="dlg-head" id="svcHead">
+    <span id="svcNo" style="font-weight:800;font-size:13px;opacity:.8"></span>
+    <h2 id="svcTitle"></h2>
+    <div class="meta"><span id="svcPrice"></span><span id="svcTime"></span></div>
+  </div>
+  <div class="dlg-body">
+    <p id="svcDesc"></p>
+    <h4>Что делаем</h4>
+    <ul id="svcList"></ul>
+    <div class="dlg-actions">
+      <button class="btn btn-main" type="button" id="svcOrder">Рассчитать эту услугу</button>
+      <a class="btn btn-wa" href="https://wa.me/79779662521" target="_blank" rel="noopener">WhatsApp</a>
+      <a class="btn btn-tg" href="https://t.me/+79779662521" target="_blank" rel="noopener">Telegram</a>
+    </div>
+  </div>
+</dialog>
+
+<!-- order form -->
+<dialog id="orderDlg" aria-labelledby="orderTitle">
+  <button class="dlg-x" type="button" data-close aria-label="Закрыть">×</button>
+  <div class="order-head">
+    <h2 id="orderTitle">Рассчитаем за <span class="grad-text">15 минут</span></h2>
+    <p>Опишите задачу и прикрепите фото, логотип или макет — заявка с файлами сразу придёт нам.</p>
+  </div>
+  <form id="orderForm" novalidate>
+    <div class="lbl full">Что нужно сделать?
+      <div class="chips" id="svcChips"></div>
+    </div>
+    <label>Ваше имя<input name="name" autocomplete="name" placeholder="Как к вам обращаться"></label>
+    <label>Телефон или @Telegram *<input name="contact" autocomplete="tel" placeholder="+7 900 000-00-00" required></label>
+    <label>Тираж<input name="qty" placeholder="Например, 50 шт."></label>
+    <label>Когда нужно?
+      <select name="when">
+        <option>Срочно — завтра</option>
+        <option>За 2–3 дня</option>
+        <option>В течение недели</option>
+        <option>Сроки не горят</option>
+      </select>
+    </label>
+    <label class="full">Комментарий<textarea name="comment" placeholder="Размер, материал, цвет, количество, есть ли макет…"></textarea></label>
+    <div class="lbl full">Фото, логотип или макет
+      <div class="drop" id="drop">
+        <input type="file" id="fileInput" multiple
+          accept="image/*,.heic,.heif,.pdf,.svg,.ai,.eps,.cdr,.psd,.tif,.tiff,.stl,.obj,.3mf,.zip,.rar,.doc,.docx">
+        <div class="plus">+</div>
+        <b>Добавить файл</b>
+        <small>Перетащите сюда или нажмите · JPG, PNG, HEIC, PDF, SVG, AI, EPS, CDR, PSD, STL, ZIP · до 5 файлов, до 10 МБ</small>
+      </div>
+    </div>
+    <div class="files full" id="files"></div>
+    <input class="hp" type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <div class="full send-row">
+      <button type="submit" class="btn btn-main" data-via="mail">Отправить заявку с файлами</button>
+      <button type="submit" class="btn btn-wa" data-via="wa">+ WhatsApp</button>
+      <button type="submit" class="btn btn-tg" data-via="tg">+ Telegram</button>
+    </div>
+    <div class="status full" id="status" role="status" aria-live="polite"></div>
+    <p class="note full">Заявка и файлы уходят нам на почту. Кнопки WhatsApp и Telegram дополнительно откроют чат с текстом заявки. Нажимая кнопку, вы соглашаетесь на обработку контактных данных для связи по заказу.</p>
+  </form>
+</dialog>
 
 <script>
-/* ================= MOTION ================= */
-(function(){
-  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var fine = window.matchMedia("(pointer: fine)").matches;
-  var prog = document.getElementById("progress"), hdr = document.getElementById("hdr"), mbar = document.getElementById("mbar");
-  var lastY = 0;
-  function onScroll(){
-    var h = document.documentElement, y = window.scrollY || h.scrollTop, max = h.scrollHeight - h.clientHeight;
-    prog.style.transform = "scaleX(" + (max > 0 ? y / max : 0) + ")";
-    hdr.classList.toggle("hide", y > 400 && y > lastY + 2);
-    if (y < lastY - 2) hdr.classList.remove("hide");
-    mbar.classList.toggle("show", y > 300);
-    lastY = y;
-  }
-  window.addEventListener("scroll", onScroll, {passive:true}); onScroll();
-
-  // split hero text into chars
-  document.querySelectorAll(".split").forEach(function(el){
-    var html = "";
-    el.textContent.split(" ").forEach(function(w, wi, arr){
-      html += '<span style="display:inline-block;white-space:nowrap">';
-      for (var i = 0; i < w.length; i++) html += '<span class="ch">' + w[i] + "</span>";
-      html += "</span>" + (wi < arr.length - 1 ? " " : "");
-    });
-    el.innerHTML = html;
-  });
-
-  // ripple
-  document.addEventListener("click", function(e){
-    var b = e.target.closest(".btn"); if(!b || reduce) return;
-    var r = b.getBoundingClientRect(), s = Math.max(r.width, r.height), sp = document.createElement("span");
-    sp.className = "ripple"; sp.style.width = sp.style.height = s + "px";
-    sp.style.left = (e.clientX - r.left - s/2) + "px"; sp.style.top = (e.clientY - r.top - s/2) + "px";
-    b.appendChild(sp); setTimeout(function(){ sp.remove(); }, 700);
-  });
-
-  if (reduce || !window.gsap || !window.ScrollTrigger) return;
-  gsap.registerPlugin(ScrollTrigger);
-  document.documentElement.classList.add("anim");
-
-  // smooth scroll
-  var lenis = null;
-  if (window.Lenis) {
-    lenis = new Lenis({ lerp: 0.1, smoothWheel: true });
-    lenis.on("scroll", ScrollTrigger.update);
-    gsap.ticker.add(function(t){ lenis.raf(t * 1000); });
-    gsap.ticker.lagSmoothing(0);
-    document.querySelectorAll('a[href^="#"]').forEach(function(a){
-      a.addEventListener("click", function(e){
-        var id = a.getAttribute("href"); if (id.length < 2) return;
-        var t = document.querySelector(id); if (!t) return;
-        e.preventDefault(); lenis.scrollTo(t, { offset: -20, duration: 1.4 });
-      });
-    });
-  }
-  window.__scrollTo = function(el){ if (lenis) lenis.scrollTo(el, {offset:-20, duration:1.4}); else el.scrollIntoView({behavior:"smooth"}); };
-
-  // hero intro
-  var tl = gsap.timeline({ defaults: { ease: "expo.out" } });
-  tl.from(".hero .ch", { yPercent: 115, rotate: 12, opacity: 0, duration: 1.2, stagger: 0.035 })
-    .from(".badge", { y: -30, opacity: 0, duration: .8 }, 0.1)
-    .from(".hero .lead, .hero .cta-row", { y: 40, opacity: 0, duration: 1, stagger: .12 }, 0.6)
-    .from(".fact", { y: 60, opacity: 0, rotate: 4, duration: 1, stagger: .1 }, 0.7)
-    .from(".stk", { scale: 0, opacity: 0, duration: 1, stagger: .08, ease: "back.out(2)" }, 0.8);
-
-  // hero scroll-out + sticker parallax
-  gsap.to("#heroInner", { yPercent: -18, scale: .94, opacity: .25, ease: "none",
-    scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true } });
-  document.querySelectorAll(".stk").forEach(function(s){
-    var sp = parseFloat(s.dataset.speed || 1);
-    gsap.to(s, { y: -160 * sp, rotate: (sp % 2 ? 1 : -1) * 24, ease: "none",
-      scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true } });
-  });
-  gsap.to(".mesh", { yPercent: 25, ease: "none", scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true } });
-
-  // velocity marquee
-  var rows = [];
-  document.querySelectorAll(".vrow").forEach(function(r){
-    var dir = parseFloat(r.dataset.dir);
-    var tw = gsap.fromTo(r, { xPercent: dir < 0 ? 0 : -50 }, { xPercent: dir < 0 ? -50 : 0, duration: 28, ease: "none", repeat: -1 });
-    rows.push(tw);
-  });
-  var skewTo = gsap.quickTo(".velo .vband", "skewX", { duration: .4, ease: "power3" });
-  ScrollTrigger.create({ trigger: ".velo", start: "top bottom", end: "bottom top", onUpdate: function(self){
-    var v = self.getVelocity();
-    rows.forEach(function(tw){ gsap.to(tw, { timeScale: 1 + Math.min(Math.abs(v) / 250, 8), duration: .2, overwrite: true }); gsap.to(tw, { timeScale: 1, duration: 1.2, delay: .2 }); });
-    skewTo(gsap.utils.clamp(-12, 12, v / -120));
-  }});
-
-  var mm = gsap.matchMedia();
-  mm.add("(min-width: 900px)", function(){
-    // SPEED horizontal pin
-    var st = document.getElementById("speedTrack");
-    st.style.overflow = "visible";
-    var sTween = gsap.to(st, { x: function(){ return -(st.scrollWidth - window.innerWidth); }, ease: "none",
-      scrollTrigger: { trigger: "#sroki", pin: true, scrub: 1, end: function(){ return "+=" + (st.scrollWidth - window.innerWidth); }, invalidateOnRefresh: true } });
-    st.querySelectorAll(".panel").forEach(function(p, i){
-      if (!i) return;
-      gsap.from(p.querySelector(".num"), { scale: .4, rotate: -10, opacity: 0, ease: "back.out(1.6)",
-        scrollTrigger: { trigger: p, containerAnimation: sTween, start: "left 85%", end: "left 35%", scrub: true } });
-      gsap.from(p.querySelectorAll("h3, p"), { y: 60, opacity: 0, stagger: .1,
-        scrollTrigger: { trigger: p, containerAnimation: sTween, start: "left 70%", end: "left 30%", scrub: true } });
-      gsap.to(p.querySelectorAll(".blob"), { x: -200, ease: "none",
-        scrollTrigger: { trigger: p, containerAnimation: sTween, start: "left right", end: "right left", scrub: true } });
-    });
-
-    // SERVICES horizontal pin
-    var tr = document.getElementById("svcTrack");
-    tr.style.overflow = "visible";
-    var dist = function(){ return tr.scrollWidth - window.innerWidth; };
-    var cTween = gsap.to(tr, { x: function(){ return -dist(); }, ease: "none",
-      scrollTrigger: { trigger: "#svcPin", pin: true, scrub: 1, end: function(){ return "+=" + dist(); }, invalidateOnRefresh: true,
-        onUpdate: function(self){ document.getElementById("svcBar").style.transform = "scaleX(" + self.progress + ")"; } } });
-    tr.querySelectorAll(".card").forEach(function(c){
-      gsap.fromTo(c, { rotate: 6, y: 80 }, { rotate: 0, y: 0, ease: "none",
-        scrollTrigger: { trigger: c, containerAnimation: cTween, start: "left right", end: "left 55%", scrub: true } });
-    });
-
-    // steps line draw
-    var path = document.getElementById("stepsPath");
-    var len = path.getTotalLength();
-    gsap.set(path, { strokeDasharray: len, strokeDashoffset: len });
-    gsap.to(path, { strokeDashoffset: 0, ease: "none", scrollTrigger: { trigger: ".steps-wrap", start: "top 80%", end: "bottom 50%", scrub: true } });
-
-    return function(){ st.style.overflow = ""; tr.style.overflow = ""; };
-  });
-
-  // big text scrub
-  document.querySelectorAll(".bigtext .line").forEach(function(l){
-    var d = parseFloat(l.dataset.x);
-    gsap.fromTo(l, { xPercent: d < 0 ? 5 : -35 }, { xPercent: d < 0 ? -35 : 5, ease: "none",
-      scrollTrigger: { trigger: ".bigtext", start: "top bottom", end: "bottom top", scrub: true } });
-  });
-
-  // stacking terms
-  var terms = gsap.utils.toArray(".term");
-  terms.forEach(function(t, i){
-    gsap.from(t, { y: 120, rotate: i % 2 ? 3 : -3, ease: "power2.out", scrollTrigger: { trigger: t, start: "top bottom", end: "top 60%", scrub: true } });
-    if (i < terms.length - 1) {
-      gsap.to(t, { scale: .9, ease: "none", scrollTrigger: { trigger: terms[i + 1], start: "top 85%", end: "top 15%", scrub: true } });
-    }
-  });
-
-  // reveals
-  ScrollTrigger.batch(".rv", { start: "top 88%", once: true,
-    onEnter: function(els){ gsap.to(els, { opacity: 1, y: 0, duration: 1.1, ease: "expo.out", stagger: .09 }); } });
-
-  // background colour morph
-  document.querySelectorAll("[data-bg]").forEach(function(s){
-    ScrollTrigger.create({ trigger: s, start: "top 55%", end: "bottom 55%",
-      onToggle: function(self){ if (self.isActive) document.body.style.backgroundColor = s.dataset.bg; } });
-  });
-
-  // footer title
-  gsap.from("footer .huge", { yPercent: 40, opacity: 0, ease: "expo.out", duration: 1.4, scrollTrigger: { trigger: "footer", start: "top 80%" } });
-
-  if (fine) {
-    // custom cursor
-    var cur = document.getElementById("cursor");
-    var cx = gsap.quickTo(cur, "x", { duration: .35, ease: "power3" }), cy = gsap.quickTo(cur, "y", { duration: .35, ease: "power3" });
-    window.addEventListener("mousemove", function(e){ cx(e.clientX); cy(e.clientY); });
-    document.querySelectorAll("a, button, .card, .drop, summary, .chips label").forEach(function(el){
-      el.addEventListener("mouseenter", function(){ cur.classList.add("big"); });
-      el.addEventListener("mouseleave", function(){ cur.classList.remove("big"); });
-    });
-    // card tilt
-    document.querySelectorAll(".card").forEach(function(c){
-      c.addEventListener("mousemove", function(e){
-        var r = c.getBoundingClientRect(), x = (e.clientX - r.left)/r.width, y = (e.clientY - r.top)/r.height;
-        c.style.setProperty("--mx", x*100 + "%"); c.style.setProperty("--my", y*100 + "%");
-        gsap.to(c, { rotateX: (.5 - y) * 10, rotateY: (x - .5) * 12, transformPerspective: 900, duration: .4 });
-      });
-      c.addEventListener("mouseleave", function(){ gsap.to(c, { rotateX: 0, rotateY: 0, duration: .6, ease: "elastic.out(1,.5)" }); });
-    });
-    // magnetic buttons
-    document.querySelectorAll(".magnet").forEach(function(b){
-      b.addEventListener("mousemove", function(e){
-        var r = b.getBoundingClientRect();
-        gsap.to(b, { x: (e.clientX - r.left - r.width/2) * .25, y: (e.clientY - r.top - r.height/2) * .35, duration: .3 });
-      });
-      b.addEventListener("mouseleave", function(){ gsap.to(b, { x: 0, y: 0, duration: .7, ease: "elastic.out(1,.4)" }); });
-    });
-  }
-
-  window.addEventListener("load", function(){ ScrollTrigger.refresh(); });
-})();
-
-/* ================= FORM ================= */
 (function(){
   var PHONE = "79779662521";
   var EMAIL = "timyur0530@gmail.com";
   var MAX_FILES = 5, MAX_TOTAL = 10 * 1024 * 1024;
 
-  var services = ["Печать на футболках","УФ-печать","3D-печать","Объёмные наклейки","Изделия из эпоксидной смолы",
-    "Ростовые фигуры из ПВХ","Картонные коробки","Визитки","Таблички","Полиграфия","Другое"];
-  var box = document.getElementById("svcChips");
-  services.forEach(function(s,i){
-    box.insertAdjacentHTML("beforeend", '<input type="checkbox" id="s'+i+'" value="'+s+'"><label for="s'+i+'">'+s+'</label>');
-  });
-  document.querySelectorAll(".order[data-svc]").forEach(function(b){
-    b.addEventListener("click", function(){
-      var v = b.getAttribute("data-svc");
-      box.querySelectorAll("input").forEach(function(inp){ if(inp.value===v) inp.checked = true; });
-      var z = document.getElementById("zakaz");
-      if (window.__scrollTo) window.__scrollTo(z); else z.scrollIntoView({behavior:"smooth"});
+  var SVC = [
+    {n:"Печать на футболках", g:"g1", price:"от 450 ₽", time:"от 1 дня",
+     d:"Футболки, худи, свитшоты и шопперы с вашим логотипом, надписью или фото. Яркая стойкая печать, которая не трескается после стирок. Можно на нашей одежде или на вашей.",
+     l:["Футболки с логотипом","Принт и фото","Худи и свитшоты","Шопперы","Мерч для команды","От 1 штуки"]},
+    {n:"УФ-печать", g:"g2", price:"от 150 ₽", time:"от 1 дня",
+     d:"Печать прямо на изделии: дерево, металл, стекло, акрил, пластик, кожа. Фотокачество, белый цвет и объёмный лак.",
+     l:["Чехлы для телефонов","Значки и кнопки","Сувениры","Подарочные таблички","Ручки и флешки","Корпоративные подарки"]},
+    {n:"3D-печать", g:"g3", lt:1, price:"от 300 ₽", time:"от 1 дня",
+     d:"Печатаем по вашей 3D-модели (STL, OBJ, 3MF) или смоделируем по фото и эскизу. PLA, PETG, фотополимерная смола — подберём под задачу.",
+     l:["Фигурки и миниатюры","Прототипы","Детали и запчасти","Корпуса","Сувениры","Моделирование по фото"]},
+    {n:"Объёмные наклейки", g:"g4", lt:1, price:"от 25 ₽/шт", time:"2–3 дня",
+     d:"3D-наклейки с прозрачной полимерной заливкой: логотип становится выпуклым и блестящим. Не выгорают, не боятся воды.",
+     l:["Наклейки с логотипом","На технику и авто","На упаковку","На сувениры","Любая форма"]},
+    {n:"Изделия из эпоксидной смолы", g:"g5", price:"от 200 ₽", time:"2–4 дня",
+     d:"Брелоки, значки, шильды и подарки с эффектом стекла. Любые цвета, блёстки, вкрапления и заливка логотипов.",
+     l:["Брелоки","Значки","Шильды","Заливка логотипов","Декор и подарки"]},
+    {n:"Ростовые фигуры из ПВХ", g:"g6", lt:1, price:"от 3 500 ₽", time:"2–3 дня",
+     d:"Фигуры в полный рост: печать на ПВХ 3–5 мм, фигурная резка по контуру, устойчивая подставка. Человек, персонаж или промо-фигура бренда.",
+     l:["Фотозоны","Выставки","Магазины","Свадьбы и праздники","Промо-фигуры"]},
+    {n:"Картонные коробки", g:"g7", price:"от 60 ₽/шт", time:"от 3 дней",
+     d:"Коробки любого размера с печатью логотипа — малыми тиражами. Для доставки, подарков и товаров маркетплейсов.",
+     l:["Для Wildberries и Ozon","Подарочные","Для доставки","С логотипом","Малые тиражи"]},
+    {n:"Визитки", g:"g8", lt:1, price:"от 990 ₽", time:"от 1 дня",
+     d:"Классические и дизайнерские визитки: плотный картон, ламинация, скругление углов, выборочный лак. Срочно — за день.",
+     l:["Срочно за 1 день","Ламинация","Скругление углов","Выборочный лак","Помощь с дизайном"]},
+    {n:"Таблички", g:"g9", price:"от 450 ₽", time:"от 1 дня",
+     d:"Офисные, дверные и адресные таблички, режим работы и указатели. Акрил, пластик, композит, металл и дерево — УФ-печать или гравировка.",
+     l:["На дверь","Офисные","Адресные","Режим работы","Указатели"]},
+    {n:"Полиграфия", g:"g10", lt:1, price:"от 1 500 ₽", time:"от 1 дня",
+     d:"Цифровая печать малых и средних тиражей — от 1 штуки.",
+     l:["Листовки и флаеры","Буклеты","Наклейки","Меню","Плакаты","Сертификаты"]}
+  ];
+
+  /* ---------- dialogs ---------- */
+  var svcDlg = document.getElementById("svcDlg"), orderDlg = document.getElementById("orderDlg"), current = 0;
+  function openDlg(d){ if (typeof d.showModal === "function") d.showModal(); else d.setAttribute("open", ""); }
+  function closeDlg(d){ if (typeof d.close === "function") d.close(); else d.removeAttribute("open"); }
+  document.querySelectorAll("[data-close]").forEach(function(b){ b.addEventListener("click", function(){ closeDlg(b.closest("dialog")); }); });
+  [svcDlg, orderDlg].forEach(function(d){ d.addEventListener("click", function(e){ if (e.target === d) closeDlg(d); }); });
+
+  document.querySelectorAll(".svc[data-svc]").forEach(function(t){
+    t.addEventListener("click", function(){
+      var i = +t.getAttribute("data-svc"), s = SVC[i]; current = i;
+      var head = document.getElementById("svcHead");
+      head.className = "dlg-head " + s.g + (s.lt ? " lt" : "");
+      document.getElementById("svcNo").textContent = "Услуга " + (i < 9 ? "0" : "") + (i + 1);
+      document.getElementById("svcTitle").textContent = s.n;
+      document.getElementById("svcPrice").textContent = s.price;
+      document.getElementById("svcTime").textContent = s.time;
+      document.getElementById("svcDesc").textContent = s.d;
+      document.getElementById("svcList").innerHTML = s.l.map(function(x){ return "<li>" + x + "</li>"; }).join("");
+      openDlg(svcDlg);
     });
+  });
+
+  function openOrder(preset){
+    box.querySelectorAll("input").forEach(function(inp){ if (preset && inp.value === preset) inp.checked = true; });
+    statusEl.className = "status full";
+    openDlg(orderDlg);
+  }
+  document.getElementById("svcOrder").addEventListener("click", function(){ closeDlg(svcDlg); openOrder(SVC[current].n); });
+  document.querySelectorAll("[data-order]").forEach(function(b){ b.addEventListener("click", function(){ openOrder(); }); });
+
+  /* ---------- form ---------- */
+  var box = document.getElementById("svcChips");
+  SVC.map(function(s){ return s.n; }).concat(["Другое"]).forEach(function(s,i){
+    box.insertAdjacentHTML("beforeend", '<input type="checkbox" id="c'+i+'" value="'+s+'"><label for="c'+i+'">'+s+'</label>');
   });
 
   var picked = [], fileInput = document.getElementById("fileInput"), drop = document.getElementById("drop"), list = document.getElementById("files");
@@ -1085,7 +752,7 @@ footer a{text-decoration:none}footer a:hover{color:var(--yellow)}
     var svc = [].map.call(box.querySelectorAll("input:checked"), function(i){return i.value;});
     if (!f.contact.value.trim()) {
       f.contact.classList.add("err"); f.contact.focus();
-      setTimeout(function(){ f.contact.classList.remove("err"); }, 600);
+      setTimeout(function(){ f.contact.classList.remove("err"); }, 1500);
       say("Укажите телефон или Telegram, чтобы мы могли ответить."); return;
     }
     var text = buildText(svc, f);
