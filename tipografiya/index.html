@@ -39,7 +39,6 @@
       "logo": "https://timmir1.github.io/Game_Mira/tipografiya/logo.svg",
       "image": "https://timmir1.github.io/Game_Mira/tipografiya/logo.svg",
       "telephone": "+79779662521",
-      "email": "timyur0530@gmail.com",
       "address": {"@type": "PostalAddress", "addressLocality": "Москва", "addressCountry": "RU"},
       "areaServed": {"@type": "Country", "name": "Россия"},
       "openingHoursSpecification": {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"], "opens": "09:00", "closes": "21:00"},
@@ -377,7 +376,7 @@ textarea{min-height:80px;resize:vertical}
           <a class="btn btn-tg" href="https://t.me/+79779662521" target="_blank" rel="noopener">Telegram</a>
         </div>
         <a class="tel" href="tel:+79779662521">+7 977 966-25-21</a>
-        <span class="mail"><a href="mailto:timyur0530@gmail.com">timyur0530@gmail.com</a> · ежедневно 9:00–21:00</span>
+        <span class="mail">ежедневно 9:00–21:00</span>
       </div>
     </div>
 
@@ -513,7 +512,6 @@ textarea{min-height:80px;resize:vertical}
         <h4>Контакты</h4>
         <ul>
           <li><a href="tel:+79779662521">+7 977 966-25-21</a></li>
-          <li><a href="mailto:timyur0530@gmail.com">timyur0530@gmail.com</a></li>
           <li><a href="https://wa.me/79779662521" target="_blank" rel="noopener">WhatsApp</a> · <a href="https://t.me/+79779662521" target="_blank" rel="noopener">Telegram</a></li>
           <li>Доставка по всей России: СДЭК, Ozon, Яндекс</li>
           <li>Ежедневно 9:00–21:00</li>
@@ -591,7 +589,7 @@ textarea{min-height:80px;resize:vertical}
       <button type="submit" class="btn btn-tg" data-via="tg">+ Telegram</button>
     </div>
     <div class="status full" id="status" role="status" aria-live="polite"></div>
-    <p class="note full">Заявка и файлы уходят нам на почту. Кнопки WhatsApp и Telegram дополнительно откроют чат с текстом заявки. Нажимая кнопку, вы соглашаетесь на обработку контактных данных для связи по заказу.</p>
+    <p class="note full">Заявка и файлы приходят нам автоматически. Кнопки WhatsApp и Telegram дополнительно откроют чат с текстом заявки. Нажимая кнопку, вы соглашаетесь на обработку контактных данных для связи по заказу.</p>
   </form>
 </dialog>
 
@@ -782,10 +780,7 @@ textarea{min-height:80px;resize:vertical}
         form.reset(); box.querySelectorAll("input").forEach(function(i){ i.checked = false; }); picked = []; render();
       })
       .catch(function(){
-        say("Не удалось отправить через сайт. Напишите нам в WhatsApp или Telegram, или на почту " + EMAIL + " — приложите файлы туда.");
-        if (!chat && via === "mail") {
-          location.href = "mailto:" + EMAIL + "?subject=" + encodeURIComponent("Заявка с сайта") + "&body=" + encodeURIComponent(text);
-        }
+        say("Не удалось отправить через сайт. Напишите нам в WhatsApp или Telegram — приложите файлы туда.");
       })
       .finally(function(){ btns.forEach(function(b){ b.disabled = false; }); });
   });
